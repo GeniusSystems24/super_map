@@ -1,0 +1,59 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter_settings
+.dart_tool/
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Generated files
+*.log
+*.lock
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Generated plugin registrant
+generated_plugin_registrant.dart
+
+# Pub
+pubspec.lock
+
+# Web
+web/.dart_tool/
+
+# iOS
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+
+# Android
+android/.gradle/
+android/app/build/
+android/gradle/
+
+# Build outputs
+build/
+
+# Flutter test outputs
+coverage/
+
+# Local environment
+.env
