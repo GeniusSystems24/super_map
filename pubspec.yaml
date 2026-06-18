@@ -3,13 +3,14 @@ description: >
   Super Map — a GeniusLink design-system Flutter package providing SuperMap, a
   pannable, zoomable, draggable node-graph canvas with READ and EDIT modes:
   pan/zoom/drag/inspect in read; four-sided ports (drag to connect), add /
-  rename / re-kind / duplicate / delete nodes, edge editing, undo and JSON
-  import/export in edit. Curved/orthogonal/straight edge routing, card/chip/pill
-  node styles, a dot grid, a live minimap, a selection details panel with in/out
-  value stats, and an optional animated edge flow. Five bundled sample graphs
-  share one engine. Light/dark + LTR/RTL.
+  rename / re-kind / recolour / duplicate / delete nodes, text-labelled
+  connections, per-node notes, edge editing, undo and JSON import/export in
+  edit. Curved/orthogonal/straight edge routing, card/chip/pill node styles, a
+  dot grid, a live minimap, a selection details panel, an all-nodes data panel,
+  an optional animated edge flow, and image / PDF / Word export. Five bundled
+  sample graphs share one engine. Light/dark + LTR/RTL.
 publish_to: "none"
-version: 0.1.0
+version: 0.2.0
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -18,6 +19,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Export pipeline (v0.2.0): PDF assembly + DOCX (zip) packaging.
+  pdf: ^3.10.0
+  archive: ^3.4.0
 
 dev_dependencies:
   flutter_test:

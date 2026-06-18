@@ -3,6 +3,53 @@
 All notable changes to **super_map** are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/); versioning is [SemVer](https://semver.org/).
 
+## [0.2.0] — 2026-06-18
+
+### Added
+- **Per-node theme colour** — `MapNode.color` overrides the kind accent without
+  changing the node's semantic kind. Picked from a curated brand palette via the
+  node context menu (edit) or set programmatically with
+  `SuperMapController.setNodeColor`. `node.accentOf(theme)` resolves the
+  effective colour; serialises as `#RRGGBB`.
+- **Per-node notes** — `MapNode.note` attaches a free-text memo. Every node shows
+  a note button (filled amber when a note exists); pressing it opens a popover
+  that reads the note in read mode and edits it in edit mode. Surfaced in the
+  details panel; settable with `setNote`.
+- **Text-labelled connections** — `MapEdge.label` names a connection's meaning
+  (e.g. "Revenue", "Settles"). Rendered as a pill at the edge midpoint above any
+  numeric value; double-click an edge (or use the menu) to edit inline.
+  `startEdgeLabel` / `commitEdgeLabel` / `setEdgeLabel` on the controller.
+- **All-nodes data panel** — a new `showData` flag (and toolbar **Data** toggle)
+  renders every node's value + in/out degree inline *and* opens a scrollable
+  list of all nodes with their stats — fixing the previous behaviour where data
+  only appeared for the selected node. Tapping a row selects + centers it.
+- **In-canvas style switchers** — node-style (card / chip / pill) and
+  edge-routing (curved / orthogonal / straight) segmented controls now sit in the
+  edit toolbar, so the drawing style of the connecting lines is changeable
+  without leaving the canvas.
+- **Export** — `MapExporter` + an Export chooser produce **PNG** (RepaintBoundary
+  capture), **PDF** (`package:pdf`) and **Word .docx** (`package:archive`) from
+  the live diagram. Bytes are handed back through the new `SuperMap.onExport`
+  callback so the host owns persistence (share sheet / file / web download).
+- Five new runnable examples (`example/lib/examples/`): minimal read-only,
+  editable + export, colours/labels/notes, controller-driven, and JSON-driven.
+
+### Changed
+- The cash-flow seed now carries node values, edge labels and a note to
+  demonstrate the new fields.
+- The edge painter, minimap and details panel resolve node accents through
+  `accentOf` so custom colours apply everywhere.
+- Dependencies: added `pdf` and `archive` for the export pipeline.
+
+### Fixed
+- **Node drag is now undoable** — a single history snapshot is taken on the first
+  real move (not on a click), so dragging, deleting and duplicating all restore
+  cleanly with undo.
+- `duplicateNode` rebuilt to copy every field (including colour + note) into a
+  fresh id in one step, removing the transient duplicate-id intermediate.
+- Read-mode panning and node movement hardened against accidental
+  selection/drag conflicts.
+
 ## [0.1.0] — 2026-06-16
 
 ### Added

@@ -16,6 +16,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:super_map/super_map.dart';
 
 import '../../../../core/core.dart';
 import '../../domain/entities/map_node.dart';
@@ -25,9 +26,11 @@ import '../painters/edge_painter.dart';
 import '../painters/grid_painter.dart';
 import 'map_context_menu.dart';
 import 'map_details_panel.dart';
+import 'map_export_sheet.dart';
 import 'map_json_sheet.dart';
 import 'map_minimap.dart';
 import 'map_node_card.dart';
+import 'map_note_popover.dart';
 
 class _MenuReq {
   const _MenuReq(this.local, this.type, this.id);
@@ -45,7 +48,9 @@ class SuperMap extends StatefulWidget {
     this.showGrid = true,
     this.showMinimap = true,
     this.showEdgeLabels = true,
+    this.showData = false,
     this.animateFlow = false,
+    this.onExport,
   });
 
   final SuperMapController controller;
@@ -54,7 +59,15 @@ class SuperMap extends StatefulWidget {
   final bool showGrid;
   final bool showMinimap;
   final bool showEdgeLabels;
+
+  /// When true, every node shows its own value / connection counts inline
+  /// (v0.2.0 — not just the selected node's data). Toggleable from the toolbar.
+  final bool showData;
   final bool animateFlow;
+
+  /// Host hook to persist/share exported bytes (PNG / PDF / DOCX). When null,
+  /// the Export button is still shown but reports that no saver is wired.
+  final MapExportSaver? onExport;
 
   @override
   State<SuperMap> createState() => _SuperMapState();
@@ -62,9 +75,12 @@ class SuperMap extends StatefulWidget {
 
 class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin {
   final GlobalKey _canvasKey = GlobalKey();
+  final GlobalKey _repaintKey = GlobalKey();
   final FocusNode _focus = FocusNode();
   Size _viewport = Size.zero;
   _MenuReq? _menu;
+  String? _noteId; // node whose note popover is open
+  late bool _showData = widget.showData;
 
   // scale-gesture anchors
   Offset _startOffset = Offset.zero;
@@ -174,6 +190,25 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
     }
   }
 
+  Future<void> _openExport() async {
+    await showMapExportSheet(
+      context,
+      boundaryKey: _repaintKey,
+      title: c.seed.title,
+      onExport: (bytes, filename, format) {
+        if (widget.onExport != null) {
+          widget.onExport!(bytes, filename, format);
+        } else if (mounted) {
+          ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+            SnackBar(content: Text('Exported $filename (${bytes.length} bytes) — wire SuperMap.onExport to save it.')),
+          );
+        }
+      },
+    );
+  }
+
+  void _toggleData() => setState(() => _showData = !_showData);
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -197,23 +232,38 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
 
   // ── toolbar ──
   Widget _toolbar(SuperThemeData t) {
-    return Row(
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        _ModeToggle(
-          mode: c.mode,
-          onChanged: c.setMode,
-        ),
+        _ModeToggle(mode: c.mode, onChanged: c.setMode),
         if (c.isEdit) ...[
-          const SizedBox(width: 10),
-          Icon(Icons.info_outline_rounded, size: 13, color: t.fg3),
-          const SizedBox(width: 6),
-          Flexible(
-            child: Text('drag a side port to connect · right-click for actions',
-                maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: SuperText.caption.copyWith(fontSize: 11.5, color: t.fg3)),
+          _CanvasSeg<MapNodeStyle>(
+            value: c.nodeStyle,
+            onChanged: c.setNodeStyle,
+            options: const {
+              MapNodeStyle.card: 'Card',
+              MapNodeStyle.pill: 'Pill',
+              MapNodeStyle.chip: 'Chip',
+            },
+          ),
+          _CanvasSeg<MapEdgeStyle>(
+            value: c.edgeStyle,
+            onChanged: c.setEdgeStyle,
+            options: const {
+              MapEdgeStyle.curved: 'Curved',
+              MapEdgeStyle.orthogonal: 'Ortho',
+              MapEdgeStyle.straight: 'Straight',
+            },
           ),
         ],
-        const Spacer(),
+        SuperButton(
+          label: 'Data',
+          variant: _showData ? SuperButtonVariant.primary : SuperButtonVariant.secondary,
+          icon: const Icon(Icons.layers_outlined),
+          onPressed: _toggleData,
+        ),
         if (c.isEdit) ...[
           SuperButton(
             label: 'Add node',
@@ -224,15 +274,19 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
               c.addNodeAt(c.screenToWorld(Offset(_viewport.width / 2, _viewport.height / 2)));
             },
           ),
-          const SizedBox(width: 8),
           SuperButton(
             label: 'Undo',
             variant: SuperButtonVariant.secondary,
             icon: const Icon(Icons.undo_rounded),
             onPressed: c.undo,
           ),
-          const SizedBox(width: 8),
         ],
+        SuperButton(
+          label: 'Export',
+          variant: SuperButtonVariant.secondary,
+          icon: const Icon(Icons.ios_share_rounded),
+          onPressed: _openExport,
+        ),
         SuperButton(
           label: 'JSON',
           variant: SuperButtonVariant.secondary,
@@ -273,44 +327,47 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
                 c.zoomAround(factor, _toLocal(s.position));
               }
             },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(SuperTokens.radiusCard),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: t.bg,
-                  border: Border.all(color: accentBorder),
-                  borderRadius: BorderRadius.circular(SuperTokens.radiusCard),
-                ),
-                child: Stack(
-                  key: _canvasKey,
-                  clipBehavior: Clip.hardEdge,
-                  children: [
-                    // grid
-                    if (widget.showGrid)
+            child: RepaintBoundary(
+              key: _repaintKey,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(SuperTokens.radiusCard),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: t.bg,
+                    border: Border.all(color: accentBorder),
+                    borderRadius: BorderRadius.circular(SuperTokens.radiusCard),
+                  ),
+                  child: Stack(
+                    key: _canvasKey,
+                    clipBehavior: Clip.hardEdge,
+                    children: [
+                      // grid
+                      if (widget.showGrid)
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: GridPainter(offset: c.offset, scale: c.scale, color: t.border),
+                          ),
+                        ),
+                      // pan / zoom / tap surface (below nodes)
                       Positioned.fill(
-                        child: CustomPaint(
-                          painter: GridPainter(offset: c.offset, scale: c.scale, color: t.border),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onScaleStart: _onScaleStart,
+                          onScaleUpdate: _onScaleUpdate,
+                          onTapUp: _onTapUp,
+                          onSecondaryTapDown: (d) => _openMenuAt(d.globalPosition),
+                          onLongPressStart: (d) => _openMenuAt(d.globalPosition),
                         ),
                       ),
-                    // pan / zoom / tap surface (below nodes)
-                    Positioned.fill(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onScaleStart: _onScaleStart,
-                        onScaleUpdate: _onScaleUpdate,
-                        onTapUp: _onTapUp,
-                        onSecondaryTapDown: (d) => _openMenuAt(d.globalPosition),
-                        onLongPressStart: (d) => _openMenuAt(d.globalPosition),
-                      ),
-                    ),
-                    // edges
-                    Positioned.fill(child: IgnorePointer(child: _edgesLayer(t))),
-                    // nodes + ports + edge labels (world space)
-                    Positioned.fill(child: _worldLayer(t)),
-                    // overlays
-                    ..._overlays(t),
-                    if (_menu != null) ..._menuLayer(t),
-                  ],
+                      // edges
+                      Positioned.fill(child: IgnorePointer(child: _edgesLayer(t))),
+                      // nodes + ports + edge labels (world space)
+                      Positioned.fill(child: _worldLayer(t)),
+                      // overlays
+                      ..._overlays(t),
+                      if (_menu != null) ..._menuLayer(t),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -342,7 +399,7 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
         incident: c.incidentEdges,
         accentForEdge: (e) {
           final from = c.nodeById(e.from);
-          return (from?.kind ?? MapNodeKind.leaf).colorOf(t);
+          return from?.accentOf(t) ?? MapNodeKind.leaf.colorOf(t);
         },
         borderStrong: t.borderStrong,
         accent: SuperTokens.accent,
@@ -375,21 +432,30 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              // edge value labels
-              if (widget.showEdgeLabels)
-                for (final g in c.geometry)
-                  if (g.edge.value != null)
-                    Positioned(
-                      left: g.mid.dx,
-                      top: g.mid.dy,
-                      child: FractionalTranslation(
-                        translation: const Offset(-0.5, -0.5),
-                        child: _EdgeLabel(
-                          value: g.edge.value!,
-                          dim: selId != null && !c.incidentEdges.contains(g.edge.id),
-                        ),
-                      ),
+              // edge labels (text + value) + inline label editor
+              for (final g in c.geometry)
+                if (c.editingEdgeId == g.edge.id ||
+                    g.edge.label != null ||
+                    (widget.showEdgeLabels && g.edge.value != null))
+                  Positioned(
+                    left: g.mid.dx,
+                    top: g.mid.dy,
+                    child: FractionalTranslation(
+                      translation: const Offset(-0.5, -0.5),
+                      child: c.editingEdgeId == g.edge.id
+                          ? _EdgeLabelEditor(
+                              initial: g.edge.label ?? '',
+                              onCommit: c.commitEdgeLabel,
+                              onCancel: c.cancelEdgeLabel,
+                            )
+                          : _EdgeLabel(
+                              label: g.edge.label,
+                              value: widget.showEdgeLabels ? g.edge.value : null,
+                              dim: selId != null && !c.incidentEdges.contains(g.edge.id),
+                              onTap: c.isEdit ? () => c.startEdgeLabel(g.edge.id) : null,
+                            ),
                     ),
+                  ),
               // nodes
               for (final n in c.nodes) _nodeCard(n, selId, neighbours),
               // ports
@@ -416,6 +482,10 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
         selected: selId == n.id,
         dimmed: dim,
         editing: c.editingId == n.id,
+        showData: _showData,
+        stats: _showData ? MapLogic.statsFor(c.edges, n.id) : null,
+        showNote: c.isEdit || n.note != null,
+        onNote: () => setState(() => _noteId = n.id),
         onSelect: () => c.selectNode(n.id),
         onDragStart: c.beginNodeDrag,
         onDragUpdate: (delta) {
@@ -527,15 +597,65 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
             onRename: () => c.startRename(sel.id),
             onClone: () => c.duplicateNode(sel.id),
             onDelete: () => c.deleteNode(sel.id),
+            onNote: () => setState(() => _noteId = sel.id),
+          ),
+        ),
+      // all-nodes data panel (v0.2.0)
+      if (_showData && c.nodes.isNotEmpty)
+        PositionedDirectional(
+          top: 56,
+          start: 12,
+          child: _DataPanel(
+            controller: c,
+            maxHeight: (_viewport.height - 188).clamp(120.0, double.infinity),
+            onPick: (id) {
+              c.selectNode(id);
+              if (!_viewport.isEmpty) c.centerOn(id, _viewport);
+            },
+            onClose: _toggleData,
           ),
         ),
       // toast
       if (c.toast != null)
-        PositionedDirectional(
-          top: 56,
-          start: 12,
-          child: _Toast(message: c.toast!, tick: c.toastTick, onDone: c.clearToast),
+        Positioned(
+          top: 14,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: _Toast(message: c.toast!, tick: c.toastTick, onDone: c.clearToast),
+          ),
         ),
+      // note popover (v0.2.0)
+      if (_noteId != null && c.nodeById(_noteId!) != null) ..._notePopoverLayer(t),
+    ];
+  }
+
+  List<Widget> _notePopoverLayer(SuperThemeData t) {
+    final n = c.nodeById(_noteId!)!;
+    final size = MapLogic.sizeOf(n, c.nodeStyle);
+    final corner = c.worldToScreen(Offset(n.x + size.width / 2, n.y - size.height / 2));
+    const w = 236.0;
+    final left = (corner.dx + 6).clamp(8.0, (_viewport.width - w - 8).clamp(8.0, double.infinity));
+    final top = (corner.dy - 6).clamp(8.0, (_viewport.height - 170).clamp(8.0, double.infinity));
+    void close() => setState(() => _noteId = null);
+    return [
+      Positioned.fill(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: close,
+          onSecondaryTap: close,
+        ),
+      ),
+      Positioned(
+        left: left,
+        top: top,
+        child: MapNotePopover(
+          node: n,
+          editMode: c.isEdit,
+          onClose: close,
+          onSave: (text) => c.setNote(n.id, text),
+        ),
+      ),
     ];
   }
 
@@ -546,6 +666,8 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
     String? title;
     MapNodeKind? currentKind;
     ValueChanged<MapNodeKind>? onPickKind;
+    Color? currentColor;
+    ValueChanged<Color?>? onPickColor;
 
     void close() => setState(() => _menu = null);
 
@@ -554,12 +676,18 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
       title = n?.label ?? 'Node';
       if (c.isEdit) {
         currentKind = n?.kind;
+        currentColor = n?.color;
         onPickKind = (k) {
           c.setKind(req.id!, k);
           close();
         };
+        onPickColor = (col) {
+          c.setNodeColor(req.id!, col);
+          close();
+        };
         items.addAll([
           MapMenuItem(icon: Icons.edit_outlined, label: 'Rename', kbd: '↵', onTap: () { c.startRename(req.id!); close(); }),
+          MapMenuItem(icon: Icons.sticky_note_2_outlined, label: (n?.note != null) ? 'Edit note' : 'Add note', onTap: () { setState(() { _menu = null; _noteId = req.id; }); }),
           MapMenuItem(icon: Icons.link_rounded, label: 'Connect from here', onTap: () {
             final n2 = c.nodeById(req.id!);
             if (n2 != null) c.startLink(req.id!, NodeSide.right, n2.center, click: true);
@@ -572,14 +700,22 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
       } else {
         items.addAll([
           MapMenuItem(icon: Icons.my_location_rounded, label: 'Inspect', onTap: () { c.selectNode(req.id!); close(); }),
+          if (n?.note != null)
+            MapMenuItem(icon: Icons.sticky_note_2_outlined, label: 'View note', onTap: () { setState(() { _menu = null; _noteId = req.id; }); }),
           MapMenuItem(icon: Icons.center_focus_strong_rounded, label: 'Center on node', onTap: () { c.centerOn(req.id!, _viewport); close(); }),
         ]);
       }
     } else if (req.type == MapSelectionType.edge) {
       title = 'Connection';
-      items.add(c.isEdit
-          ? MapMenuItem(icon: Icons.delete_outline_rounded, label: 'Delete connection', danger: true, onTap: () { c.deleteEdge(req.id!); close(); })
-          : MapMenuItem(icon: Icons.my_location_rounded, label: 'Select connection', onTap: () { c.selectEdge(req.id!); close(); }));
+      if (c.isEdit) {
+        final e = c.edgeById(req.id!);
+        items.addAll([
+          MapMenuItem(icon: Icons.edit_outlined, label: (e?.label != null) ? 'Edit label' : 'Label connection', onTap: () { c.startEdgeLabel(req.id!); close(); }),
+          MapMenuItem(icon: Icons.delete_outline_rounded, label: 'Delete connection', danger: true, onTap: () { c.deleteEdge(req.id!); close(); }),
+        ]);
+      } else {
+        items.add(MapMenuItem(icon: Icons.my_location_rounded, label: 'Select connection', onTap: () { c.selectEdge(req.id!); close(); }));
+      }
     } else {
       title = 'Canvas';
       if (c.isEdit) {
@@ -611,7 +747,7 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
       Positioned(
         left: left,
         top: top,
-        child: MapContextMenu(title: title, items: items, currentKind: currentKind, onPickKind: onPickKind),
+        child: MapContextMenu(title: title, items: items, currentKind: currentKind, onPickKind: onPickKind, currentColor: currentColor, onPickColor: onPickColor),
       ),
     ];
   }
@@ -726,25 +862,292 @@ class _TitleChip extends StatelessWidget {
 }
 
 class _EdgeLabel extends StatelessWidget {
-  const _EdgeLabel({required this.value, required this.dim});
-  final double value;
+  const _EdgeLabel({this.label, this.value, required this.dim, this.onTap});
+  final String? label;
+  final double? value;
   final bool dim;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    Widget pill(Widget child) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: t.surface,
+            border: Border.all(color: t.border),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: child,
+        );
     return AnimatedOpacity(
       duration: SuperTokens.durBase,
       opacity: dim ? 0.2 : 1,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
-        decoration: BoxDecoration(
-          color: t.surface,
-          border: Border.all(color: t.border),
-          borderRadius: BorderRadius.circular(999),
+      child: MouseRegion(
+        cursor: onTap != null ? SystemMouseCursors.text : MouseCursor.defer,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          onDoubleTap: onTap,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (label != null)
+                pill(ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 168),
+                  child: Text(label!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: SuperText.caption.copyWith(
+                          fontSize: 10.5, fontWeight: FontWeight.w600, color: t.fg2)),
+                )),
+              if (label != null && value != null) const SizedBox(height: 2),
+              if (value != null)
+                pill(Text(mapCompact(value!),
+                    style: SuperText.mono.copyWith(
+                        fontSize: 10, fontWeight: FontWeight.w700, color: t.fg3))),
+            ],
+          ),
         ),
-        child: Text(mapCompact(value),
-            style: SuperText.mono.copyWith(fontSize: 10.5, fontWeight: FontWeight.w700, color: t.fg2)),
+      ),
+    );
+  }
+}
+
+/// Inline editor for an edge's text label, rendered at the edge midpoint.
+class _EdgeLabelEditor extends StatefulWidget {
+  const _EdgeLabelEditor({required this.initial, required this.onCommit, required this.onCancel});
+  final String initial;
+  final ValueChanged<String> onCommit;
+  final VoidCallback onCancel;
+
+  @override
+  State<_EdgeLabelEditor> createState() => _EdgeLabelEditorState();
+}
+
+class _EdgeLabelEditorState extends State<_EdgeLabelEditor> {
+  late final TextEditingController _ctl = TextEditingController(text: widget.initial)
+    ..selection = TextSelection(baseOffset: 0, extentOffset: widget.initial.length);
+  final FocusNode _focus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _focus.requestFocus());
+  }
+
+  @override
+  void dispose() {
+    _ctl.dispose();
+    _focus.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    return SizedBox(
+      width: 132,
+      height: 24,
+      child: TextField(
+        controller: _ctl,
+        focusNode: _focus,
+        textAlign: TextAlign.center,
+        cursorColor: SuperTokens.accent,
+        style: SuperText.body.copyWith(fontSize: 11, color: t.fg1),
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: 'Label…',
+          hintStyle: SuperText.body.copyWith(fontSize: 11, color: t.fg4),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          filled: true,
+          fillColor: t.inputBg,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(999),
+            borderSide: const BorderSide(color: SuperTokens.accent, width: 1.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(999),
+            borderSide: const BorderSide(color: SuperTokens.accent, width: 1.5),
+          ),
+        ),
+        onSubmitted: widget.onCommit,
+        onTapOutside: (_) => widget.onCommit(_ctl.text),
+      ),
+    );
+  }
+}
+
+/// A compact segmented control used in the canvas toolbar (node / edge style).
+class _CanvasSeg<T> extends StatelessWidget {
+  const _CanvasSeg({required this.value, required this.options, required this.onChanged});
+  final T value;
+  final Map<T, String> options;
+  final ValueChanged<T> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: t.inputBg,
+        border: Border.all(color: t.border),
+        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        for (final entry in options.entries)
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => onChanged(entry.key),
+            child: AnimatedContainer(
+              duration: SuperTokens.durBase,
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+              decoration: BoxDecoration(
+                color: value == entry.key ? SuperTokens.accent : const Color(0x00000000),
+                borderRadius: BorderRadius.circular(SuperTokens.radiusControl - 1),
+              ),
+              child: Text(entry.value,
+                  style: SuperText.button.copyWith(
+                      fontSize: 11.5, color: value == entry.key ? Colors.white : t.fg2)),
+            ),
+          ),
+      ]),
+    );
+  }
+}
+
+/// The all-nodes data panel (v0.2.0): a scrollable list of every node with its
+/// in/out degree and value — so all nodes' data is visible at once, not only
+/// the selected one. Tapping a row selects + centers that node.
+class _DataPanel extends StatelessWidget {
+  const _DataPanel({
+    required this.controller,
+    required this.maxHeight,
+    required this.onPick,
+    required this.onClose,
+  });
+  final SuperMapController controller;
+  final double maxHeight;
+  final ValueChanged<String> onPick;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    final c = controller;
+    return Container(
+      width: 222,
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      decoration: BoxDecoration(
+        color: Color.alphaBlend(t.surface.withOpacity(0.96), t.bg),
+        border: Border.all(color: t.borderStrong),
+        borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
+        boxShadow: t.cardShadow,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 9, 8, 9),
+            child: Row(children: [
+              const Icon(Icons.layers_outlined, size: 13, color: SuperTokens.accent),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('ALL NODES · ${c.nodes.length}',
+                    style: SuperText.label.copyWith(fontSize: 10.5, color: t.fg2)),
+              ),
+              SuperIconButton(icon: Icons.close_rounded, onPressed: onClose),
+            ]),
+          ),
+          const Hairline(),
+          Flexible(
+            child: ListView.separated(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: c.nodes.length,
+              separatorBuilder: (_, __) => const Hairline(),
+              itemBuilder: (context, i) {
+                final n = c.nodes[i];
+                final s = MapLogic.statsFor(c.edges, n.id);
+                final accent = n.accentOf(t);
+                final selected = c.selectedNodeId == n.id;
+                return _DataRow(
+                  node: n,
+                  stats: s,
+                  accent: accent,
+                  selected: selected,
+                  onTap: () => onPick(n.id),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DataRow extends StatefulWidget {
+  const _DataRow({
+    required this.node,
+    required this.stats,
+    required this.accent,
+    required this.selected,
+    required this.onTap,
+  });
+  final MapNode node;
+  final NodeStats stats;
+  final Color accent;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  State<_DataRow> createState() => _DataRowState();
+}
+
+class _DataRowState extends State<_DataRow> {
+  bool _hover = false;
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    final n = widget.node, s = widget.stats;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        child: Container(
+          color: widget.selected
+              ? t.tintFill(SuperTokens.accent, 0.10)
+              : (_hover ? t.hover : const Color(0x00000000)),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          child: Row(children: [
+            Container(width: 8, height: 8, decoration: BoxDecoration(color: widget.accent, shape: BoxShape.circle)),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(n.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: SuperText.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: t.fg1)),
+                  Text('in ${s.inCount} · out ${s.outCount}${n.note != null ? ' · note' : ''}',
+                      style: SuperText.mono.copyWith(fontSize: 9.5, color: t.fg4)),
+                ],
+              ),
+            ),
+            if (n.value != null)
+              Text(mapCompact(n.value!),
+                  style: SuperText.mono.copyWith(fontSize: 10.5, fontWeight: FontWeight.w700, color: widget.accent)),
+          ]),
+        ),
       ),
     );
   }

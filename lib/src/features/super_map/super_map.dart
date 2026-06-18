@@ -34,6 +34,8 @@ export 'presentation/widgets/map_details_panel.dart';
 export 'presentation/widgets/map_minimap.dart';
 export 'presentation/widgets/map_context_menu.dart';
 export 'presentation/widgets/map_json_sheet.dart';
+export 'presentation/widgets/map_export_sheet.dart';
+export 'presentation/widgets/map_note_popover.dart';
 export 'presentation/widgets/super_map.dart';
 
 // Presentation — pages

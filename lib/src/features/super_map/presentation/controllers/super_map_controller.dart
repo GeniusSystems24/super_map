@@ -13,7 +13,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart' show Offset, Size, Rect;
+import 'package:flutter/widgets.dart' show Offset, Size, Rect, Color;
 
 import '../../domain/entities/map_graph.dart';
 import '../../domain/entities/map_node.dart';
@@ -96,6 +96,7 @@ class SuperMapController extends ChangeNotifier {
   MapSelection? _selection;
   String? _hoverId;
   String? _editingId;
+  String? _editingEdgeId;
   LinkDraft? _link;
   String? _toast;
   int _toastTick = 0;
@@ -123,6 +124,7 @@ class SuperMapController extends ChangeNotifier {
       _selection?.type == MapSelectionType.edge ? _selection!.id : null;
   String? get hoverId => _hoverId;
   String? get editingId => _editingId;
+  String? get editingEdgeId => _editingEdgeId;
   LinkDraft? get link => _link;
   String? get toast => _toast;
 
@@ -133,6 +135,13 @@ class SuperMapController extends ChangeNotifier {
   MapNode? nodeById(String id) {
     for (final n in _nodes) {
       if (n.id == id) return n;
+    }
+    return null;
+  }
+
+  MapEdge? edgeById(String id) {
+    for (final e in _edges) {
+      if (e.id == id) return e;
     }
     return null;
   }
@@ -159,6 +168,7 @@ class SuperMapController extends ChangeNotifier {
     _edges = List<MapEdge>.from(g.edges);
     _selection = null;
     _editingId = null;
+    _editingEdgeId = null;
     _link = null;
     _history.clear();
     _pendingFit = true;
@@ -201,6 +211,7 @@ class SuperMapController extends ChangeNotifier {
     if (m == MapMode.read) {
       _link = null;
       _editingId = null;
+      _editingEdgeId = null;
     }
     notifyListeners();
   }
@@ -345,18 +356,21 @@ class SuperMapController extends ChangeNotifier {
     if (n == null) return;
     _pushHistory();
     final nid = _newId('n');
-    _nodes = [..._nodes, n.copyWith(x: n.x + 36, y: n.y + 36)];
-    // copyWith keeps the same id; rebuild with the new id explicitly:
-    _nodes[_nodes.length - 1] = MapNode(
-      id: nid,
-      x: n.x + 36,
-      y: n.y + 36,
-      label: n.label,
-      ar: n.ar,
-      sub: n.sub,
-      kind: n.kind,
-      value: n.value,
-    );
+    _nodes = [
+      ..._nodes,
+      MapNode(
+        id: nid,
+        x: n.x + 36,
+        y: n.y + 36,
+        label: n.label,
+        ar: n.ar,
+        sub: n.sub,
+        kind: n.kind,
+        value: n.value,
+        color: n.color,
+        note: n.note,
+      ),
+    ];
     _selection = MapSelection(MapSelectionType.node, nid);
     _showToast('Duplicated');
   }
@@ -372,6 +386,24 @@ class SuperMapController extends ChangeNotifier {
   void setKind(String id, MapNodeKind kind) {
     _pushHistory();
     _nodes = [for (final n in _nodes) n.id == id ? n.copyWith(kind: kind) : n];
+    notifyListeners();
+  }
+
+  /// Sets (or clears, when [color] is null) the per-node theme color (v0.2.0).
+  void setNodeColor(String id, Color? color) {
+    _pushHistory();
+    _nodes = [for (final n in _nodes) n.id == id ? n.copyWith(color: color) : n];
+    _showToast(color == null ? 'Color cleared' : 'Color set');
+  }
+
+  /// Sets (or clears, when [note] is empty/null) the per-node memo (v0.2.0).
+  void setNote(String id, String? note) {
+    final trimmed = (note ?? '').trim();
+    _pushHistory();
+    _nodes = [
+      for (final n in _nodes)
+        n.id == id ? n.copyWith(note: trimmed.isEmpty ? null : trimmed) : n
+    ];
     notifyListeners();
   }
 
@@ -416,6 +448,45 @@ class SuperMapController extends ChangeNotifier {
     _edges = _edges.where((e) => e.id != id).toList();
     _selection = null;
     _showToast('Edge removed');
+  }
+
+  // ── edge label (v0.2.0) ──
+  /// Begins inline editing of edge [id]'s text label.
+  void startEdgeLabel(String id) {
+    _selection = MapSelection(MapSelectionType.edge, id);
+    _editingEdgeId = id;
+    notifyListeners();
+  }
+
+  /// Commits the edited edge label (an empty string clears it).
+  void commitEdgeLabel(String text) {
+    final id = _editingEdgeId;
+    if (id == null) return;
+    final trimmed = text.trim();
+    _pushHistory();
+    _edges = [
+      for (final e in _edges)
+        e.id == id ? e.copyWith(label: trimmed.isEmpty ? null : trimmed) : e
+    ];
+    _editingEdgeId = null;
+    notifyListeners();
+  }
+
+  void cancelEdgeLabel() {
+    if (_editingEdgeId == null) return;
+    _editingEdgeId = null;
+    notifyListeners();
+  }
+
+  /// Directly sets edge [id]'s label without entering edit mode.
+  void setEdgeLabel(String id, String? label) {
+    final trimmed = (label ?? '').trim();
+    _pushHistory();
+    _edges = [
+      for (final e in _edges)
+        e.id == id ? e.copyWith(label: trimmed.isEmpty ? null : trimmed) : e
+    ];
+    notifyListeners();
   }
 
   // ── linking (drag a port to connect) ──

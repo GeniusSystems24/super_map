@@ -24,6 +24,7 @@ export 'usecases/usecase.dart';
 // Utils
 export 'utils/key_directions.dart';
 export 'utils/super_format.dart';
+export 'utils/map_exporter.dart';
 
 // Extensions
 export 'extensions/context_extensions.dart';

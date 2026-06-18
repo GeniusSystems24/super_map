@@ -70,6 +70,8 @@ class MapNode {
     this.sub,
     this.kind = MapNodeKind.leaf,
     this.value,
+    this.color,
+    this.note,
   });
 
   /// Stable unique id — the selection key and the edge endpoint reference.
@@ -94,8 +96,20 @@ class MapNode {
   /// Optional numeric metric (e.g. a balance) — surfaced in the details panel.
   final double? value;
 
+  /// Optional per-node theme color that overrides the [kind] accent. Lets a
+  /// single node be re-colored without changing its semantic kind (v0.2.0).
+  final Color? color;
+
+  /// Optional free-text memo attached to the node, revealed via the node's note
+  /// button and the details panel (v0.2.0).
+  final String? note;
+
   /// The world-space center as an [Offset].
   Offset get center => Offset(x, y);
+
+  /// The effective accent for this node: the custom [color] when set, otherwise
+  /// the theme-aware [kind] color.
+  Color accentOf(SuperThemeData t) => color ?? kind.colorOf(t);
 
   MapNode copyWith({
     double? x,
@@ -105,6 +119,8 @@ class MapNode {
     String? sub,
     MapNodeKind? kind,
     double? value,
+    Object? color = _unset,
+    Object? note = _unset,
   }) =>
       MapNode(
         id: id,
@@ -115,10 +131,13 @@ class MapNode {
         sub: sub ?? this.sub,
         kind: kind ?? this.kind,
         value: value ?? this.value,
+        color: color == _unset ? this.color : color as Color?,
+        note: note == _unset ? this.note : note as String?,
       );
 
   /// Serializes to the round-trippable JSON shape `{ id, x, y, label, ar?,
-  /// kind, sub?, value? }` (matches the React export).
+  /// kind, sub?, value?, color?, note? }` (matches the React export). [color]
+  /// is written as a `#RRGGBB` hex string.
   Map<String, dynamic> toJson() => {
         'id': id,
         'x': x.round(),
@@ -128,6 +147,8 @@ class MapNode {
         'kind': kind.name,
         if (sub != null) 'sub': sub,
         if (value != null) 'value': value,
+        if (color != null) 'color': _hex(color!),
+        if (note != null) 'note': note,
       };
 
   factory MapNode.fromJson(Map<String, dynamic> j) => MapNode(
@@ -139,7 +160,20 @@ class MapNode {
         sub: j['sub'] as String?,
         kind: MapNodeKind.fromName(j['kind'] as String?),
         value: (j['value'] as num?)?.toDouble(),
+        color: _parseColor(j['color']),
+        note: j['note'] as String?,
       );
+
+  static const Object _unset = Object();
+  static String _hex(Color c) =>
+      '#${(c.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
+  static Color? _parseColor(Object? v) {
+    if (v is! String || v.isEmpty) return null;
+    final s = v.startsWith('#') ? v.substring(1) : v;
+    final n = int.tryParse(s, radix: 16);
+    if (n == null) return null;
+    return Color(s.length <= 6 ? (0xFF000000 | n) : n);
+  }
 
   @override
   bool operator ==(Object other) => other is MapNode && other.id == id;
@@ -157,6 +191,7 @@ class MapEdge {
     required this.from,
     required this.to,
     this.value,
+    this.label,
   });
 
   /// Stable unique id — the selection key.
@@ -171,10 +206,25 @@ class MapEdge {
   /// Optional numeric value carried by the connection.
   final double? value;
 
+  /// Optional free-text label rendered on the connection to name its meaning
+  /// (e.g. "Revenue", "Settles") — v0.2.0.
+  final String? label;
+
+  MapEdge copyWith({Object? value = _unset, Object? label = _unset}) => MapEdge(
+        id: id,
+        from: from,
+        to: to,
+        value: value == _unset ? this.value : value as double?,
+        label: label == _unset ? this.label : label as String?,
+      );
+
+  static const Object _unset = Object();
+
   Map<String, dynamic> toJson() => {
         'from': from,
         'to': to,
         if (value != null) 'value': value,
+        if (label != null) 'label': label,
       };
 
   factory MapEdge.fromJson(Map<String, dynamic> j, {required String id}) => MapEdge(
@@ -182,6 +232,7 @@ class MapEdge {
         from: j['from'] as String,
         to: j['to'] as String,
         value: (j['value'] as num?)?.toDouble(),
+        label: j['label'] as String?,
       );
 
   @override

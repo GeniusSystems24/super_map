@@ -1,7 +1,7 @@
 name: super_map_example
 description: Runnable showcase for the super_map Flutter package.
 publish_to: "none"
-version: 0.1.0
+version: 0.2.0
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   super_map:
     path: ../
+  # Used only by the "Editable + Export" example to save/share exported bytes.
+  printing: ^5.12.0
 
 dev_dependencies:
   flutter_test:

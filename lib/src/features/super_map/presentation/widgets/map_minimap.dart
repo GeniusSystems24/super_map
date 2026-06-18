@@ -61,7 +61,7 @@ class MapMinimap extends StatelessWidget {
           selectedNodeId: selectedNodeId,
           edgeColor: t.borderStrong,
           accent: SuperTokens.accent,
-          accentForNode: (n) => n.kind.colorOf(t),
+          accentForNode: (n) => n.accentOf(t),
         ),
       ),
     );

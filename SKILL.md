@@ -4,7 +4,8 @@ description: >
   Use the super_map Flutter package to build GeniusLink design-system node-graph
   / diagram canvases — SuperMap, a pannable, zoomable, draggable graph with READ
   and EDIT modes (pan/zoom/drag/inspect; ports to connect, add/rename/re-kind/
-  duplicate/delete nodes, edge editing, undo, JSON import/export). Apply when a
+  recolour/duplicate/delete nodes, text-labelled connections, per-node notes,
+  edge editing, undo, JSON import/export, image/PDF/Word export). Apply when a
   Flutter app needs a themed (light/dark, LTR/RTL) flow map, mind-map, org /
   approval workflow, accounting-cycle, topology or any node-and-edge diagram.
 ---
@@ -82,6 +83,10 @@ Rules:
   kinds (`leaf`, `document`) resolve their color against the theme.
 - Put a `value` on a node or edge only when a number is meaningful — it surfaces
   in the details-panel stats and as an edge midpoint pill.
+- **v0.2.0 fields:** `MapNode.color` (a custom accent overriding the kind —
+  `node.accentOf(theme)` resolves it), `MapNode.note` (a free-text memo shown via
+  the node's note button), and `MapEdge.label` (text naming the connection,
+  rendered at the midpoint). All round-trip through `toJson`/`fromJson`.
 
 ## Driving it
 
@@ -100,16 +105,29 @@ SuperMap(
   showGrid: true,
   showMinimap: true,
   showEdgeLabels: true,
+  showData: false,                // every node's value+degree inline + a list panel
   animateFlow: false,             // animated dashes along edges
+  onExport: (bytes, filename, format) {  // PNG / PDF / DOCX bytes — you persist them
+    // e.g. Printing.sharePdf(bytes: bytes, filename: filename);
+  },
 );
 ```
 
 Switch styles / mode on the controller and the canvas reflows:
 `controller.setMode(MapMode.edit)`, `controller.setNodeStyle(MapNodeStyle.chip)`,
 `controller.setEdgeStyle(MapEdgeStyle.orthogonal)`. Programmatic edits:
-`addEdge`, `deleteNode`, `setKind`, `loadGraph`, `importJson(text)`,
-`exportJson()`, `undo`. Camera: `fitToView(size)`, `centerOn(id, size)`,
-`zoomAround(factor, focus)`.
+`addEdge`, `deleteNode`, `setKind`, `setNodeColor(id, color)`, `setNote(id, text)`,
+`setEdgeLabel(id, text)`, `loadGraph`, `importJson(text)`, `exportJson()`, `undo`.
+Camera: `fitToView(size)`, `centerOn(id, size)`, `zoomAround(factor, focus)`.
+
+## Export (v0.2.0)
+
+The **Export** toolbar button captures the canvas and offers PNG / PDF / Word.
+`MapExporter` does the work — `capturePng(repaintKey)`, `pngToPdf(...)`,
+`pngToDocx(...)` — and the finished bytes arrive via `SuperMap.onExport(bytes,
+filename, format)`. Persist them yourself (share sheet, file, web download); the
+`printing` package's `Printing.sharePdf(bytes:, filename:)` is the simplest
+cross-platform saver. The package depends on `pdf` + `archive` for assembly.
 
 ## Bundled seeds (fastest path)
 
@@ -121,11 +139,13 @@ cycles all five with style toggles.
 ## Interaction model (automatic)
 
 Read: drag canvas = pan · scroll / pinch = zoom · drag node = rearrange · tap =
-select + inspect · right-click / long-press = menu. Edit adds: drag a side
-**port** to connect · double-tap = inline rename · `Delete`/`Backspace` =
-remove the selection · context-menu = rename / connect / duplicate / change
-kind / delete · toolbar = Add node / Undo / JSON. Don't reimplement these — they
-ship in `SuperMap`.
+select + inspect · tap a node's note button = read its note · right-click /
+long-press = menu. Edit adds: drag a side **port** to connect · double-tap a node
+= inline rename · double-tap an edge = inline label · `Delete`/`Backspace` =
+remove the selection · context-menu = rename / note / colour / connect /
+duplicate / change kind / label / delete · toolbar = node+edge style switchers /
+Data / Add node / Undo / Export / JSON. Don't reimplement these — they ship in
+`SuperMap`.
 
 ## Reusing the geometry
 

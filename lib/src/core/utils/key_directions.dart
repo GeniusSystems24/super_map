@@ -11,6 +11,7 @@
 // ============================================================
 
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 /// Resolves a horizontal arrow [key] to a logical index *step* for text [dir].
 /// Returns `+1` / `-1` for right/left (mirrored under RTL), else `0`.

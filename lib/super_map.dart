@@ -6,10 +6,12 @@
 ///   edit  — four-sided ports (drag to connect), add / rename / re-kind /
 ///           duplicate / delete nodes, delete edges, undo, JSON import/export.
 ///
-/// Extras: right-click / long-press context menus on nodes, edges and canvas;
-/// curved / orthogonal / straight edge routing with side-anchored arrowheads;
-/// card / chip / pill node styles; a dot grid; a live minimap; a selection
-/// details panel with in/out value stats; and an optional animated edge flow.
+/// Extras: per-node theme colors and notes, text-labelled connections, an
+/// all-nodes data panel, image / PDF / Word export, right-click / long-press
+/// context menus on nodes, edges and canvas; curved / orthogonal / straight
+/// edge routing with side-anchored arrowheads; card / chip / pill node styles;
+/// a dot grid; a live minimap; a selection details panel with in/out value
+/// stats; and an optional animated edge flow.
 ///
 /// The data model (`MapNode` / `MapEdge` / `MapGraph`) is domain-neutral — the
 /// five bundled `MapGraphData` seeds (cash-flow, mind-map, approval workflow,

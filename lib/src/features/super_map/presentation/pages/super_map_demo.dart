@@ -26,6 +26,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
   late final SuperMapController _controller = SuperMapController(graph: MapGraphData.all.first);
   int _seedIndex = 0;
   bool _flow = false;
+  bool _showData = false;
 
   MapGraph get _graph => MapGraphData.all[_seedIndex];
 
@@ -89,6 +90,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
                     controller: _controller,
                     height: 560,
                     animateFlow: _flow,
+                    showData: _showData,
                   ),
                   const SizedBox(height: SuperTokens.space6),
                   _settings(t),
@@ -144,6 +146,15 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
           },
           onChanged: (v) => setState(() => _controller.setEdgeStyle(v)),
         ),
+        Row(mainAxisSize: MainAxisSize.min, children: [
+          Text('DATA', style: SuperText.label.copyWith(color: t.fg3)),
+          const SizedBox(width: SuperTokens.space2),
+          Switch(
+            value: _showData,
+            activeColor: SuperTokens.accent,
+            onChanged: (v) => setState(() => _showData = v),
+          ),
+        ]),
         Row(mainAxisSize: MainAxisSize.min, children: [
           Text('FLOW', style: SuperText.label.copyWith(color: t.fg3)),
           const SizedBox(width: SuperTokens.space2),

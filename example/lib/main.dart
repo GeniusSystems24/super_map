@@ -12,6 +12,11 @@ import 'package:flutter/material.dart';
 import 'package:super_map/super_map.dart';
 
 import 'custom_map_demo.dart';
+import 'examples/01_minimal_read.dart';
+import 'examples/02_editable_export.dart';
+import 'examples/03_styled_features.dart';
+import 'examples/04_controller_driven.dart';
+import 'examples/05_json_driven.dart';
 
 void main() => runApp(const ExampleApp());
 
@@ -82,6 +87,16 @@ class _Launcher extends StatelessWidget {
         Icons.account_tree_outlined, (_) => const SuperMapDemo()),
     _Demo('Custom Graph', 'A hand-built MapGraph wired straight into SuperMap',
         Icons.hub_outlined, (_) => const CustomMapDemo()),
+    _Demo('1 · Minimal (read)', 'The shortest path — a 3-node read-only canvas',
+        Icons.visibility_outlined, (_) => const MinimalReadExample()),
+    _Demo('2 · Editable + Export', 'Edit mode with Image / PDF / Word export wired to printing',
+        Icons.ios_share_rounded, (_) => const EditableExportExample()),
+    _Demo('3 · Colours · labels · notes', 'Per-node colours, labelled connections and notes (v0.2.0)',
+        Icons.palette_outlined, (_) => const StyledFeaturesExample()),
+    _Demo('4 · Controller-driven', 'Drive the canvas from app chrome via controller intents',
+        Icons.tune_rounded, (_) => const ControllerDrivenExample()),
+    _Demo('5 · JSON-driven', 'Parse a graph from JSON with MapGraph.fromJson',
+        Icons.data_object_rounded, (_) => const JsonDrivenExample()),
   ];
 
   @override

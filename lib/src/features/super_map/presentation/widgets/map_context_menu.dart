@@ -12,6 +12,19 @@ import 'package:flutter/material.dart';
 import '../../../../core/core.dart';
 import '../../domain/entities/map_node.dart';
 
+/// The curated per-node color palette (v0.2.0). `null` is the "Default" swatch
+/// that clears the override and falls back to the kind accent.
+const List<({String label, Color? color})> kMapNodeColors = [
+  (label: 'Default', color: null),
+  (label: 'Blue', color: Color(0xFF4A7CFF)),
+  (label: 'Green', color: Color(0xFF1DB88A)),
+  (label: 'Orange', color: Color(0xFFF97316)),
+  (label: 'Red', color: Color(0xFFEF4444)),
+  (label: 'Violet', color: Color(0xFFA855F7)),
+  (label: 'Sky', color: Color(0xFF0EA5E9)),
+  (label: 'Slate', color: Color(0xFF64748B)),
+];
+
 /// One row in a [MapContextMenu].
 class MapMenuItem extends StatefulWidget {
   const MapMenuItem({
@@ -76,6 +89,8 @@ class MapContextMenu extends StatefulWidget {
     required this.items,
     this.currentKind,
     this.onPickKind,
+    this.currentColor,
+    this.onPickColor,
   });
 
   final String? title;
@@ -85,6 +100,11 @@ class MapContextMenu extends StatefulWidget {
   final MapNodeKind? currentKind;
   final ValueChanged<MapNodeKind>? onPickKind;
 
+  /// When non-null, prepends a "Node color" expander + a swatch row (v0.2.0).
+  /// The picked value is null for "Default".
+  final Color? currentColor;
+  final ValueChanged<Color?>? onPickColor;
+
   static const double width = 200;
 
   @override
@@ -93,6 +113,7 @@ class MapContextMenu extends StatefulWidget {
 
 class _MapContextMenuState extends State<MapContextMenu> {
   bool _showKinds = false;
+  bool _showColors = false;
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +143,14 @@ class _MapContextMenuState extends State<MapContextMenu> {
               ),
             ),
           if (widget.title != null) const Hairline(),
+          if (widget.onPickColor != null) ...[
+            MapMenuItem(
+              icon: Icons.palette_outlined,
+              label: _showColors ? 'Pick a color…' : 'Node color',
+              onTap: () => setState(() => _showColors = !_showColors),
+            ),
+            if (_showColors) _colorRow(t),
+          ],
           if (widget.onPickKind != null) ...[
             MapMenuItem(
               icon: Icons.grid_view_rounded,
@@ -148,6 +177,41 @@ class _MapContextMenuState extends State<MapContextMenu> {
               kind: k,
               selected: widget.currentKind == k,
               onTap: () => widget.onPickKind!(k),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _colorRow(SuperThemeData t) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 2, 10, 8),
+      child: Wrap(
+        spacing: 7,
+        runSpacing: 7,
+        children: [
+          for (final c in kMapNodeColors)
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => widget.onPickColor!(c.color),
+              child: Tooltip(
+                message: c.label,
+                child: Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: c.color ?? t.fg3,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: widget.currentColor == c.color ? t.fg1 : t.borderStrong,
+                      width: 2,
+                    ),
+                  ),
+                  child: c.color == null
+                      ? Icon(Icons.block_rounded, size: 12, color: t.surface)
+                      : null,
+                ),
+              ),
             ),
         ],
       ),

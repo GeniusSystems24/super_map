@@ -32,6 +32,7 @@ class MapDetailsPanel extends StatelessWidget {
     required this.onRename,
     required this.onClone,
     required this.onDelete,
+    this.onNote,
   });
 
   final MapNode node;
@@ -41,11 +42,12 @@ class MapDetailsPanel extends StatelessWidget {
   final VoidCallback onRename;
   final VoidCallback onClone;
   final VoidCallback onDelete;
+  final VoidCallback? onNote;
 
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
-    final accent = node.kind.colorOf(t);
+    final accent = node.accentOf(t);
 
     return Container(
       width: 240,
@@ -127,6 +129,33 @@ class MapDetailsPanel extends StatelessWidget {
                     ],
                   ),
                 ],
+                if (node.note != null) ...[
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onNote,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: t.tintFill(SuperTokens.warning, 0.08),
+                        border: Border.all(color: t.border),
+                        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.sticky_note_2_outlined, size: 13, color: SuperTokens.warning),
+                          const SizedBox(width: 7),
+                          Expanded(
+                            child: Text(node.note!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: SuperText.caption.copyWith(fontSize: 11.5, color: t.fg2)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
                 if (editMode) ...[
                   const SizedBox(height: 12),
                   Row(
@@ -139,6 +168,11 @@ class MapDetailsPanel extends StatelessWidget {
                           onPressed: onRename,
                         ),
                       ),
+                      const SizedBox(width: 7),
+                      SuperIconButton(
+                          icon: Icons.sticky_note_2_outlined,
+                          tooltip: node.note != null ? 'Edit note' : 'Add note',
+                          onPressed: onNote ?? () {}),
                       const SizedBox(width: 7),
                       SuperIconButton(icon: Icons.copy_rounded, tooltip: 'Clone', onPressed: onClone),
                       const SizedBox(width: 7),
