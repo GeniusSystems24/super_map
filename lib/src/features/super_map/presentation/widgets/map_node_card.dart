@@ -146,7 +146,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
 
     Widget content = widget.editing ? _editor(t, accent) : _label(t, accent);
 
-    Widget card = AnimatedOpacity(
+    final card = AnimatedOpacity(
       duration: SuperTokens.durBase,
       opacity: widget.dimmed ? 0.36 : 1,
       child: Container(
@@ -166,25 +166,16 @@ class _MapNodeCardState extends State<MapNodeCard> {
             ],
             Expanded(child: content),
             if (widget.showData && !widget.editing) _dataBadge(t, accent, isChip),
+            if (widget.showNote) ...[
+              const SizedBox(width: 6),
+              _NoteButton(
+                has: widget.node.note != null,
+                onTap: () => widget.onNote?.call(),
+              ),
+            ],
           ],
         ),
       ),
-    );
-
-    final stack = Stack(
-      clipBehavior: Clip.none,
-      children: [
-        card,
-        if (widget.showNote)
-          PositionedDirectional(
-            top: -8,
-            end: -8,
-            child: _NoteButton(
-              has: widget.node.note != null,
-              onTap: () => widget.onNote?.call(),
-            ),
-          ),
-      ],
     );
 
     return MouseRegion(
@@ -200,7 +191,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
         onPanEnd: (_) => widget.onDragEnd(),
         onLongPressStart: (d) => widget.onContextMenu(d.globalPosition),
         onSecondaryTapDown: (d) => widget.onContextMenu(d.globalPosition),
-        child: stack,
+        child: card,
       ),
     );
   }
@@ -263,6 +254,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
 
     if (isChip || secondary == null) return title;
     return Column(
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [title, const SizedBox(height: 1), secondary],

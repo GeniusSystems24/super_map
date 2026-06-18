@@ -31,6 +31,9 @@ All notable changes to **super_map** are documented here. Format follows
   capture), **PDF** (`package:pdf`) and **Word .docx** (`package:archive`) from
   the live diagram. Bytes are handed back through the new `SuperMap.onExport`
   callback so the host owns persistence (share sheet / file / web download).
+- **Animated flow** now adds a pulse dot travelling source → target along each
+  connection (on top of the marching-ants dashes) when `animateFlow` is on,
+  respecting `prefers-reduced-motion`.
 - Five new runnable examples (`example/lib/examples/`): minimal read-only,
   editable + export, colours/labels/notes, controller-driven, and JSON-driven.
 

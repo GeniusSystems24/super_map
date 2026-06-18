@@ -407,6 +407,7 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
         linkTo: linkTo,
         flow: widget.animateFlow,
         dashPhase: (_flow?.value ?? 0) * 26,
+        flowT: _flow?.value ?? 0,
       ),
     );
   }
@@ -474,6 +475,8 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
     return Positioned(
       left: n.x - size.width / 2,
       top: n.y - size.height / 2,
+      width: size.width,
+      height: size.height,
       child: MapNodeCard(
         node: n,
         size: size,

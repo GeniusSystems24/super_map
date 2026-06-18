@@ -34,6 +34,7 @@ class EdgePainter extends CustomPainter {
     this.linkTo,
     this.flow = false,
     this.dashPhase = 0,
+    this.flowT = 0,
   });
 
   final List<EdgeGeometry> geometry;
@@ -54,6 +55,9 @@ class EdgePainter extends CustomPainter {
   final Offset? linkTo;
   final bool flow;
   final double dashPhase;
+
+  /// Normalised (0..1) progress used to place the travelling flow dot.
+  final double flowT;
 
   Offset _toScreen(Offset w) => w * scale + offset;
 
@@ -87,6 +91,7 @@ class EdgePainter extends CustomPainter {
 
       if (flow) {
         canvas.drawPath(_dashed(screenPath, 7 * scale, 6 * scale, dashPhase * scale), paint);
+        _flowDot(canvas, screenPath, on, color, dim);
       } else {
         canvas.drawPath(screenPath, paint);
       }
@@ -104,6 +109,20 @@ class EdgePainter extends CustomPainter {
         ..moveTo(_toScreen(linkFrom!).dx, _toScreen(linkFrom!).dy)
         ..lineTo(_toScreen(linkTo!).dx, _toScreen(linkTo!).dy);
       canvas.drawPath(_dashed(path, 5 * scale, 5 * scale, 0), p);
+    }
+  }
+
+  // a pulse dot travelling source → target along the screen path
+  void _flowDot(Canvas canvas, Path screenPath, bool on, Color color, bool dim) {
+    for (final metric in screenPath.computeMetrics()) {
+      if (metric.length <= 0) continue;
+      final tan = metric.getTangentForOffset(metric.length * (flowT % 1.0));
+      if (tan == null) continue;
+      canvas.drawCircle(
+        tan.position,
+        (on ? 3.6 : 3.0) * scale,
+        Paint()..color = color.withOpacity(dim ? 0.12 : 0.95),
+      );
     }
   }
 
@@ -156,5 +175,6 @@ class EdgePainter extends CustomPainter {
       old.edgeStyle != edgeStyle ||
       old.linkTo != linkTo ||
       old.dashPhase != dashPhase ||
+      old.flowT != flowT ||
       old.flow != flow;
 }
