@@ -5,11 +5,13 @@ A **GeniusLink design-system** Flutter package providing **`SuperMap`** — a pa
 - **read** — pan (drag empty canvas), zoom (scroll / pinch), drag nodes to rearrange, tap to select + inspect, open per-node **notes**, right-click / long-press for a context menu.
 - **edit** — everything in read, plus four-sided **connection ports** (drag to connect), **add / rename / re-kind / recolour / duplicate / delete** nodes, **text-label** connections, attach **notes**, switch node + edge styles in-canvas, **delete** edges, **undo** (depth 40), and **JSON import / export** that round-trips the whole diagram.
 
-Extras: **per-node theme colours**, **text-labelled connections**, an **all-nodes data panel** (every node's stats at once), **image / PDF / Word export**, curved / orthogonal / straight **edge routing** with side-anchored arrowheads, **card / chip / pill** node styles, a **dot grid**, a live **minimap**, a selection **details panel** with in/out value stats + a Net figure, and an optional animated **edge flow**.
+Extras: **per-node theme colours**, **text-labelled connections**, an **all-nodes data panel** (every node's stats at once), **image / PDF / Word / CSV export**, curved / orthogonal / straight **edge routing** with side-anchored arrowheads, **card / chip / pill** node styles, a **dot grid**, a live **minimap**, a selection **details panel** with in/out value stats + a Net figure, and an optional animated **edge flow**.
+
+**Built for ERP & accounting diagrams.** v1.0.0 adds a domain layer over the canvas: a workflow **status** per node (`draft → pending → approved / posted / rejected`), an **audit lock** that pins posted records, a **source-record ref** + **audit metadata** map, a per-graph **currency**, toolbar **node search**, **auto-layout** (layered / grid / radial), an audit-grade **validator** (dangling / duplicate / self-loop / orphan / cycle + a double-entry flow-balance check), and **CSV export**.
 
 The data model (`MapNode` / `MapEdge` / `MapGraph`) is **domain-neutral** — the five bundled `MapGraphData` seeds (cash-flow, mind-map, approval workflow, accounting cycle, order-to-cash) all share one engine. A faithful Dart port of the React `super-map` tool. Light + dark themes, LTR + RTL.
 
-> **0.2.0** adds per-node colours & notes, text labels on connections, an all-nodes data panel, in-canvas style switchers, and image / PDF / Word export. See the [changelog](CHANGELOG.md).
+> **1.0.0** — the ERP release: workflow status, audit locks, source refs + metadata, per-graph currency, node search, layered/grid/radial auto-layout, a graph validator (incl. double-entry balance) and CSV export. Fully backward-compatible with 0.2.0 graphs. See the [changelog](CHANGELOG.md).
 
 ---
 
@@ -58,6 +60,9 @@ SuperMap(
   showEdgeLabels: true,
   showData: false,                // show every node's value/degree inline
   animateFlow: false,
+  showSearch: true,               // toolbar node search (v1.0.0)
+  showValidate: true,             // toolbar Validate button (v1.0.0)
+  showLayout: true,               // toolbar Layout menu in edit mode (v1.0.0)
   onExport: (bytes, filename, format) { /* save / share the bytes */ },
 );
 ```
@@ -95,11 +100,64 @@ const MapGraph(
 );
 ```
 
-- `MapNode` — a card centered at world `(x, y)` with an English `label`, an optional Arabic `ar`, an optional uppercase `sub` caption, a `kind`, an optional numeric `value`, an optional per-node `color` (overrides the kind accent — **v0.2.0**), and an optional `note` memo (**v0.2.0**). World coordinates are abstract; the engine **fits them to the viewport** on load. `node.accentOf(theme)` resolves the effective colour.
+- `MapNode` — a card centered at world `(x, y)` with an English `label`, an optional Arabic `ar`, an optional uppercase `sub` caption, a `kind`, an optional numeric `value`, an optional per-node `color` (overrides the kind accent — **v0.2.0**), and an optional `note` memo (**v0.2.0**). **v1.0.0** adds a workflow `status` ([`MapNodeStatus`](#erp-layer-v100)), an audit `locked` flag, a source-record `ref` (e.g. `JV-2024-0042`) and an ordered `meta` map of audit key/values. World coordinates are abstract; the engine **fits them to the viewport** on load. `node.accentOf(theme)` resolves the effective colour.
 - `MapEdge` — a directed `from → to` connection with an optional numeric `value` and an optional text `label` naming the relationship (**v0.2.0**), both rendered at the midpoint.
+- `MapGraph` — `id`, `title`, optional `ar` / `subtitle`, a `legend`, the `nodes` + `edges`, and a `currency` code (**v1.0.0**, default `SAR`) used to format value sums.
 - `MapNodeKind` — 15 kinds (income, hub, expense, equity, topic, branch, leaf, process, role, approval, document, account, statement, party, payment), each with a brand color, an icon and a human tag. `kind.colorOf(theme)` resolves neutral kinds against the theme.
 
-Both `MapNode` and `MapGraph` round-trip via `toJson()` / `fromJson()` — the same shape the in-canvas JSON editor reads and writes (`color` serialises as `#RRGGBB`).
+Both `MapNode` and `MapGraph` round-trip via `toJson()` / `fromJson()` — the same shape the in-canvas JSON editor reads and writes (`color` serialises as `#RRGGBB`; `status`, `locked`, `ref`, `meta` and `currency` round-trip too).
+
+---
+
+## ERP layer (v1.0.0)
+
+The canvas stays domain-neutral, but these additions make it audit-grade for ledgers, settlements and approval flows.
+
+### Workflow status, locks, refs & metadata
+
+```dart
+MapNode(
+  id: 'jv', x: 0, y: 0, label: 'Journal Entry', ar: 'قيد يومية',
+  kind: MapNodeKind.document,
+  status: MapNodeStatus.posted,           // draft · pending · approved · posted · rejected · onHold
+  locked: true,                           // audit-locked: resists move / re-kind / recolour / delete
+  ref: 'JV-2024-0042',                    // source record, rendered monospace
+  meta: {'Posted': '2024-03-14', 'By': 'A. Salem'},
+  value: 5240,
+);
+```
+
+A non-`none` status draws a coloured dot on the card and a pill in the details panel; a locked node shows a lock glyph. In edit mode the details panel exposes a **status picker** and a **lock toggle**, and the controller enforces locks (`setStatus`, `setLocked`, `setRef`, `setMeta`, `isLocked`). Value sums format against the graph's `currency`.
+
+### Validation — `MapValidator`
+
+Run the audit checks over any graph; press **Validate** in the toolbar to surface them in a tappable panel.
+
+```dart
+final issues = MapValidator.validate(graph);   // List<MapIssue>, errors first
+final summary = MapValidator.summarise(graph); // counts by severity
+```
+
+Checks: **dangling edge** (missing endpoint), **duplicate node / edge id**, **self-loop**, **parallel edge**, **orphan node**, **directed cycle** (illegal in approval / accounting flows), and **flow imbalance** — a pass-through node whose incoming value sum ≠ outgoing sum beyond a tolerance (the double-entry / conservation check). Each `MapIssue` carries a `code`, `severity`, `message` and the `nodeId` / `edgeId` it anchors to.
+
+### Auto-layout — `MapLayout`
+
+Tidy a hand-built or freshly-imported diagram. Locked nodes keep their coordinates.
+
+```dart
+controller.autoLayout(const MapLayoutSpec(kind: MapLayoutKind.layered)); // layered · grid · radial
+final tidy = MapLayout.apply(graph, const MapLayoutSpec(kind: MapLayoutKind.radial, rootId: 'root'));
+```
+
+- **layered** — longest-path ranks, left→right or top→down. Best for approval chains / document flows.
+- **grid** — row-major in node order. A safe fallback for a bag of records.
+- **radial** — a root at the centre, descendants on concentric rings by BFS depth.
+
+The toolbar **Layout** button (edit mode) runs the same three.
+
+### Node search
+
+The toolbar search field filters across a node's label, Arabic name, sub-title, ref, note, kind, status and value; matches stay lit, the rest dim. Drive it from chrome with `controller.setQuery(...)`, `controller.matches`, `controller.hasQuery`, `controller.clearQuery()`.
 
 ---
 
@@ -134,9 +192,9 @@ Set them on the controller — `controller.setNodeStyle(...)`, `controller.setEd
 | Tap a node's **note** button | view note | view / edit note |
 | Drag a side **port** | — | connect to another node |
 | Right-click / long-press | inspect / center menu | full action menu (rename · note · colour · kind · label · delete) |
-| `Delete` / `Backspace` | — | delete the selection |
+| `Delete` / `Backspace` | — | delete the selection (locked nodes resist) |
 
-The **details panel** shows the selected node's kind, labels, In / Out connection counts + value sums, the Net figure, and its note; in edit mode it adds rename / note / clone / delete. Toggle **Data** in the toolbar (or `showData: true`) to surface **every** node's value + degree inline plus an all-nodes list panel — not just the selected one. The **JSON** button opens an editor over the live `{ meta, nodes, edges }` — edit and *Apply* to regenerate, or *Copy*.
+The **details panel** shows the selected node's kind, **status** + **lock** pills, labels, the source **ref**, **audit metadata** rows, In / Out connection counts + value sums (in the graph's currency), the Net figure, and its note; in edit mode it adds a status picker, a lock toggle, and rename / note / clone / delete. Toggle **Data** in the toolbar (or `showData: true`) to surface **every** node's value + degree inline plus an all-nodes list panel — not just the selected one. The toolbar also carries **Search**, **Validate** and (in edit) **Layout**. The **JSON** button opens an editor over the live `{ meta, nodes, edges }` — edit and *Apply* to regenerate, or *Copy*.
 
 ---
 
@@ -149,8 +207,9 @@ The **Export** toolbar button rasterises the canvas and offers three formats, al
 | **Image (PNG)** | a `RepaintBoundary` capture at 2.5× pixel ratio |
 | **PDF** | the PNG embedded full-bleed on an auto-orientation A4 page (`package:pdf`) |
 | **Word (.docx)** | the PNG wrapped in a minimal Office Open XML document (`package:archive`) |
+| **CSV** | `MapExporter.nodesCsv(graph)` / `edgesCsv(graph)` — RFC-4180-quoted, Arabic-safe spreadsheet tables (**v1.0.0**) |
 
-Every format returns **raw bytes** through your `onExport` callback so the package stays platform-agnostic — wire it to a share sheet, file picker or web download:
+The image formats return **raw bytes** through your `onExport` callback so the package stays platform-agnostic — wire it to a share sheet, file picker or web download:
 
 ```dart
 import 'package:printing/printing.dart';
@@ -162,7 +221,14 @@ SuperMap(
 );
 ```
 
-Or call `MapExporter` directly: `capturePng(key)`, `pngToPdf(png, …)`, `pngToDocx(png, …)`.
+For spreadsheets, call `MapExporter` directly and save the bytes (BOM-prefixed UTF-8 so Excel reads Arabic columns):
+
+```dart
+final csv   = MapExporter.nodesCsv(controller.toGraph());
+final bytes = MapExporter.csvBytes(csv); // Uint8List ready to write to a .csv
+```
+
+Or call the image helpers directly: `capturePng(key)`, `pngToPdf(png, …)`, `pngToDocx(png, …)`.
 
 ---
 
@@ -180,8 +246,8 @@ lib/
             ├── data/
             │   └── datasources/          # MapGraphData (five sample graphs)
             ├── domain/
-            │   ├── entities/             # MapNode, MapEdge, MapGraph, MapNodeKind
-            │   └── usecases/             # MapLogic (geometry, routing, bounds, stats) — pure Dart
+            │   ├── entities/             # MapNode, MapEdge, MapGraph, MapNodeKind, MapNodeStatus
+            │   └── usecases/             # MapLogic (geometry), MapValidator, MapLayout — pure Dart
             └── presentation/
                 ├── controllers/          # SuperMapController (the Model/state)
                 ├── painters/             # GridPainter, EdgePainter
@@ -197,7 +263,7 @@ lib/
 
 ## Example
 
-A runnable gallery lives in `example/` — it registers the theme extension, toggles light/dark and LTR/RTL, and links seven demos that share **one** engine:
+A runnable gallery lives in `example/` — it registers the theme extension, toggles light/dark and LTR/RTL, and links **thirteen** demos that share **one** engine:
 
 ```bash
 cd example
@@ -211,6 +277,12 @@ flutter run
 - **3 · Colours · labels · notes** — the v0.2.0 expressive features on a hand-built graph.
 - **4 · Controller-driven** — driving the canvas from app chrome via controller intents.
 - **5 · JSON-driven** — parsing a graph from a JSON string with `MapGraph.fromJson`.
+- **6 · ERP workflow** — status, audit lock, source ref + metadata and currency on a journal-entry approval chain (**v1.0.0**).
+- **7 · Validation** — a deliberately broken graph exercising every `MapValidator` check incl. the flow-balance test (**v1.0.0**).
+- **8 · Auto-layout** — layered / grid / radial via `MapLayout` (**v1.0.0**).
+- **9 · CSV export** — `MapExporter.nodesCsv` / `edgesCsv` spreadsheet output (**v1.0.0**).
+- **10 · Node search** — filter + dim a dense diagram from the toolbar (**v1.0.0**).
+- **11 · Audit locks** — pinned posted records that resist edits (**v1.0.0**).
 
 ---
 

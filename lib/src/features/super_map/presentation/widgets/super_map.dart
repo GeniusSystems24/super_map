@@ -21,6 +21,8 @@ import '../../../../../super_map.dart';
 import '../../../../core/core.dart';
 import '../../domain/entities/map_node.dart';
 import '../../domain/usecases/map_logic.dart';
+import '../../domain/usecases/map_layout.dart';
+import '../../domain/usecases/map_validator.dart';
 import '../controllers/super_map_controller.dart';
 import '../painters/edge_painter.dart';
 import '../painters/grid_painter.dart';
@@ -50,6 +52,9 @@ class SuperMap extends StatefulWidget {
     this.showEdgeLabels = true,
     this.showData = false,
     this.animateFlow = false,
+    this.showSearch = true,
+    this.showValidate = true,
+    this.showLayout = true,
     this.onExport,
   });
 
@@ -64,6 +69,18 @@ class SuperMap extends StatefulWidget {
   /// (v0.2.0 — not just the selected node's data). Toggleable from the toolbar.
   final bool showData;
   final bool animateFlow;
+
+  /// Show the toolbar node-search field (v1.0.0). Matching nodes stay lit;
+  /// non-matches dim. Set false to hide it.
+  final bool showSearch;
+
+  /// Show the toolbar Validate button (v1.0.0) — runs [MapValidator] and opens
+  /// the issues panel.
+  final bool showValidate;
+
+  /// Show the toolbar Layout menu (v1.0.0) — layered / grid / radial
+  /// auto-layout. Only meaningful in edit mode; hidden in read mode.
+  final bool showLayout;
 
   /// Host hook to persist/share exported bytes (PNG / PDF / DOCX). When null,
   /// the Export button is still shown but reports that no saver is wired.
@@ -81,6 +98,7 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
   _MenuReq? _menu;
   String? _noteId; // node whose note popover is open
   late bool _showData = widget.showData;
+  bool _showIssues = false; // validation panel open
 
   // scale-gesture anchors
   Offset _startOffset = Offset.zero;
@@ -209,6 +227,47 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
 
   void _toggleData() => setState(() => _showData = !_showData);
 
+  void _runValidate() {
+    c.validate();
+    setState(() => _showIssues = true);
+  }
+
+  Future<void> _pickLayout(Offset global) async {
+    final t = context.superTheme;
+    final kind = await showMenu<MapLayoutKind>(
+      context: context,
+      position: RelativeRect.fromLTRB(global.dx, global.dy, global.dx, global.dy),
+      color: t.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
+        side: BorderSide(color: t.borderStrong),
+      ),
+      items: [
+        for (final (k, label, sub) in const [
+          (MapLayoutKind.layered, 'Layered', 'Flow left → right'),
+          (MapLayoutKind.grid, 'Grid', 'Row-major tidy'),
+          (MapLayoutKind.radial, 'Radial', 'Rings from a root'),
+        ])
+          PopupMenuItem<MapLayoutKind>(
+            value: k,
+            height: 40,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(label, style: SuperText.button.copyWith(fontSize: 12.5, color: t.fg1)),
+                Text(sub, style: SuperText.caption.copyWith(fontSize: 10.5, color: t.fg4)),
+              ],
+            ),
+          ),
+      ],
+    );
+    if (kind != null) c.autoLayout(MapLayoutSpec(kind: kind));
+  }
+
+  // Dim a node when a search is active and it is not a match.
+  bool _searchDimmed(String id) => c.hasQuery && !c.matches.contains(id);
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -264,7 +323,38 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
           icon: const Icon(Icons.layers_outlined),
           onPressed: _toggleData,
         ),
+        if (widget.showSearch)
+          _SearchField(
+            query: c.query,
+            count: c.hasQuery ? c.matches.length : null,
+            onChanged: c.setQuery,
+            onClear: c.clearQuery,
+          ),
+        if (widget.showValidate)
+          SuperButton(
+            label: c.issues.isEmpty
+                ? 'Validate'
+                : 'Issues · ${c.validationSummary.total}',
+            variant: (c.issues.any((i) => i.isError))
+                ? SuperButtonVariant.primary
+                : SuperButtonVariant.secondary,
+            icon: const Icon(Icons.verified_outlined),
+            onPressed: _runValidate,
+          ),
         if (c.isEdit) ...[
+          if (widget.showLayout)
+            Builder(
+              builder: (btnCtx) => SuperButton(
+                label: 'Layout',
+                variant: SuperButtonVariant.secondary,
+                icon: const Icon(Icons.auto_awesome_mosaic_outlined),
+                onPressed: () {
+                  final box = btnCtx.findRenderObject() as RenderBox?;
+                  final pos = box?.localToGlobal(box.size.bottomLeft(Offset.zero)) ?? Offset.zero;
+                  _pickLayout(pos);
+                },
+              ),
+            ),
           SuperButton(
             label: 'Add node',
             variant: SuperButtonVariant.secondary,
@@ -471,7 +561,8 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
 
   Widget _nodeCard(MapNode n, String? selId, Set<String> neighbours) {
     final size = MapLogic.sizeOf(n, c.nodeStyle);
-    final dim = selId != null && selId != n.id && !neighbours.contains(n.id);
+    final dim = (selId != null && selId != n.id && !neighbours.contains(n.id)) ||
+        _searchDimmed(n.id);
     return Positioned(
       left: n.x - size.width / 2,
       top: n.y - size.height / 2,
@@ -596,11 +687,14 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
             node: sel,
             stats: stats,
             editMode: c.isEdit,
+            currency: c.seed.currency,
             onClose: c.clearSelection,
             onRename: () => c.startRename(sel.id),
             onClone: () => c.duplicateNode(sel.id),
             onDelete: () => c.deleteNode(sel.id),
             onNote: () => setState(() => _noteId = sel.id),
+            onToggleLock: () => c.setLocked(sel.id),
+            onSetStatus: (s) => c.setStatus(sel.id, s),
           ),
         ),
       // all-nodes data panel (v0.2.0)
@@ -616,6 +710,29 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
               if (!_viewport.isEmpty) c.centerOn(id, _viewport);
             },
             onClose: _toggleData,
+          ),
+        ),
+      // validation issues panel (v1.0.0)
+      if (_showIssues)
+        Positioned(
+          bottom: 12,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: _IssuesPanel(
+              issues: c.issues,
+              summary: c.validationSummary,
+              maxHeight: (_viewport.height - 120).clamp(120.0, 280.0),
+              onClose: () => setState(() => _showIssues = false),
+              onPick: (issue) {
+                if (issue.nodeId != null && c.nodeById(issue.nodeId!) != null) {
+                  c.selectNode(issue.nodeId!);
+                  if (!_viewport.isEmpty) c.centerOn(issue.nodeId!, _viewport);
+                } else if (issue.edgeId != null && c.edgeById(issue.edgeId!) != null) {
+                  c.selectEdge(issue.edgeId!);
+                }
+              },
+            ),
           ),
         ),
       // toast
@@ -1254,6 +1371,205 @@ class _ToastState extends State<_Toast> {
         const SizedBox(width: 7),
         Text(widget.message, style: SuperText.button.copyWith(fontSize: 12, color: t.bg)),
       ]),
+    );
+  }
+}
+
+/// The toolbar node-search field (v1.0.0). A compact pill input that mirrors
+/// the controller's query and shows a live match count.
+class _SearchField extends StatefulWidget {
+  const _SearchField({
+    required this.query,
+    required this.count,
+    required this.onChanged,
+    required this.onClear,
+  });
+  final String query;
+  final int? count;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+
+  @override
+  State<_SearchField> createState() => _SearchFieldState();
+}
+
+class _SearchFieldState extends State<_SearchField> {
+  late final TextEditingController _ctl = TextEditingController(text: widget.query);
+
+  @override
+  void didUpdateWidget(_SearchField old) {
+    super.didUpdateWidget(old);
+    if (widget.query != _ctl.text) _ctl.text = widget.query;
+  }
+
+  @override
+  void dispose() {
+    _ctl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    final has = widget.query.trim().isNotEmpty;
+    return Container(
+      width: 188,
+      height: 34,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: t.inputBg,
+        border: Border.all(color: has ? SuperTokens.accent : t.border),
+        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+      ),
+      child: Row(children: [
+        Icon(Icons.search_rounded, size: 15, color: has ? SuperTokens.accent : t.fg3),
+        const SizedBox(width: 7),
+        Expanded(
+          child: TextField(
+            controller: _ctl,
+            cursorColor: SuperTokens.accent,
+            style: SuperText.body.copyWith(fontSize: 12.5, color: t.fg1),
+            decoration: InputDecoration(
+              isDense: true,
+              isCollapsed: true,
+              border: InputBorder.none,
+              hintText: 'Search nodes…',
+              hintStyle: SuperText.body.copyWith(fontSize: 12.5, color: t.fg4),
+            ),
+            onChanged: widget.onChanged,
+          ),
+        ),
+        if (has) ...[
+          Text('${widget.count ?? 0}',
+              style: SuperText.mono.copyWith(fontSize: 10.5, color: t.fg3)),
+          const SizedBox(width: 4),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              _ctl.clear();
+              widget.onClear();
+            },
+            child: Icon(Icons.close_rounded, size: 14, color: t.fg3),
+          ),
+        ],
+      ]),
+    );
+  }
+}
+
+/// The validation issues panel (v1.0.0). Lists [MapValidator] findings grouped
+/// error → warning → info, each tappable to select / center the offending node
+/// or edge.
+class _IssuesPanel extends StatelessWidget {
+  const _IssuesPanel({
+    required this.issues,
+    required this.summary,
+    required this.maxHeight,
+    required this.onClose,
+    required this.onPick,
+  });
+  final List<MapIssue> issues;
+  final MapValidationSummary summary;
+  final double maxHeight;
+  final VoidCallback onClose;
+  final ValueChanged<MapIssue> onPick;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    return Container(
+      width: 380,
+      constraints: BoxConstraints(maxHeight: maxHeight, maxWidth: 380),
+      decoration: BoxDecoration(
+        color: Color.alphaBlend(t.surface.withOpacity(0.97), t.bg),
+        border: Border.all(color: t.borderStrong),
+        borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
+        boxShadow: t.cardShadow,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(13, 9, 8, 9),
+            child: Row(children: [
+              Icon(summary.isClean ? Icons.verified_rounded : Icons.report_problem_outlined,
+                  size: 14, color: summary.isClean ? SuperTokens.success : SuperTokens.warning),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  summary.isClean
+                      ? 'VALIDATION PASSED'
+                      : 'ISSUES · ${summary.errors} ERR · ${summary.warnings} WARN · ${summary.infos} INFO',
+                  style: SuperText.label.copyWith(fontSize: 10, color: t.fg2),
+                ),
+              ),
+              SuperIconButton(icon: Icons.close_rounded, onPressed: onClose),
+            ]),
+          ),
+          const Hairline(),
+          if (issues.isEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(13, 14, 13, 16),
+              child: Text('No problems found. The diagram is structurally sound.',
+                  style: SuperText.caption.copyWith(fontSize: 12, color: t.fg3)),
+            )
+          else
+            Flexible(
+              child: ListView.separated(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                itemCount: issues.length,
+                separatorBuilder: (_, __) => const Hairline(),
+                itemBuilder: (context, i) => _IssueRow(issue: issues[i], onTap: () => onPick(issues[i])),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IssueRow extends StatefulWidget {
+  const _IssueRow({required this.issue, required this.onTap});
+  final MapIssue issue;
+  final VoidCallback onTap;
+  @override
+  State<_IssueRow> createState() => _IssueRowState();
+}
+
+class _IssueRowState extends State<_IssueRow> {
+  bool _hover = false;
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    final (icon, color) = switch (widget.issue.severity) {
+      MapIssueSeverity.error => (Icons.error_outline_rounded, SuperTokens.danger),
+      MapIssueSeverity.warning => (Icons.warning_amber_rounded, SuperTokens.warning),
+      MapIssueSeverity.info => (Icons.info_outline_rounded, SuperTokens.accent),
+    };
+    final tappable = widget.issue.nodeId != null || widget.issue.edgeId != null;
+    return MouseRegion(
+      cursor: tappable ? SystemMouseCursors.click : MouseCursor.defer,
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: tappable ? widget.onTap : null,
+        child: Container(
+          color: _hover && tappable ? t.hover : const Color(0x00000000),
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Padding(padding: const EdgeInsets.only(top: 1), child: Icon(icon, size: 14, color: color)),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Text(widget.issue.message,
+                  style: SuperText.caption.copyWith(fontSize: 11.5, color: t.fg2, height: 1.3)),
+            ),
+          ]),
+        ),
+      ),
     );
   }
 }

@@ -17,6 +17,8 @@ export 'domain/entities/map_graph.dart';
 
 // Domain — usecases
 export 'domain/usecases/map_logic.dart';
+export 'domain/usecases/map_validator.dart';
+export 'domain/usecases/map_layout.dart';
 
 // Data — sample datasource
 export 'data/datasources/map_graph_data.dart';

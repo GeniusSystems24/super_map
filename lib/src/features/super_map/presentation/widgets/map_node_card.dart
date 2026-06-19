@@ -165,6 +165,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
               const SizedBox(width: 9),
             ],
             Expanded(child: content),
+            if (!widget.editing) _statusLock(t),
             if (widget.showData && !widget.editing) _dataBadge(t, accent, isChip),
             if (widget.showNote) ...[
               const SizedBox(width: 6),
@@ -192,6 +193,40 @@ class _MapNodeCardState extends State<MapNodeCard> {
         onLongPressStart: (d) => widget.onContextMenu(d.globalPosition),
         onSecondaryTapDown: (d) => widget.onContextMenu(d.globalPosition),
         child: card,
+      ),
+    );
+  }
+
+  // Small workflow-status dot + audit-lock glyph cluster (v1.0.0). Renders
+  // nothing when the node is in the default state and unlocked.
+  Widget _statusLock(SuperThemeData t) {
+    final node = widget.node;
+    final showStatus = !node.status.isNone;
+    if (!showStatus && !node.locked) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(left: 6),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (showStatus)
+            Tooltip(
+              message: node.status.tag,
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: node.status.colorOf(t),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          if (showStatus && node.locked) const SizedBox(width: 5),
+          if (node.locked)
+            Tooltip(
+              message: 'Locked',
+              child: Icon(Icons.lock_rounded, size: 13, color: t.fg3),
+            ),
+        ],
       ),
     );
   }

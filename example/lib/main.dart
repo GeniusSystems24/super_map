@@ -17,6 +17,12 @@ import 'examples/02_editable_export.dart';
 import 'examples/03_styled_features.dart';
 import 'examples/04_controller_driven.dart';
 import 'examples/05_json_driven.dart';
+import 'examples/06_erp_workflow.dart';
+import 'examples/07_validation.dart';
+import 'examples/08_auto_layout.dart';
+import 'examples/09_csv_export.dart';
+import 'examples/10_search.dart';
+import 'examples/11_audit_locks.dart';
 
 void main() => runApp(const ExampleApp());
 
@@ -97,6 +103,18 @@ class _Launcher extends StatelessWidget {
         Icons.tune_rounded, (_) => const ControllerDrivenExample()),
     _Demo('5 · JSON-driven', 'Parse a graph from JSON with MapGraph.fromJson',
         Icons.data_object_rounded, (_) => const JsonDrivenExample()),
+    _Demo('6 · ERP workflow', 'Status, audit lock, source ref + metadata, currency (v1.0.0)',
+        Icons.fact_check_outlined, (_) => const ErpWorkflowExample()),
+    _Demo('7 · Validation', 'MapValidator — dangling / cycle / orphan + flow balance (v1.0.0)',
+        Icons.verified_outlined, (_) => const ValidationExample()),
+    _Demo('8 · Auto-layout', 'Layered / grid / radial via MapLayout (v1.0.0)',
+        Icons.auto_awesome_mosaic_outlined, (_) => const AutoLayoutExample()),
+    _Demo('9 · CSV export', 'Nodes / edges spreadsheet tables via MapExporter (v1.0.0)',
+        Icons.table_chart_outlined, (_) => const CsvExportExample()),
+    _Demo('10 · Node search', 'Filter + dim a dense diagram from the toolbar (v1.0.0)',
+        Icons.search_rounded, (_) => const SearchExample()),
+    _Demo('11 · Audit locks', 'Pinned posted records that resist edits (v1.0.0)',
+        Icons.lock_outline_rounded, (_) => const AuditLocksExample()),
   ];
 
   @override

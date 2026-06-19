@@ -3,6 +3,57 @@
 All notable changes to **super_map** are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/); versioning is [SemVer](https://semver.org/).
 
+## [1.0.0] — 2026-06-19
+
+The **ERP release** — a domain layer over the node-graph canvas for audit-grade
+ledger, settlement and approval diagrams. Fully backward-compatible: every
+0.2.0 graph, controller call and widget keeps working unchanged.
+
+### Added
+- **Workflow status** — `MapNode.status` (`MapNodeStatus`: none · draft · pending
+  · approved · posted · rejected · onHold) tracks where a record stands in a
+  process, independent of its semantic `kind`. A coloured status dot appears on
+  the card and a status pill in the details panel; edit mode gets an inline
+  status picker. Set with `SuperMapController.setStatus`.
+- **Audit locks** — `MapNode.locked` pins a posted/approved record: the
+  controller refuses to move, re-kind, recolour, re-ref or delete it and toasts
+  "Node is locked". The card shows a lock glyph; the details panel shows a
+  Locked pill and a lock toggle. `setLocked` / `isLocked` on the controller.
+- **Source refs & audit metadata** — `MapNode.ref` (e.g. `JV-2024-0042`, rendered
+  monospace) ties a node to its source ERP record; `MapNode.meta` is an ordered
+  key→value map surfaced as rows in the details panel. `setRef` / `setMeta`.
+- **Per-graph currency** — `MapGraph.currency` (default `SAR`) formats every
+  value sum in the details panel and CSV export; round-trips through JSON `meta`.
+- **`MapValidator`** — an audit-grade graph validator (pure Dart). Detects
+  dangling edges, duplicate node/edge ids, self-loops, parallel edges, orphan
+  nodes, **directed cycles**, and **flow imbalance** (a pass-through node whose
+  incoming value sum ≠ outgoing sum — the double-entry/conservation check).
+  Returns ordered `MapIssue`s (errors first); `validate()` / `summarise()`. The
+  toolbar **Validate** button opens a tappable issues panel that jumps to the
+  offending node/edge.
+- **`MapLayout`** — deterministic auto-layout (pure Dart): **layered** (longest-
+  path ranks, L→R or T→B), **grid** (row-major) and **radial** (BFS rings from a
+  root). Locked nodes keep their coordinates. `controller.autoLayout(spec)` and
+  the edit-toolbar **Layout** menu.
+- **Node search** — a toolbar search field filters across a node's label, Arabic
+  name, sub, ref, note, kind, status and value; matches stay lit, the rest dim.
+  `setQuery` / `matches` / `hasQuery` / `clearQuery` on the controller; toggle
+  with `SuperMap(showSearch: …)`.
+- **CSV export** — `MapExporter.nodesCsv(graph)` and `edgesCsv(graph)` emit
+  RFC-4180-quoted, Arabic-safe spreadsheet tables; `csvBytes(csv)` wraps a string
+  as BOM-prefixed UTF-8. `MapExportFormat.csv` joins the format enum.
+- **Six new examples** — `06_erp_workflow`, `07_validation`, `08_auto_layout`,
+  `09_csv_export`, `10_search`, `11_audit_locks` — registered in the gallery.
+
+### Changed
+- `MapNode.copyWith` / `toJson` / `fromJson` carry the new `status`, `locked`,
+  `ref` and `meta` fields (all optional; omitted when default).
+- `MapGraph.toJson` writes `meta.currency`; `fromJson` reads it.
+- The details panel takes a `currency` and optional `onToggleLock` /
+  `onSetStatus` hooks (defaulted, so existing call sites are unaffected).
+- `SuperMap` gains `showSearch`, `showValidate`, `showLayout` flags (all
+  default `true`).
+
 ## [0.2.0] — 2026-06-18
 
 ### Added

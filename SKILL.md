@@ -5,9 +5,13 @@ description: >
   / diagram canvases — SuperMap, a pannable, zoomable, draggable graph with READ
   and EDIT modes (pan/zoom/drag/inspect; ports to connect, add/rename/re-kind/
   recolour/duplicate/delete nodes, text-labelled connections, per-node notes,
-  edge editing, undo, JSON import/export, image/PDF/Word export). Apply when a
-  Flutter app needs a themed (light/dark, LTR/RTL) flow map, mind-map, org /
-  approval workflow, accounting-cycle, topology or any node-and-edge diagram.
+  edge editing, undo, JSON import/export, image/PDF/Word/CSV export). v1.0.0 adds
+  an ERP layer: workflow status, audit locks, source refs + metadata, per-graph
+  currency, node search, layered/grid/radial auto-layout (MapLayout) and an
+  audit-grade validator (MapValidator, incl. double-entry flow-balance). Apply
+  when a Flutter app needs a themed (light/dark, LTR/RTL) flow map, mind-map,
+  org / approval workflow, journal-entry / ledger, settlement, accounting-cycle,
+  topology or any node-and-edge diagram.
 ---
 
 # Super Map — Agent Skill
@@ -87,6 +91,33 @@ Rules:
   `node.accentOf(theme)` resolves it), `MapNode.note` (a free-text memo shown via
   the node's note button), and `MapEdge.label` (text naming the connection,
   rendered at the midpoint). All round-trip through `toJson`/`fromJson`.
+- **v1.0.0 ERP fields:** `MapNode.status` (`MapNodeStatus` — draft/pending/
+  approved/posted/rejected/onHold; a status dot + details pill), `MapNode.locked`
+  (audit lock — the controller refuses move/edit/delete), `MapNode.ref` (source
+  record id, monospace), `MapNode.meta` (ordered audit key→value rows), and
+  `MapGraph.currency` (default `SAR`, formats value sums). All round-trip too.
+
+## ERP layer (v1.0.0)
+
+Make an ERP/accounting diagram audit-grade with the domain additions:
+
+- **Status & locks** — set `status:` / `locked:` on a node, or call
+  `controller.setStatus(id, MapNodeStatus.posted)` / `setLocked(id)` /
+  `setRef(id, 'JV-2024-0042')` / `setMeta(id, {...})`. Locked nodes resist every
+  mutating intent. The details panel shows a status picker + lock toggle in edit
+  mode.
+- **Validation** — `MapValidator.validate(graph)` returns ordered `MapIssue`s
+  (errors first): dangling/duplicate/self-loop/parallel edges, orphan nodes,
+  **directed cycles**, and **flow imbalance** (in-sum ≠ out-sum — the double-entry
+  check). `summarise(graph)` for counts. The toolbar **Validate** button opens a
+  tappable issues panel; tapping a row jumps to the node/edge.
+- **Auto-layout** — `controller.autoLayout(MapLayoutSpec(kind: MapLayoutKind.
+  layered))` (or `grid` / `radial`), or `MapLayout.apply(graph, spec)` purely.
+  Locked nodes keep their position. The edit toolbar has a **Layout** menu.
+- **Search** — `controller.setQuery('payroll')` (or the toolbar field) lights
+  matches and dims the rest; read `matches` / `hasQuery`, call `clearQuery()`.
+- **CSV** — `MapExporter.nodesCsv(graph)` / `edgesCsv(graph)` →
+  `MapExporter.csvBytes(csv)` for a BOM-prefixed UTF-8 `.csv`.
 
 ## Driving it
 
@@ -117,10 +148,12 @@ Switch styles / mode on the controller and the canvas reflows:
 `controller.setMode(MapMode.edit)`, `controller.setNodeStyle(MapNodeStyle.chip)`,
 `controller.setEdgeStyle(MapEdgeStyle.orthogonal)`. Programmatic edits:
 `addEdge`, `deleteNode`, `setKind`, `setNodeColor(id, color)`, `setNote(id, text)`,
-`setEdgeLabel(id, text)`, `loadGraph`, `importJson(text)`, `exportJson()`, `undo`.
+`setEdgeLabel(id, text)`, `setStatus(id, status)`, `setLocked(id)`, `setRef(id, ref)`,
+`setMeta(id, map)`, `autoLayout(spec)`, `validate()`, `setQuery(q)`, `loadGraph`,
+`importJson(text)`, `exportJson()`, `undo`.
 Camera: `fitToView(size)`, `centerOn(id, size)`, `zoomAround(factor, focus)`.
 
-## Export (v0.2.0)
+## Export (v0.2.0 + v1.0.0)
 
 The **Export** toolbar button captures the canvas and offers PNG / PDF / Word.
 `MapExporter` does the work — `capturePng(repaintKey)`, `pngToPdf(...)`,
@@ -128,6 +161,9 @@ The **Export** toolbar button captures the canvas and offers PNG / PDF / Word.
 filename, format)`. Persist them yourself (share sheet, file, web download); the
 `printing` package's `Printing.sharePdf(bytes:, filename:)` is the simplest
 cross-platform saver. The package depends on `pdf` + `archive` for assembly.
+**v1.0.0** adds spreadsheet output — `MapExporter.nodesCsv(graph)` /
+`edgesCsv(graph)` return RFC-4180-quoted, Arabic-safe CSV text; wrap with
+`csvBytes(csv)` and write a `.csv`.
 
 ## Bundled seeds (fastest path)
 
@@ -151,16 +187,20 @@ Data / Add node / Undo / Export / JSON. Don't reimplement these — they ship in
 
 `MapLogic` is pure and widget-free — reuse it outside the widget for layout or
 export: `sizeOf`, `sideAnchor`, `buildPath`, `geometry`, `bounds`, `neighbours`,
-`incidentEdges`, `statsFor`, `nodeAt`, `distanceToPath`.
+`incidentEdges`, `statsFor`, `nodeAt`, `distanceToPath`. `MapValidator` and
+`MapLayout` (v1.0.0) are likewise pure — validate or auto-place a graph with no
+widget in scope (e.g. server-side, in a test, or before import).
 
 ## Architecture (when extending)
 
 Clean Architecture per feature under `lib/src/features/super_map/`:
-`data/` (the five sample graphs) · `domain/` (`MapNode` / `MapEdge` / `MapGraph`
-entities; `MapLogic` geometry — pure Dart) · `presentation/` (`controllers/` =
-`SuperMapController` Model as a `ChangeNotifier`, `painters/` + `widgets/` +
-`pages/` = View). Shared tokens/widgets live in `lib/src/core/`. Add new graph
-algorithms in `domain/usecases/map_logic.dart`; keep the controller widget-free.
+`data/` (the five sample graphs) · `domain/` (`MapNode` / `MapEdge` / `MapGraph` /
+`MapNodeStatus` entities; `MapLogic` geometry, `MapValidator`, `MapLayout` —
+pure Dart) · `presentation/` (`controllers/` = `SuperMapController` Model as a
+`ChangeNotifier`, `painters/` + `widgets/` + `pages/` = View). Shared
+tokens/widgets live in `lib/src/core/` (`MapExporter` lives in
+`core/utils/`). Add new graph algorithms as usecases under `domain/usecases/`;
+keep the controller widget-free.
 
 ## Common mistakes
 
@@ -173,3 +213,8 @@ algorithms in `domain/usecases/map_logic.dart`; keep the controller widget-free.
   field and tooltips assert.
 - Expecting world `(x, y)` to be screen pixels — they are abstract; the engine
   fits and the user pans/zooms from there. Call `fitToView` after a manual load.
+- Trying to move / delete a `locked` node and wondering why nothing happens —
+  that's the audit lock; call `setLocked(id, false)` (or the details-panel
+  toggle) first.
+- Hand-rolling validation or layout — use `MapValidator` / `MapLayout` instead;
+  they cover cycles, orphans, double-entry balance and three layouts already.

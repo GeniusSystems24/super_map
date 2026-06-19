@@ -18,6 +18,8 @@ import 'package:flutter/widgets.dart' show Offset, Size, Rect, Color;
 import '../../domain/entities/map_graph.dart';
 import '../../domain/entities/map_node.dart';
 import '../../domain/usecases/map_logic.dart';
+import '../../domain/usecases/map_layout.dart';
+import '../../domain/usecases/map_validator.dart';
 
 /// Read vs. edit interaction mode.
 enum MapMode { read, edit }
@@ -101,6 +103,8 @@ class SuperMapController extends ChangeNotifier {
   String? _toast;
   int _toastTick = 0;
   bool _pendingFit = false;
+  String _query = '';
+  List<MapIssue> _issues = const [];
 
   final List<_Snapshot> _history = [];
   int _uid = 0;
@@ -131,6 +135,37 @@ class SuperMapController extends ChangeNotifier {
   /// Increments on every toast — lets the View distinguish repeat messages.
   int get toastTick => _toastTick;
   bool get canUndo => _history.isNotEmpty;
+
+  // ── search (v1.0.0) ──
+  /// The active node search query (case-insensitive).
+  String get query => _query;
+  bool get hasQuery => _query.trim().isNotEmpty;
+
+  /// Ids of nodes matching the current [query] across label / ar / sub / ref /
+  /// note / kind / status / value. Empty when [query] is blank.
+  Set<String> get matches {
+    final q = _query.trim().toLowerCase();
+    if (q.isEmpty) return const {};
+    bool hit(MapNode n) {
+      final hay = [
+        n.label,
+        n.ar ?? '',
+        n.sub ?? '',
+        n.ref ?? '',
+        n.note ?? '',
+        n.kind.name,
+        n.status.tag,
+        n.value?.toString() ?? '',
+      ].join('\u0000').toLowerCase();
+      return hay.contains(q);
+    }
+
+    return {for (final n in _nodes) if (hit(n)) n.id};
+  }
+
+  /// The most recent [validate] result (empty until validate() runs).
+  List<MapIssue> get issues => _issues;
+  MapValidationSummary get validationSummary => MapValidationSummary(_issues);
 
   MapNode? nodeById(String id) {
     for (final n in _nodes) {
@@ -170,6 +205,7 @@ class SuperMapController extends ChangeNotifier {
     _editingId = null;
     _editingEdgeId = null;
     _link = null;
+    _issues = const [];
     _history.clear();
     _pendingFit = true;
   }
@@ -329,8 +365,13 @@ class SuperMapController extends ChangeNotifier {
   // ── node mutations ──
   String _newId(String prefix) => '$prefix${DateTime.now().millisecondsSinceEpoch.toRadixString(36)}${_uid++}';
 
-  /// Moves node [id] to a new world position (live during a drag).
+  /// True when node [id] is audit-locked and so cannot be edited / moved.
+  bool isLocked(String id) => nodeById(id)?.locked ?? false;
+
+  /// Moves node [id] to a new world position (live during a drag). A locked
+  /// node ignores the move.
   void moveNodeTo(String id, Offset world) {
+    if (isLocked(id)) return;
     _nodes = [
       for (final n in _nodes) n.id == id ? n.copyWith(x: world.dx, y: world.dy) : n,
     ];
@@ -369,6 +410,9 @@ class SuperMapController extends ChangeNotifier {
         value: n.value,
         color: n.color,
         note: n.note,
+        status: n.status,
+        // A duplicate is a fresh draft: never inherit the lock or the source ref.
+        locked: false,
       ),
     ];
     _selection = MapSelection(MapSelectionType.node, nid);
@@ -376,6 +420,10 @@ class SuperMapController extends ChangeNotifier {
   }
 
   void deleteNode(String id) {
+    if (isLocked(id)) {
+      _showToast('Node is locked');
+      return;
+    }
     _pushHistory();
     _nodes = _nodes.where((n) => n.id != id).toList();
     _edges = _edges.where((e) => e.from != id && e.to != id).toList();
@@ -384,13 +432,72 @@ class SuperMapController extends ChangeNotifier {
   }
 
   void setKind(String id, MapNodeKind kind) {
+    if (isLocked(id)) {
+      _showToast('Node is locked');
+      return;
+    }
     _pushHistory();
     _nodes = [for (final n in _nodes) n.id == id ? n.copyWith(kind: kind) : n];
     notifyListeners();
   }
 
+  /// Sets the workflow [status] of node [id] (v1.0.0).
+  void setStatus(String id, MapNodeStatus status) {
+    if (isLocked(id)) {
+      _showToast('Node is locked');
+      return;
+    }
+    _pushHistory();
+    _nodes = [for (final n in _nodes) n.id == id ? n.copyWith(status: status) : n];
+    _showToast(status.isNone ? 'Status cleared' : 'Status: ${status.tag}');
+  }
+
+  /// Toggles (or sets, when [value] is given) node [id]'s audit lock (v1.0.0).
+  /// Locking is always permitted; unlocking is what a lock is meant to prevent
+  /// implicitly, so it is an explicit, deliberate action here.
+  void setLocked(String id, [bool? value]) {
+    final n = nodeById(id);
+    if (n == null) return;
+    final next = value ?? !n.locked;
+    _pushHistory();
+    _nodes = [for (final m in _nodes) m.id == id ? m.copyWith(locked: next) : m];
+    _showToast(next ? 'Locked' : 'Unlocked');
+  }
+
+  /// Sets (or clears, when empty/null) the source-record [ref] of node [id]
+  /// (v1.0.0) — e.g. `JV-2024-0042`.
+  void setRef(String id, String? ref) {
+    if (isLocked(id)) {
+      _showToast('Node is locked');
+      return;
+    }
+    final trimmed = (ref ?? '').trim();
+    _pushHistory();
+    _nodes = [
+      for (final n in _nodes)
+        n.id == id ? n.copyWith(ref: trimmed.isEmpty ? null : trimmed) : n
+    ];
+    notifyListeners();
+  }
+
+  /// Sets (or clears, when empty/null) node [id]'s audit metadata map (v1.0.0).
+  void setMeta(String id, Map<String, String>? meta) {
+    if (isLocked(id)) {
+      _showToast('Node is locked');
+      return;
+    }
+    _pushHistory();
+    final clean = (meta == null || meta.isEmpty) ? null : meta;
+    _nodes = [for (final n in _nodes) n.id == id ? n.copyWith(meta: clean) : n];
+    notifyListeners();
+  }
+
   /// Sets (or clears, when [color] is null) the per-node theme color (v0.2.0).
   void setNodeColor(String id, Color? color) {
+    if (isLocked(id)) {
+      _showToast('Node is locked');
+      return;
+    }
     _pushHistory();
     _nodes = [for (final n in _nodes) n.id == id ? n.copyWith(color: color) : n];
     _showToast(color == null ? 'Color cleared' : 'Color set');
@@ -515,6 +622,48 @@ class SuperMapController extends ChangeNotifier {
   void cancelLink() {
     if (_link == null) return;
     _link = null;
+    notifyListeners();
+  }
+
+  // ── search / filter (v1.0.0) ──
+  /// Sets the live node search query. Matching node ids are exposed via
+  /// [matches]; the View dims non-matches. Passing blank clears the search.
+  void setQuery(String q) {
+    if (_query == q) return;
+    _query = q;
+    notifyListeners();
+  }
+
+  void clearQuery() => setQuery('');
+
+  // ── auto-layout (v1.0.0) ──
+  /// Re-places nodes with one of the [MapLayout] algorithms (locked nodes keep
+  /// their coordinates) and requests a fit. Undoable.
+  void autoLayout([MapLayoutSpec spec = const MapLayoutSpec()]) {
+    if (_nodes.isEmpty) return;
+    _pushHistory();
+    final laid = MapLayout.apply(toGraph(), spec);
+    _nodes = laid.nodes.map((n) => n.copyWith()).toList();
+    _pendingFit = true;
+    _showToast('Layout applied');
+  }
+
+  // ── validation (v1.0.0) ──
+  /// Runs [MapValidator] over the live graph, caches the result in [issues],
+  /// surfaces a one-line toast, and returns the issues.
+  List<MapIssue> validate({double balanceEpsilon = 0.5}) {
+    _issues = MapValidator.validate(toGraph(), balanceEpsilon: balanceEpsilon);
+    final s = MapValidationSummary(_issues);
+    _showToast(s.isClean
+        ? 'Validation passed'
+        : '${s.errors} error(s), ${s.warnings} warning(s)');
+    return _issues;
+  }
+
+  /// Clears the cached validation result.
+  void clearIssues() {
+    if (_issues.isEmpty) return;
+    _issues = const [];
     notifyListeners();
   }
 

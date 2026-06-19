@@ -5,6 +5,10 @@
 // selected. Shows the kind accent bar, icon, English + Arabic labels, the kind
 // tag pill, an In / Out stat grid (count + value sum), the Net figure, and (in
 // edit mode) rename / clone / delete actions. A port of the React details panel.
+//
+// v1.0.0 adds the ERP overlay: a workflow status pill, the source-record `ref`
+// (monospace), the audit `meta` rows, a configurable `currency` code, and (in
+// edit mode) a lock toggle + a status picker.
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -33,6 +37,9 @@ class MapDetailsPanel extends StatelessWidget {
     required this.onClone,
     required this.onDelete,
     this.onNote,
+    this.currency = 'SAR',
+    this.onToggleLock,
+    this.onSetStatus,
   });
 
   final MapNode node;
@@ -43,6 +50,15 @@ class MapDetailsPanel extends StatelessWidget {
   final VoidCallback onClone;
   final VoidCallback onDelete;
   final VoidCallback? onNote;
+
+  /// Currency code appended to value sums (v1.0.0). Defaults to `SAR`.
+  final String currency;
+
+  /// Edit-mode hook to flip the node's audit lock (v1.0.0).
+  final VoidCallback? onToggleLock;
+
+  /// Edit-mode hook to set the node's workflow status (v1.0.0).
+  final ValueChanged<MapNodeStatus>? onSetStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -102,16 +118,33 @@ class MapDetailsPanel extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: StatusPill(node.kind.tag, tone: _toneFor(node.kind, accent)),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    StatusPill(node.kind.tag, tone: _toneFor(node.kind, accent)),
+                    if (!node.status.isNone)
+                      StatusPill(node.status.tag, tone: _statusTone(node.status)),
+                    if (node.locked)
+                      StatusPill('Locked', tone: PillTone.neutral),
+                  ],
                 ),
+                if (node.ref != null) ...[
+                  const SizedBox(height: 9),
+                  _RefRow(reference: node.ref!),
+                ],
+                if (node.meta != null && node.meta!.isNotEmpty) ...[
+                  const SizedBox(height: 9),
+                  const Hairline(),
+                  const SizedBox(height: 8),
+                  ...node.meta!.entries.map((e) => _MetaRow(label: e.key, value: e.value)),
+                ],
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    Expanded(child: _Stat(label: 'In', value: '${stats.inCount}', sub: stats.inSum > 0 ? '${mapCompact(stats.inSum)} SAR' : null)),
+                    Expanded(child: _Stat(label: 'In', value: '${stats.inCount}', sub: stats.inSum > 0 ? '${mapCompact(stats.inSum)} $currency' : null)),
                     const SizedBox(width: 8),
-                    Expanded(child: _Stat(label: 'Out', value: '${stats.outCount}', sub: stats.outSum > 0 ? '${mapCompact(stats.outSum)} SAR' : null)),
+                    Expanded(child: _Stat(label: 'Out', value: '${stats.outCount}', sub: stats.outSum > 0 ? '${mapCompact(stats.outSum)} $currency' : null)),
                   ],
                 ),
                 if (stats.inSum > 0 || stats.outSum > 0) ...[
@@ -158,6 +191,10 @@ class MapDetailsPanel extends StatelessWidget {
                 ],
                 if (editMode) ...[
                   const SizedBox(height: 12),
+                  if (onSetStatus != null) ...[
+                    _StatusPicker(current: node.status, onSet: onSetStatus!),
+                    const SizedBox(height: 8),
+                  ],
                   Row(
                     children: [
                       Expanded(
@@ -169,6 +206,12 @@ class MapDetailsPanel extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 7),
+                      if (onToggleLock != null)
+                        SuperIconButton(
+                            icon: node.locked ? Icons.lock_rounded : Icons.lock_open_rounded,
+                            tooltip: node.locked ? 'Unlock' : 'Lock',
+                            onPressed: onToggleLock!),
+                      if (onToggleLock != null) const SizedBox(width: 7),
                       SuperIconButton(
                           icon: Icons.sticky_note_2_outlined,
                           tooltip: node.note != null ? 'Edit note' : 'Add note',
@@ -176,7 +219,11 @@ class MapDetailsPanel extends StatelessWidget {
                       const SizedBox(width: 7),
                       SuperIconButton(icon: Icons.copy_rounded, tooltip: 'Clone', onPressed: onClone),
                       const SizedBox(width: 7),
-                      SuperIconButton(icon: Icons.delete_outline_rounded, tooltip: 'Delete', danger: true, onPressed: onDelete),
+                      SuperIconButton(
+                          icon: Icons.delete_outline_rounded,
+                          tooltip: node.locked ? 'Locked' : 'Delete',
+                          danger: true,
+                          onPressed: onDelete),
                     ],
                   ),
                 ],
@@ -194,6 +241,144 @@ class MapDetailsPanel extends StatelessWidget {
     if (accent == SuperTokens.danger) return PillTone.danger;
     if (accent == SuperTokens.accent) return PillTone.accent;
     return PillTone.neutral;
+  }
+
+  PillTone _statusTone(MapNodeStatus s) => switch (s) {
+        MapNodeStatus.approved => PillTone.success,
+        MapNodeStatus.pending => PillTone.warning,
+        MapNodeStatus.rejected => PillTone.danger,
+        MapNodeStatus.posted => PillTone.accent,
+        _ => PillTone.neutral,
+      };
+}
+
+/// The source-record reference row — monospace, dot-segmented, with a copy-less
+/// document glyph (GeniusLink renders serials like `JV-2024-0042` in mono).
+class _RefRow extends StatelessWidget {
+  const _RefRow({required this.reference});
+  final String reference;
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    return Row(
+      children: [
+        Icon(Icons.tag_rounded, size: 13, color: t.fg4),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(reference,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: SuperText.mono.copyWith(fontSize: 11.5, color: t.fg2)),
+        ),
+      ],
+    );
+  }
+}
+
+/// One audit-metadata row: an uppercase label on the left, mono value right.
+class _MetaRow extends StatelessWidget {
+  const _MetaRow({required this.label, required this.value});
+  final String label;
+  final String value;
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Expanded(
+            child: Text(label.toUpperCase(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: SuperText.pill.copyWith(fontSize: 9.5, color: t.fg3)),
+          ),
+          const SizedBox(width: 8),
+          Text(value,
+              style: SuperText.mono.copyWith(fontSize: 11, color: t.fg1)),
+        ],
+      ),
+    );
+  }
+}
+
+/// A compact segmented status picker shown in edit mode. Tapping a swatch sets
+/// the node's [MapNodeStatus]; the active one is filled.
+class _StatusPicker extends StatelessWidget {
+  const _StatusPicker({required this.current, required this.onSet});
+  final MapNodeStatus current;
+  final ValueChanged<MapNodeStatus> onSet;
+
+  static const _choices = [
+    MapNodeStatus.none,
+    MapNodeStatus.draft,
+    MapNodeStatus.pending,
+    MapNodeStatus.approved,
+    MapNodeStatus.posted,
+    MapNodeStatus.rejected,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('STATUS', style: SuperText.label.copyWith(color: t.fg3)),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            for (final s in _choices)
+              _StatusSwatch(
+                status: s,
+                selected: s == current,
+                onTap: () => onSet(s),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _StatusSwatch extends StatelessWidget {
+  const _StatusSwatch({required this.status, required this.selected, required this.onTap});
+  final MapNodeStatus status;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.superTheme;
+    final c = status.colorOf(t);
+    final label = status.isNone ? 'None' : status.tag;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: selected ? t.tintFill(c, 0.16) : t.inputBg,
+          border: Border.all(color: selected ? c : t.border),
+          borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 7, height: 7, decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
+            const SizedBox(width: 5),
+            Text(label,
+                style: SuperText.pill.copyWith(
+                    fontSize: 9.5, color: selected ? t.fg1 : t.fg3)),
+          ],
+        ),
+      ),
+    );
   }
 }
 

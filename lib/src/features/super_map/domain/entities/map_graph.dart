@@ -45,6 +45,7 @@ class MapGraph {
     this.ar,
     this.subtitle,
     this.legend = const [],
+    this.currency = 'SAR',
     required this.nodes,
     required this.edges,
   });
@@ -64,6 +65,11 @@ class MapGraph {
   /// The kinds this graph uses, in legend order.
   final List<MapNodeKind> legend;
 
+  /// The currency code used to format node / edge [MapNode.value]s and the
+  /// details-panel sums — e.g. `SAR`, `USD`, `AED` (v1.0.0). Rendered as a
+  /// trailing code (`5,240.00 SAR`), Western digits regardless of language.
+  final String currency;
+
   final List<MapNode> nodes;
   final List<MapEdge> edges;
 
@@ -77,13 +83,14 @@ class MapGraph {
         ar: ar,
         subtitle: subtitle,
         legend: legend,
+        currency: currency,
         nodes: nodes ?? this.nodes,
         edges: edges ?? this.edges,
       );
 
   /// Serializes to `{ meta, nodes[], edges[] }` (matches the React export).
   Map<String, dynamic> toJson() => {
-        'meta': {'title': title},
+        'meta': {'title': title, 'currency': currency},
         'nodes': nodes.map((n) => n.toJson()).toList(),
         'edges': edges.map((e) => e.toJson()).toList(),
       };
@@ -94,6 +101,7 @@ class MapGraph {
     Map<String, dynamic> j, {
     String id = 'imported',
     String title = 'Imported',
+    String currency = 'SAR',
   }) {
     final meta = j['meta'] as Map<String, dynamic>?;
     final rawNodes = (j['nodes'] as List?) ?? const [];
@@ -101,6 +109,7 @@ class MapGraph {
     return MapGraph(
       id: id,
       title: (meta?['title'] as String?) ?? title,
+      currency: (meta?['currency'] as String?) ?? currency,
       nodes: rawNodes
           .map((e) => MapNode.fromJson(e as Map<String, dynamic>))
           .toList(),

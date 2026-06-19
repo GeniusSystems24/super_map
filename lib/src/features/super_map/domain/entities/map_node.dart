@@ -56,6 +56,43 @@ enum MapNodeKind {
       values.firstWhere((k) => k.name == name, orElse: () => leaf);
 }
 
+/// The workflow / lifecycle state of a [MapNode] — an ERP-grade overlay on top
+/// of its [MapNodeKind] (v1.0.0). A node keeps its semantic kind (what it *is*)
+/// while [MapNodeStatus] tracks where it *stands* in a process: a journal entry
+/// is a `document` kind that moves `draft → pending → posted`; a purchase line
+/// is a `process` kind that moves `pending → approved`/`rejected`. Drives a
+/// small status dot on the card and a status pill in the details panel. Neutral
+/// states carry a null color and resolve against the theme.
+enum MapNodeStatus {
+  none(null, ''),
+  draft(null, 'Draft'),
+  pending(SuperTokens.warning, 'Pending'),
+  approved(SuperTokens.success, 'Approved'),
+  posted(SuperTokens.accent, 'Posted'),
+  rejected(SuperTokens.danger, 'Rejected'),
+  onHold(_holdViolet, 'On Hold');
+
+  const MapNodeStatus(this._color, this.tag);
+
+  static const Color _holdViolet = Color(0xFFA855F7);
+
+  /// The raw status color, or null for the neutral `none` / `draft` states.
+  final Color? _color;
+
+  /// The human-readable label rendered in the status pill.
+  final String tag;
+
+  /// True for the default, unset state (no badge is drawn).
+  bool get isNone => this == MapNodeStatus.none;
+
+  /// The status color, theme-aware for neutral states.
+  Color colorOf(SuperThemeData t) => _color ?? t.fg3;
+
+  /// Looks a status up by its serialized name, falling back to [none].
+  static MapNodeStatus fromName(String? name) =>
+      values.firstWhere((s) => s.name == name, orElse: () => none);
+}
+
 /// One node in a [MapNode] graph. Carries a world position ([x], [y] — the
 /// center of the card), an English [label], an optional Arabic [ar] label, an
 /// optional uppercase [sub] caption, a [kind], and an optional numeric [value].
@@ -72,6 +109,10 @@ class MapNode {
     this.value,
     this.color,
     this.note,
+    this.status = MapNodeStatus.none,
+    this.locked = false,
+    this.ref,
+    this.meta,
   });
 
   /// Stable unique id — the selection key and the edge endpoint reference.
@@ -104,6 +145,25 @@ class MapNode {
   /// button and the details panel (v0.2.0).
   final String? note;
 
+  /// Workflow / lifecycle state — an ERP overlay on top of [kind] (v1.0.0).
+  /// Defaults to [MapNodeStatus.none] (no badge).
+  final MapNodeStatus status;
+
+  /// When true the node is audit-locked: it cannot be moved, re-kinded,
+  /// recolored or deleted in edit mode (v1.0.0). Use for posted / approved
+  /// records that must not change. Shown with a small lock glyph.
+  final bool locked;
+
+  /// Optional reference to the source ERP record this node stands for — a
+  /// serial / document id such as `JV-2024-0042` or `INV-ISS-2024-0089`
+  /// (v1.0.0). Rendered monospace in the details panel.
+  final String? ref;
+
+  /// Optional ordered audit metadata (key → value) surfaced as rows in the
+  /// details panel — e.g. `{'Posted': '2024-03-14', 'By': 'A. Salem'}`
+  /// (v1.0.0). Values are strings; keep them short.
+  final Map<String, String>? meta;
+
   /// The world-space center as an [Offset].
   Offset get center => Offset(x, y);
 
@@ -121,6 +181,10 @@ class MapNode {
     double? value,
     Object? color = _unset,
     Object? note = _unset,
+    MapNodeStatus? status,
+    bool? locked,
+    Object? ref = _unset,
+    Object? meta = _unset,
   }) =>
       MapNode(
         id: id,
@@ -133,11 +197,15 @@ class MapNode {
         value: value ?? this.value,
         color: color == _unset ? this.color : color as Color?,
         note: note == _unset ? this.note : note as String?,
+        status: status ?? this.status,
+        locked: locked ?? this.locked,
+        ref: ref == _unset ? this.ref : ref as String?,
+        meta: meta == _unset ? this.meta : meta as Map<String, String>?,
       );
 
   /// Serializes to the round-trippable JSON shape `{ id, x, y, label, ar?,
-  /// kind, sub?, value?, color?, note? }` (matches the React export). [color]
-  /// is written as a `#RRGGBB` hex string.
+  /// kind, sub?, value?, color?, note?, status?, locked?, ref?, meta? }`.
+  /// [color] is written as a `#RRGGBB` hex string.
   Map<String, dynamic> toJson() => {
         'id': id,
         'x': x.round(),
@@ -149,6 +217,10 @@ class MapNode {
         if (value != null) 'value': value,
         if (color != null) 'color': _hex(color!),
         if (note != null) 'note': note,
+        if (status != MapNodeStatus.none) 'status': status.name,
+        if (locked) 'locked': true,
+        if (ref != null) 'ref': ref,
+        if (meta != null && meta!.isNotEmpty) 'meta': meta,
       };
 
   factory MapNode.fromJson(Map<String, dynamic> j) => MapNode(
@@ -162,6 +234,10 @@ class MapNode {
         value: (j['value'] as num?)?.toDouble(),
         color: _parseColor(j['color']),
         note: j['note'] as String?,
+        status: MapNodeStatus.fromName(j['status'] as String?),
+        locked: j['locked'] == true,
+        ref: j['ref'] as String?,
+        meta: _parseMeta(j['meta']),
       );
 
   static const Object _unset = Object();
@@ -173,6 +249,13 @@ class MapNode {
     final n = int.tryParse(s, radix: 16);
     if (n == null) return null;
     return Color(s.length <= 6 ? (0xFF000000 | n) : n);
+  }
+
+  static Map<String, String>? _parseMeta(Object? v) {
+    if (v is! Map) return null;
+    final out = <String, String>{};
+    v.forEach((k, val) => out['$k'] = '$val');
+    return out.isEmpty ? null : out;
   }
 
   @override

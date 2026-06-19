@@ -22,8 +22,10 @@ import 'package:flutter/widgets.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../../features/super_map/domain/entities/map_graph.dart';
+
 /// The file format a SuperMap export produced.
-enum MapExportFormat { png, pdf, docx }
+enum MapExportFormat { png, pdf, docx, csv }
 
 extension MapExportFormatX on MapExportFormat {
   /// The conventional extension (no dot).
@@ -31,6 +33,7 @@ extension MapExportFormatX on MapExportFormat {
         MapExportFormat.png => 'png',
         MapExportFormat.pdf => 'pdf',
         MapExportFormat.docx => 'docx',
+        MapExportFormat.csv => 'csv',
       };
 
   /// The MIME type a host should advertise when saving / sharing.
@@ -39,11 +42,77 @@ extension MapExportFormatX on MapExportFormat {
         MapExportFormat.pdf => 'application/pdf',
         MapExportFormat.docx =>
           'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        MapExportFormat.csv => 'text/csv',
       };
 }
 
 /// Stateless export pipeline. Never instantiated.
 abstract final class MapExporter {
+  // ── CSV (v1.0.0) ──────────────────────────────────────────────────────────
+  // Spreadsheet exports for the ERP / audit side of SuperMap. Two tables —
+  // nodes and edges — each RFC-4180 quoted so labels, Arabic text and refs
+  // survive commas, quotes and newlines. Western digits throughout.
+
+  /// The node table as CSV text. Columns:
+  /// `id,label,ar,kind,status,locked,ref,value,note,x,y`. [currency] (defaults
+  /// to the graph's) is appended to the header's value column for clarity.
+  static String nodesCsv(MapGraph graph) {
+    final cur = graph.currency;
+    final rows = <List<String>>[
+      ['id', 'label', 'ar', 'kind', 'status', 'locked', 'ref', 'value ($cur)', 'note', 'x', 'y'],
+      for (final n in graph.nodes)
+        [
+          n.id,
+          n.label,
+          n.ar ?? '',
+          n.kind.name,
+          n.status.isNone ? '' : n.status.name,
+          n.locked ? 'true' : 'false',
+          n.ref ?? '',
+          n.value?.toStringAsFixed(2) ?? '',
+          n.note ?? '',
+          n.x.round().toString(),
+          n.y.round().toString(),
+        ],
+    ];
+    return _encodeCsv(rows);
+  }
+
+  /// The edge table as CSV text. Columns:
+  /// `id,from,fromLabel,to,toLabel,label,value`.
+  static String edgesCsv(MapGraph graph) {
+    final byId = {for (final n in graph.nodes) n.id: n};
+    final rows = <List<String>>[
+      ['id', 'from', 'fromLabel', 'to', 'toLabel', 'label', 'value'],
+      for (final e in graph.edges)
+        [
+          e.id,
+          e.from,
+          byId[e.from]?.label ?? '',
+          e.to,
+          byId[e.to]?.label ?? '',
+          e.label ?? '',
+          e.value?.toStringAsFixed(2) ?? '',
+        ],
+    ];
+    return _encodeCsv(rows);
+  }
+
+  /// UTF-8 bytes for a CSV string, prefixed with a BOM so Excel opens Arabic
+  /// columns in the correct encoding.
+  static Uint8List csvBytes(String csv) =>
+      Uint8List.fromList([0xEF, 0xBB, 0xBF, ...const Utf8Encoder().convert(csv)]);
+
+  static String _encodeCsv(List<List<String>> rows) =>
+      rows.map((r) => r.map(_csvCell).join(',')).join('\r\n');
+
+  static String _csvCell(String v) {
+    final needsQuote =
+        v.contains(',') || v.contains('"') || v.contains('\n') || v.contains('\r');
+    final escaped = v.replaceAll('"', '""');
+    return needsQuote ? '"$escaped"' : escaped;
+  }
+
   /// Rasterises the [RepaintBoundary] behind [boundaryKey] to PNG bytes at
   /// [pixelRatio] (2.0 ≈ retina). Returns null if the boundary isn't laid out.
   static Future<Uint8List?> capturePng(

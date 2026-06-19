@@ -7,11 +7,20 @@
 ///           duplicate / delete nodes, delete edges, undo, JSON import/export.
 ///
 /// Extras: per-node theme colors and notes, text-labelled connections, an
-/// all-nodes data panel, image / PDF / Word export, right-click / long-press
-/// context menus on nodes, edges and canvas; curved / orthogonal / straight
-/// edge routing with side-anchored arrowheads; card / chip / pill node styles;
-/// a dot grid; a live minimap; a selection details panel with in/out value
-/// stats; and an optional animated edge flow.
+/// all-nodes data panel, image / PDF / Word / CSV export, right-click /
+/// long-press context menus on nodes, edges and canvas; curved / orthogonal /
+/// straight edge routing with side-anchored arrowheads; card / chip / pill node
+/// styles; a dot grid; a live minimap; a selection details panel with in/out
+/// value stats; and an optional animated edge flow.
+///
+/// **v1.0.0 — the ERP layer.** Nodes gain a workflow [MapNodeStatus]
+/// (draft → pending → approved/posted/rejected), an audit [MapNode.locked]
+/// flag, a source-record [MapNode.ref] and an audit [MapNode.meta] map; graphs
+/// gain a [MapGraph.currency]. The View adds toolbar node search, layered /
+/// grid / radial auto-layout ([MapLayout]) and a Validate button backed by
+/// [MapValidator] — dangling / duplicate / self-loop / parallel edge checks,
+/// orphan + cycle detection, and a double-entry flow-balance check. CSV export
+/// joins the PNG / PDF / DOCX pipeline via [MapExporter].
 ///
 /// The data model (`MapNode` / `MapEdge` / `MapGraph`) is domain-neutral — the
 /// five bundled `MapGraphData` seeds (cash-flow, mind-map, approval workflow,
