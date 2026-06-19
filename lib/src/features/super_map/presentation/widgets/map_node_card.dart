@@ -102,7 +102,8 @@ class _MapNodeCardState extends State<MapNodeCard> {
 
   void _beginEdit() {
     _ctl = TextEditingController(text: widget.node.label)
-      ..selection = TextSelection(baseOffset: 0, extentOffset: widget.node.label.length);
+      ..selection =
+          TextSelection(baseOffset: 0, extentOffset: widget.node.label.length);
     _focus = FocusNode();
     WidgetsBinding.instance.addPostFrameCallback((_) => _focus?.requestFocus());
   }
@@ -128,19 +129,16 @@ class _MapNodeCardState extends State<MapNodeCard> {
     final isChip = widget.style != MapNodeStyle.card;
 
     final frame = widget.selected ? accent : t.borderStrong;
+    final accentWidth = isChip ? 3.0 : 4.0;
     final decoration = BoxDecoration(
       color: t.surface,
-      border: Border(
-        left: BorderSide(color: accent, width: isChip ? 3 : 4),
-        top: BorderSide(color: frame),
-        right: BorderSide(color: frame),
-        bottom: BorderSide(color: frame),
-      ),
+      border: Border.all(color: frame),
       borderRadius: BorderRadius.circular(isChip ? 999 : SuperTokens.radiusMd),
       boxShadow: [
         ...t.cardShadow,
         if (widget.selected)
-          BoxShadow(color: accent.withOpacity(0.30), blurRadius: 0, spreadRadius: 3),
+          BoxShadow(
+              color: accent.withOpacity(0.30), blurRadius: 0, spreadRadius: 3),
       ],
     );
 
@@ -152,35 +150,54 @@ class _MapNodeCardState extends State<MapNodeCard> {
       child: Container(
         width: widget.size.width,
         height: widget.size.height,
-        padding: EdgeInsets.symmetric(horizontal: isChip ? 14 : 13),
         decoration: decoration,
         clipBehavior: Clip.antiAlias,
-        child: Row(
+        child: Stack(
           children: [
-            if (!isChip) ...[
-              _IconBox(icon: widget.node.kind.icon, color: accent),
-              const SizedBox(width: 9),
-            ] else ...[
-              _Dot(color: accent),
-              const SizedBox(width: 9),
-            ],
-            Expanded(child: content),
-            if (!widget.editing) _statusLock(t),
-            if (widget.showData && !widget.editing) _dataBadge(t, accent, isChip),
-            if (widget.showNote) ...[
-              const SizedBox(width: 6),
-              _NoteButton(
-                has: widget.node.note != null,
-                onTap: () => widget.onNote?.call(),
+            PositionedDirectional(
+              start: 0,
+              top: 0,
+              bottom: 0,
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: accent),
+                child: SizedBox(width: accentWidth),
               ),
-            ],
+            ),
+            Positioned.fill(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: isChip ? 14 : 13),
+                child: Row(
+                  children: [
+                    if (!isChip) ...[
+                      _IconBox(icon: widget.node.kind.icon, color: accent),
+                      const SizedBox(width: 9),
+                    ] else ...[
+                      _Dot(color: accent),
+                      const SizedBox(width: 9),
+                    ],
+                    Expanded(child: content),
+                    if (!widget.editing) _statusLock(t),
+                    if (widget.showData && !widget.editing)
+                      _dataBadge(t, accent, isChip),
+                    if (widget.showNote) ...[
+                      const SizedBox(width: 6),
+                      _NoteButton(
+                        has: widget.node.note != null,
+                        onTap: () => widget.onNote?.call(),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
 
     return MouseRegion(
-      cursor: widget.editMode ? SystemMouseCursors.move : SystemMouseCursors.grab,
+      cursor:
+          widget.editMode ? SystemMouseCursors.move : SystemMouseCursors.grab,
       onEnter: (_) => widget.onHover(true),
       onExit: (_) => widget.onHover(false),
       child: GestureDetector(
@@ -246,7 +263,9 @@ class _MapNodeCardState extends State<MapNodeCard> {
           if (value != null)
             Text(_compact(value),
                 style: SuperText.mono.copyWith(
-                    fontSize: isChip ? 10.5 : 11, fontWeight: FontWeight.w700, color: accent)),
+                    fontSize: isChip ? 10.5 : 11,
+                    fontWeight: FontWeight.w700,
+                    color: accent)),
           if (showDegree)
             Text('${s.inCount}→${s.outCount}',
                 style: SuperText.mono.copyWith(fontSize: 9.5, color: t.fg4)),
@@ -283,7 +302,9 @@ class _MapNodeCardState extends State<MapNodeCard> {
       node.label,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: (isChip ? SuperText.caption.copyWith(fontSize: 12.5) : SuperText.body.copyWith(fontSize: 13.5))
+      style: (isChip
+              ? SuperText.caption.copyWith(fontSize: 12.5)
+              : SuperText.body.copyWith(fontSize: 13.5))
           .copyWith(fontWeight: FontWeight.w700, color: t.fg1),
     );
 
@@ -307,7 +328,8 @@ class _MapNodeCardState extends State<MapNodeCard> {
         style: SuperText.body.copyWith(fontSize: 13, color: t.fg1),
         decoration: InputDecoration(
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
           filled: true,
           fillColor: t.inputBg,
           enabledBorder: OutlineInputBorder(
@@ -320,8 +342,10 @@ class _MapNodeCardState extends State<MapNodeCard> {
           ),
         ),
         onSubmitted: widget.onCommitRename,
-        onEditingComplete: () => widget.onCommitRename(_ctl?.text ?? widget.node.label),
-        onTapOutside: (_) => widget.onCommitRename(_ctl?.text ?? widget.node.label),
+        onEditingComplete: () =>
+            widget.onCommitRename(_ctl?.text ?? widget.node.label),
+        onTapOutside: (_) =>
+            widget.onCommitRename(_ctl?.text ?? widget.node.label),
       ),
     );
   }

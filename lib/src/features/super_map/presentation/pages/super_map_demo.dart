@@ -23,9 +23,10 @@ class SuperMapDemo extends StatefulWidget {
 }
 
 class _SuperMapDemoState extends State<SuperMapDemo> {
-  late final SuperMapController _controller = SuperMapController(graph: MapGraphData.all.first);
+  late final SuperMapController _controller =
+      SuperMapController(graph: MapGraphData.all.first);
   int _seedIndex = 0;
-  bool _flow = false;
+  bool _flow = true;
   bool _showData = false;
 
   MapGraph get _graph => MapGraphData.all[_seedIndex];
@@ -52,7 +53,8 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('Super Map', style: SuperText.heading.copyWith(color: t.fg1)),
+        title:
+            Text('Super Map', style: SuperText.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Center(
@@ -64,23 +66,29 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('SUPER MAP \u2022 SHOWCASE',
-                      style: SuperText.eyebrow.copyWith(color: SuperTokens.accent)),
+                      style: SuperText.eyebrow
+                          .copyWith(color: SuperTokens.accent)),
                   const SizedBox(height: SuperTokens.space2),
                   Text.rich(
                     TextSpan(children: [
-                      TextSpan(text: _graph.title, style: SuperText.h1.copyWith(color: t.fg1)),
+                      TextSpan(
+                          text: _graph.title,
+                          style: SuperText.h1.copyWith(color: t.fg1)),
                       if (_graph.ar != null)
                         TextSpan(
                             text: '  ${_graph.ar}',
                             style: SuperText.h1.copyWith(
-                                fontFamily: SuperTokens.arabicFont, fontSize: 20, color: t.fg3)),
+                                fontFamily: SuperTokens.arabicFont,
+                                fontSize: 20,
+                                color: t.fg3)),
                     ]),
                   ),
                   if (_graph.subtitle != null) ...[
                     const SizedBox(height: SuperTokens.space2),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 720),
-                      child: Text(_graph.subtitle!, style: SuperText.body.copyWith(color: t.fg3)),
+                      child: Text(_graph.subtitle!,
+                          style: SuperText.body.copyWith(color: t.fg3)),
                     ),
                   ],
                   const SizedBox(height: SuperTokens.space6),
@@ -175,7 +183,11 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
       children: [
         for (final k in _graph.legend)
           Row(mainAxisSize: MainAxisSize.min, children: [
-            Container(width: 9, height: 9, decoration: BoxDecoration(color: k.colorOf(t), shape: BoxShape.circle)),
+            Container(
+                width: 9,
+                height: 9,
+                decoration:
+                    BoxDecoration(color: k.colorOf(t), shape: BoxShape.circle)),
             const SizedBox(width: 6),
             Text(k.tag, style: SuperText.caption.copyWith(color: t.fg2)),
           ]),
@@ -185,7 +197,8 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({required this.label, required this.selected, required this.onTap});
+  const _Chip(
+      {required this.label, required this.selected, required this.onTap});
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -244,10 +257,14 @@ class _OptionGroup<T> extends StatelessWidget {
               onTap: () => onChanged(entry.key),
               child: AnimatedContainer(
                 duration: SuperTokens.durBase,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: value == entry.key ? SuperTokens.accent : const Color(0x00000000),
-                  borderRadius: BorderRadius.circular(SuperTokens.radiusControl - 1),
+                  color: value == entry.key
+                      ? SuperTokens.accent
+                      : const Color(0x00000000),
+                  borderRadius:
+                      BorderRadius.circular(SuperTokens.radiusControl - 1),
                 ),
                 child: Text(entry.value,
                     style: SuperText.button.copyWith(

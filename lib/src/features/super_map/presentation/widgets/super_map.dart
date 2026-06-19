@@ -90,7 +90,8 @@ class SuperMap extends StatefulWidget {
   State<SuperMap> createState() => _SuperMapState();
 }
 
-class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin {
+class _SuperMapState extends State<SuperMap>
+    with SingleTickerProviderStateMixin {
   final GlobalKey _canvasKey = GlobalKey();
   final GlobalKey _repaintKey = GlobalKey();
   final FocusNode _focus = FocusNode();
@@ -112,8 +113,25 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
+    _syncFlowAnimation();
+  }
+
+  @override
+  void didUpdateWidget(covariant SuperMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.animateFlow != widget.animateFlow) _syncFlowAnimation();
+  }
+
+  void _syncFlowAnimation() {
     if (widget.animateFlow) {
-      _flow = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat();
+      _flow ??= AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 1150),
+      );
+      if (!_flow!.isAnimating) _flow!.repeat();
+    } else {
+      _flow?.dispose();
+      _flow = null;
     }
   }
 
@@ -124,7 +142,8 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  RenderBox? get _box => _canvasKey.currentContext?.findRenderObject() as RenderBox?;
+  RenderBox? get _box =>
+      _canvasKey.currentContext?.findRenderObject() as RenderBox?;
   Offset _toLocal(Offset global) => _box?.globalToLocal(global) ?? global;
 
   String? _edgeAt(Offset local) {
@@ -193,7 +212,9 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
   void _onKey(KeyEvent e) {
     if (e is! KeyDownEvent) return;
     final sel = c.selection;
-    if (c.isEdit && (e.logicalKey == LogicalKeyboardKey.delete || e.logicalKey == LogicalKeyboardKey.backspace)) {
+    if (c.isEdit &&
+        (e.logicalKey == LogicalKeyboardKey.delete ||
+            e.logicalKey == LogicalKeyboardKey.backspace)) {
       if (sel?.type == MapSelectionType.node) c.deleteNode(sel!.id);
       if (sel?.type == MapSelectionType.edge) c.deleteEdge(sel!.id);
     }
@@ -204,7 +225,8 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
     if (edited == null || !mounted) return;
     final err = c.importJson(edited);
     if (err != null && mounted) {
-      ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(err)));
+      ScaffoldMessenger.maybeOf(context)
+          ?.showSnackBar(SnackBar(content: Text(err)));
     }
   }
 
@@ -218,7 +240,9 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
           widget.onExport!(bytes, filename, format);
         } else if (mounted) {
           ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-            SnackBar(content: Text('Exported $filename (${bytes.length} bytes) — wire SuperMap.onExport to save it.')),
+            SnackBar(
+                content: Text(
+                    'Exported $filename (${bytes.length} bytes) — wire SuperMap.onExport to save it.')),
           );
         }
       },
@@ -236,7 +260,8 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
     final t = context.superTheme;
     final kind = await showMenu<MapLayoutKind>(
       context: context,
-      position: RelativeRect.fromLTRB(global.dx, global.dy, global.dx, global.dy),
+      position:
+          RelativeRect.fromLTRB(global.dx, global.dy, global.dx, global.dy),
       color: t.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
@@ -255,8 +280,12 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(label, style: SuperText.button.copyWith(fontSize: 12.5, color: t.fg1)),
-                Text(sub, style: SuperText.caption.copyWith(fontSize: 10.5, color: t.fg4)),
+                Text(label,
+                    style: SuperText.button
+                        .copyWith(fontSize: 12.5, color: t.fg1)),
+                Text(sub,
+                    style: SuperText.caption
+                        .copyWith(fontSize: 10.5, color: t.fg4)),
               ],
             ),
           ),
@@ -319,7 +348,9 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
         ],
         SuperButton(
           label: 'Data',
-          variant: _showData ? SuperButtonVariant.primary : SuperButtonVariant.secondary,
+          variant: _showData
+              ? SuperButtonVariant.primary
+              : SuperButtonVariant.secondary,
           icon: const Icon(Icons.layers_outlined),
           onPressed: _toggleData,
         ),
@@ -350,7 +381,9 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
                 icon: const Icon(Icons.auto_awesome_mosaic_outlined),
                 onPressed: () {
                   final box = btnCtx.findRenderObject() as RenderBox?;
-                  final pos = box?.localToGlobal(box.size.bottomLeft(Offset.zero)) ?? Offset.zero;
+                  final pos =
+                      box?.localToGlobal(box.size.bottomLeft(Offset.zero)) ??
+                          Offset.zero;
                   _pickLayout(pos);
                 },
               ),
@@ -361,7 +394,8 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
             icon: const Icon(Icons.add_rounded),
             onPressed: () {
               if (_viewport.isEmpty) return;
-              c.addNodeAt(c.screenToWorld(Offset(_viewport.width / 2, _viewport.height / 2)));
+              c.addNodeAt(c.screenToWorld(
+                  Offset(_viewport.width / 2, _viewport.height / 2)));
             },
           ),
           SuperButton(
@@ -435,7 +469,10 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
                       if (widget.showGrid)
                         Positioned.fill(
                           child: CustomPaint(
-                            painter: GridPainter(offset: c.offset, scale: c.scale, color: t.border),
+                            painter: GridPainter(
+                                offset: c.offset,
+                                scale: c.scale,
+                                color: t.border),
                           ),
                         ),
                       // pan / zoom / tap surface (below nodes)
@@ -445,12 +482,15 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
                           onScaleStart: _onScaleStart,
                           onScaleUpdate: _onScaleUpdate,
                           onTapUp: _onTapUp,
-                          onSecondaryTapDown: (d) => _openMenuAt(d.globalPosition),
-                          onLongPressStart: (d) => _openMenuAt(d.globalPosition),
+                          onSecondaryTapDown: (d) =>
+                              _openMenuAt(d.globalPosition),
+                          onLongPressStart: (d) =>
+                              _openMenuAt(d.globalPosition),
                         ),
                       ),
                       // edges
-                      Positioned.fill(child: IgnorePointer(child: _edgesLayer(t))),
+                      Positioned.fill(
+                          child: IgnorePointer(child: _edgesLayer(t))),
                       // nodes + ports + edge labels (world space)
                       Positioned.fill(child: _worldLayer(t)),
                       // overlays
@@ -473,7 +513,8 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
     if (link != null) {
       final from = c.nodeById(link.fromId);
       if (from != null) {
-        final a = MapLogic.sideAnchor(from.center, MapLogic.sizeOf(from, c.nodeStyle), link.cursor);
+        final a = MapLogic.sideAnchor(
+            from.center, MapLogic.sizeOf(from, c.nodeStyle), link.cursor);
         linkFrom = a.point;
         linkTo = link.cursor;
       }
@@ -541,9 +582,13 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
                             )
                           : _EdgeLabel(
                               label: g.edge.label,
-                              value: widget.showEdgeLabels ? g.edge.value : null,
-                              dim: selId != null && !c.incidentEdges.contains(g.edge.id),
-                              onTap: c.isEdit ? () => c.startEdgeLabel(g.edge.id) : null,
+                              value:
+                                  widget.showEdgeLabels ? g.edge.value : null,
+                              dim: selId != null &&
+                                  !c.incidentEdges.contains(g.edge.id),
+                              onTap: c.isEdit
+                                  ? () => c.startEdgeLabel(g.edge.id)
+                                  : null,
                             ),
                     ),
                   ),
@@ -561,8 +606,9 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
 
   Widget _nodeCard(MapNode n, String? selId, Set<String> neighbours) {
     final size = MapLogic.sizeOf(n, c.nodeStyle);
-    final dim = (selId != null && selId != n.id && !neighbours.contains(n.id)) ||
-        _searchDimmed(n.id);
+    final dim =
+        (selId != null && selId != n.id && !neighbours.contains(n.id)) ||
+            _searchDimmed(n.id);
     return Positioned(
       left: n.x - size.width / 2,
       top: n.y - size.height / 2,
@@ -590,7 +636,8 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
         onDoubleTap: () => c.startRename(n.id),
         onContextMenu: (global) {
           c.selectNode(n.id);
-          setState(() => _menu = _MenuReq(_toLocal(global), MapSelectionType.node, n.id));
+          setState(() =>
+              _menu = _MenuReq(_toLocal(global), MapSelectionType.node, n.id));
         },
         onHover: (h) => c.setHover(h ? n.id : null),
         onCommitRename: c.commitRename,
@@ -620,7 +667,8 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
               final world = c.screenToWorld(_toLocal(global));
               c.startLink(n.id, side, world);
             },
-            onUpdate: (global) => c.updateLink(c.screenToWorld(_toLocal(global))),
+            onUpdate: (global) =>
+                c.updateLink(c.screenToWorld(_toLocal(global))),
             onEnd: (global) {
               final world = c.screenToWorld(_toLocal(global));
               final target = MapLogic.nodeAt(c.nodes, world, c.nodeStyle);
@@ -641,9 +689,15 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
         top: 12,
         start: 12,
         child: Row(children: [
-          _RoundBtn(icon: Icons.fullscreen_rounded, tooltip: 'Fit to view', onTap: () => c.fitToView(_viewport)),
+          _RoundBtn(
+              icon: Icons.fullscreen_rounded,
+              tooltip: 'Fit to view',
+              onTap: () => c.fitToView(_viewport)),
           const SizedBox(width: 7),
-          _RoundBtn(icon: Icons.refresh_rounded, tooltip: 'Reset layout', onTap: c.reset),
+          _RoundBtn(
+              icon: Icons.refresh_rounded,
+              tooltip: 'Reset layout',
+              onTap: c.reset),
         ]),
       ),
       // top-right: title chip
@@ -657,9 +711,15 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
         bottom: 12,
         end: 12,
         child: Column(children: [
-          _RoundBtn(icon: Icons.add_rounded, tooltip: 'Zoom in', onTap: () => _zoomCenter(1.2)),
+          _RoundBtn(
+              icon: Icons.add_rounded,
+              tooltip: 'Zoom in',
+              onTap: () => _zoomCenter(1.2)),
           const SizedBox(height: 7),
-          _RoundBtn(icon: Icons.remove_rounded, tooltip: 'Zoom out', onTap: () => _zoomCenter(1 / 1.2)),
+          _RoundBtn(
+              icon: Icons.remove_rounded,
+              tooltip: 'Zoom out',
+              onTap: () => _zoomCenter(1 / 1.2)),
         ]),
       ),
       // bottom-left: minimap
@@ -728,7 +788,8 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
                 if (issue.nodeId != null && c.nodeById(issue.nodeId!) != null) {
                   c.selectNode(issue.nodeId!);
                   if (!_viewport.isEmpty) c.centerOn(issue.nodeId!, _viewport);
-                } else if (issue.edgeId != null && c.edgeById(issue.edgeId!) != null) {
+                } else if (issue.edgeId != null &&
+                    c.edgeById(issue.edgeId!) != null) {
                   c.selectEdge(issue.edgeId!);
                 }
               },
@@ -742,21 +803,26 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
           left: 0,
           right: 0,
           child: Center(
-            child: _Toast(message: c.toast!, tick: c.toastTick, onDone: c.clearToast),
+            child: _Toast(
+                message: c.toast!, tick: c.toastTick, onDone: c.clearToast),
           ),
         ),
       // note popover (v0.2.0)
-      if (_noteId != null && c.nodeById(_noteId!) != null) ..._notePopoverLayer(t),
+      if (_noteId != null && c.nodeById(_noteId!) != null)
+        ..._notePopoverLayer(t),
     ];
   }
 
   List<Widget> _notePopoverLayer(SuperThemeData t) {
     final n = c.nodeById(_noteId!)!;
     final size = MapLogic.sizeOf(n, c.nodeStyle);
-    final corner = c.worldToScreen(Offset(n.x + size.width / 2, n.y - size.height / 2));
+    final corner =
+        c.worldToScreen(Offset(n.x + size.width / 2, n.y - size.height / 2));
     const w = 236.0;
-    final left = (corner.dx + 6).clamp(8.0, (_viewport.width - w - 8).clamp(8.0, double.infinity));
-    final top = (corner.dy - 6).clamp(8.0, (_viewport.height - 170).clamp(8.0, double.infinity));
+    final left = (corner.dx + 6)
+        .clamp(8.0, (_viewport.width - w - 8).clamp(8.0, double.infinity));
+    final top = (corner.dy - 6)
+        .clamp(8.0, (_viewport.height - 170).clamp(8.0, double.infinity));
     void close() => setState(() => _noteId = null);
     return [
       Positioned.fill(
@@ -806,23 +872,76 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
           close();
         };
         items.addAll([
-          MapMenuItem(icon: Icons.edit_outlined, label: 'Rename', kbd: '↵', onTap: () { c.startRename(req.id!); close(); }),
-          MapMenuItem(icon: Icons.sticky_note_2_outlined, label: (n?.note != null) ? 'Edit note' : 'Add note', onTap: () { setState(() { _menu = null; _noteId = req.id; }); }),
-          MapMenuItem(icon: Icons.link_rounded, label: 'Connect from here', onTap: () {
-            final n2 = c.nodeById(req.id!);
-            if (n2 != null) c.startLink(req.id!, NodeSide.right, n2.center, click: true);
-            close();
-          }),
-          MapMenuItem(icon: Icons.copy_rounded, label: 'Duplicate', onTap: () { c.duplicateNode(req.id!); close(); }),
+          MapMenuItem(
+              icon: Icons.edit_outlined,
+              label: 'Rename',
+              kbd: '↵',
+              onTap: () {
+                c.startRename(req.id!);
+                close();
+              }),
+          MapMenuItem(
+              icon: Icons.sticky_note_2_outlined,
+              label: (n?.note != null) ? 'Edit note' : 'Add note',
+              onTap: () {
+                setState(() {
+                  _menu = null;
+                  _noteId = req.id;
+                });
+              }),
+          MapMenuItem(
+              icon: Icons.link_rounded,
+              label: 'Connect from here',
+              onTap: () {
+                final n2 = c.nodeById(req.id!);
+                if (n2 != null)
+                  c.startLink(req.id!, NodeSide.right, n2.center, click: true);
+                close();
+              }),
+          MapMenuItem(
+              icon: Icons.copy_rounded,
+              label: 'Duplicate',
+              onTap: () {
+                c.duplicateNode(req.id!);
+                close();
+              }),
           const _MenuDivider(),
-          MapMenuItem(icon: Icons.delete_outline_rounded, label: 'Delete', danger: true, kbd: '⌫', onTap: () { c.deleteNode(req.id!); close(); }),
+          MapMenuItem(
+              icon: Icons.delete_outline_rounded,
+              label: 'Delete',
+              danger: true,
+              kbd: '⌫',
+              onTap: () {
+                c.deleteNode(req.id!);
+                close();
+              }),
         ]);
       } else {
         items.addAll([
-          MapMenuItem(icon: Icons.my_location_rounded, label: 'Inspect', onTap: () { c.selectNode(req.id!); close(); }),
+          MapMenuItem(
+              icon: Icons.my_location_rounded,
+              label: 'Inspect',
+              onTap: () {
+                c.selectNode(req.id!);
+                close();
+              }),
           if (n?.note != null)
-            MapMenuItem(icon: Icons.sticky_note_2_outlined, label: 'View note', onTap: () { setState(() { _menu = null; _noteId = req.id; }); }),
-          MapMenuItem(icon: Icons.center_focus_strong_rounded, label: 'Center on node', onTap: () { c.centerOn(req.id!, _viewport); close(); }),
+            MapMenuItem(
+                icon: Icons.sticky_note_2_outlined,
+                label: 'View note',
+                onTap: () {
+                  setState(() {
+                    _menu = null;
+                    _noteId = req.id;
+                  });
+                }),
+          MapMenuItem(
+              icon: Icons.center_focus_strong_rounded,
+              label: 'Center on node',
+              onTap: () {
+                c.centerOn(req.id!, _viewport);
+                close();
+              }),
         ]);
       }
     } else if (req.type == MapSelectionType.edge) {
@@ -830,31 +949,73 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
       if (c.isEdit) {
         final e = c.edgeById(req.id!);
         items.addAll([
-          MapMenuItem(icon: Icons.edit_outlined, label: (e?.label != null) ? 'Edit label' : 'Label connection', onTap: () { c.startEdgeLabel(req.id!); close(); }),
-          MapMenuItem(icon: Icons.delete_outline_rounded, label: 'Delete connection', danger: true, onTap: () { c.deleteEdge(req.id!); close(); }),
+          MapMenuItem(
+              icon: Icons.edit_outlined,
+              label: (e?.label != null) ? 'Edit label' : 'Label connection',
+              onTap: () {
+                c.startEdgeLabel(req.id!);
+                close();
+              }),
+          MapMenuItem(
+              icon: Icons.delete_outline_rounded,
+              label: 'Delete connection',
+              danger: true,
+              onTap: () {
+                c.deleteEdge(req.id!);
+                close();
+              }),
         ]);
       } else {
-        items.add(MapMenuItem(icon: Icons.my_location_rounded, label: 'Select connection', onTap: () { c.selectEdge(req.id!); close(); }));
+        items.add(MapMenuItem(
+            icon: Icons.my_location_rounded,
+            label: 'Select connection',
+            onTap: () {
+              c.selectEdge(req.id!);
+              close();
+            }));
       }
     } else {
       title = 'Canvas';
       if (c.isEdit) {
-        items.add(MapMenuItem(icon: Icons.add_rounded, label: 'Add node here', onTap: () {
-          c.addNodeAt(c.screenToWorld(req.local));
-          close();
-        }));
+        items.add(MapMenuItem(
+            icon: Icons.add_rounded,
+            label: 'Add node here',
+            onTap: () {
+              c.addNodeAt(c.screenToWorld(req.local));
+              close();
+            }));
       }
       items.addAll([
-        MapMenuItem(icon: Icons.fullscreen_rounded, label: 'Fit to view', onTap: () { c.fitToView(_viewport); close(); }),
-        MapMenuItem(icon: Icons.refresh_rounded, label: 'Reset layout', onTap: () { c.reset(); close(); }),
+        MapMenuItem(
+            icon: Icons.fullscreen_rounded,
+            label: 'Fit to view',
+            onTap: () {
+              c.fitToView(_viewport);
+              close();
+            }),
+        MapMenuItem(
+            icon: Icons.refresh_rounded,
+            label: 'Reset layout',
+            onTap: () {
+              c.reset();
+              close();
+            }),
         const _MenuDivider(),
-        MapMenuItem(icon: Icons.data_object_rounded, label: 'Diagram JSON…', onTap: () { close(); _openJson(); }),
+        MapMenuItem(
+            icon: Icons.data_object_rounded,
+            label: 'Diagram JSON…',
+            onTap: () {
+              close();
+              _openJson();
+            }),
       ]);
     }
 
     const w = MapContextMenu.width;
-    final left = req.local.dx.clamp(6.0, (_viewport.width - w - 6).clamp(6.0, double.infinity));
-    final top = req.local.dy.clamp(6.0, (_viewport.height - 40).clamp(6.0, double.infinity));
+    final left = req.local.dx
+        .clamp(6.0, (_viewport.width - w - 6).clamp(6.0, double.infinity));
+    final top = req.local.dy
+        .clamp(6.0, (_viewport.height - 40).clamp(6.0, double.infinity));
 
     return [
       Positioned.fill(
@@ -867,7 +1028,13 @@ class _SuperMapState extends State<SuperMap> with SingleTickerProviderStateMixin
       Positioned(
         left: left,
         top: top,
-        child: MapContextMenu(title: title, items: items, currentKind: currentKind, onPickKind: onPickKind, currentColor: currentColor, onPickColor: onPickColor),
+        child: MapContextMenu(
+            title: title,
+            items: items,
+            currentKind: currentKind,
+            onPickKind: onPickKind,
+            currentColor: currentColor,
+            onPickColor: onPickColor),
       ),
     ];
   }
@@ -896,8 +1063,8 @@ class _ModeToggle extends StatelessWidget {
             borderRadius: BorderRadius.circular(SuperTokens.radiusControl - 1),
           ),
           child: Text(label,
-              style: SuperText.button.copyWith(
-                  fontSize: 13, color: on ? Colors.white : t.fg2)),
+              style: SuperText.button
+                  .copyWith(fontSize: 13, color: on ? Colors.white : t.fg2)),
         ),
       );
     }
@@ -909,13 +1076,16 @@ class _ModeToggle extends StatelessWidget {
         border: Border.all(color: t.border),
         borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
       ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [seg('Read', MapMode.read), seg('Edit', MapMode.edit)]),
+      child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [seg('Read', MapMode.read), seg('Edit', MapMode.edit)]),
     );
   }
 }
 
 class _RoundBtn extends StatefulWidget {
-  const _RoundBtn({required this.icon, required this.tooltip, required this.onTap});
+  const _RoundBtn(
+      {required this.icon, required this.tooltip, required this.onTap});
   final IconData icon;
   final String tooltip;
   final VoidCallback onTap;
@@ -971,11 +1141,15 @@ class _TitleChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.my_location_rounded, size: 13, color: SuperTokens.accent),
+        const Icon(Icons.my_location_rounded,
+            size: 13, color: SuperTokens.accent),
         const SizedBox(width: 8),
-        Text(title, style: SuperText.caption.copyWith(fontSize: 11.5, fontWeight: FontWeight.w700, color: t.fg1)),
+        Text(title,
+            style: SuperText.caption.copyWith(
+                fontSize: 11.5, fontWeight: FontWeight.w700, color: t.fg1)),
         const SizedBox(width: 8),
-        Text('$zoom%', style: SuperText.mono.copyWith(fontSize: 10.5, color: t.fg3)),
+        Text('$zoom%',
+            style: SuperText.mono.copyWith(fontSize: 10.5, color: t.fg3)),
       ]),
     );
   }
@@ -1019,13 +1193,17 @@ class _EdgeLabel extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: SuperText.caption.copyWith(
-                          fontSize: 10.5, fontWeight: FontWeight.w600, color: t.fg2)),
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                          color: t.fg2)),
                 )),
               if (label != null && value != null) const SizedBox(height: 2),
               if (value != null)
                 pill(Text(mapCompact(value!),
                     style: SuperText.mono.copyWith(
-                        fontSize: 10, fontWeight: FontWeight.w700, color: t.fg3))),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: t.fg3))),
             ],
           ),
         ),
@@ -1036,7 +1214,8 @@ class _EdgeLabel extends StatelessWidget {
 
 /// Inline editor for an edge's text label, rendered at the edge midpoint.
 class _EdgeLabelEditor extends StatefulWidget {
-  const _EdgeLabelEditor({required this.initial, required this.onCommit, required this.onCancel});
+  const _EdgeLabelEditor(
+      {required this.initial, required this.onCommit, required this.onCancel});
   final String initial;
   final ValueChanged<String> onCommit;
   final VoidCallback onCancel;
@@ -1046,8 +1225,10 @@ class _EdgeLabelEditor extends StatefulWidget {
 }
 
 class _EdgeLabelEditorState extends State<_EdgeLabelEditor> {
-  late final TextEditingController _ctl = TextEditingController(text: widget.initial)
-    ..selection = TextSelection(baseOffset: 0, extentOffset: widget.initial.length);
+  late final TextEditingController _ctl =
+      TextEditingController(text: widget.initial)
+        ..selection =
+            TextSelection(baseOffset: 0, extentOffset: widget.initial.length);
   final FocusNode _focus = FocusNode();
 
   @override
@@ -1079,7 +1260,8 @@ class _EdgeLabelEditorState extends State<_EdgeLabelEditor> {
           isDense: true,
           hintText: 'Label…',
           hintStyle: SuperText.body.copyWith(fontSize: 11, color: t.fg4),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           filled: true,
           fillColor: t.inputBg,
           enabledBorder: OutlineInputBorder(
@@ -1100,7 +1282,8 @@ class _EdgeLabelEditorState extends State<_EdgeLabelEditor> {
 
 /// A compact segmented control used in the canvas toolbar (node / edge style).
 class _CanvasSeg<T> extends StatelessWidget {
-  const _CanvasSeg({required this.value, required this.options, required this.onChanged});
+  const _CanvasSeg(
+      {required this.value, required this.options, required this.onChanged});
   final T value;
   final Map<T, String> options;
   final ValueChanged<T> onChanged;
@@ -1124,12 +1307,16 @@ class _CanvasSeg<T> extends StatelessWidget {
               duration: SuperTokens.durBase,
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
               decoration: BoxDecoration(
-                color: value == entry.key ? SuperTokens.accent : const Color(0x00000000),
-                borderRadius: BorderRadius.circular(SuperTokens.radiusControl - 1),
+                color: value == entry.key
+                    ? SuperTokens.accent
+                    : const Color(0x00000000),
+                borderRadius:
+                    BorderRadius.circular(SuperTokens.radiusControl - 1),
               ),
               child: Text(entry.value,
                   style: SuperText.button.copyWith(
-                      fontSize: 11.5, color: value == entry.key ? Colors.white : t.fg2)),
+                      fontSize: 11.5,
+                      color: value == entry.key ? Colors.white : t.fg2)),
             ),
           ),
       ]),
@@ -1173,11 +1360,13 @@ class _DataPanel extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 9, 8, 9),
             child: Row(children: [
-              const Icon(Icons.layers_outlined, size: 13, color: SuperTokens.accent),
+              const Icon(Icons.layers_outlined,
+                  size: 13, color: SuperTokens.accent),
               const SizedBox(width: 8),
               Expanded(
                 child: Text('ALL NODES · ${c.nodes.length}',
-                    style: SuperText.label.copyWith(fontSize: 10.5, color: t.fg2)),
+                    style:
+                        SuperText.label.copyWith(fontSize: 10.5, color: t.fg2)),
               ),
               SuperIconButton(icon: Icons.close_rounded, onPressed: onClose),
             ]),
@@ -1247,7 +1436,11 @@ class _DataRowState extends State<_DataRow> {
               : (_hover ? t.hover : const Color(0x00000000)),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           child: Row(children: [
-            Container(width: 8, height: 8, decoration: BoxDecoration(color: widget.accent, shape: BoxShape.circle)),
+            Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                    color: widget.accent, shape: BoxShape.circle)),
             const SizedBox(width: 9),
             Expanded(
               child: Column(
@@ -1257,15 +1450,23 @@ class _DataRowState extends State<_DataRow> {
                   Text(n.label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: SuperText.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: t.fg1)),
-                  Text('in ${s.inCount} · out ${s.outCount}${n.note != null ? ' · note' : ''}',
-                      style: SuperText.mono.copyWith(fontSize: 9.5, color: t.fg4)),
+                      style: SuperText.caption.copyWith(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: t.fg1)),
+                  Text(
+                      'in ${s.inCount} · out ${s.outCount}${n.note != null ? ' · note' : ''}',
+                      style:
+                          SuperText.mono.copyWith(fontSize: 9.5, color: t.fg4)),
                 ],
               ),
             ),
             if (n.value != null)
               Text(mapCompact(n.value!),
-                  style: SuperText.mono.copyWith(fontSize: 10.5, fontWeight: FontWeight.w700, color: widget.accent)),
+                  style: SuperText.mono.copyWith(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      color: widget.accent)),
           ]),
         ),
       ),
@@ -1274,7 +1475,11 @@ class _DataRowState extends State<_DataRow> {
 }
 
 class _Port extends StatefulWidget {
-  const _Port({required this.lit, required this.onStart, required this.onUpdate, required this.onEnd});
+  const _Port(
+      {required this.lit,
+      required this.onStart,
+      required this.onUpdate,
+      required this.onEnd});
   final bool lit;
   final ValueChanged<Offset> onStart; // global position
   final ValueChanged<Offset> onUpdate;
@@ -1328,7 +1533,8 @@ class _MenuDivider extends StatelessWidget {
 }
 
 class _Toast extends StatefulWidget {
-  const _Toast({required this.message, required this.tick, required this.onDone});
+  const _Toast(
+      {required this.message, required this.tick, required this.onDone});
   final String message;
   final int tick;
   final VoidCallback onDone;
@@ -1369,7 +1575,8 @@ class _ToastState extends State<_Toast> {
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(Icons.check_rounded, size: 13, color: t.bg),
         const SizedBox(width: 7),
-        Text(widget.message, style: SuperText.button.copyWith(fontSize: 12, color: t.bg)),
+        Text(widget.message,
+            style: SuperText.button.copyWith(fontSize: 12, color: t.bg)),
       ]),
     );
   }
@@ -1394,7 +1601,8 @@ class _SearchField extends StatefulWidget {
 }
 
 class _SearchFieldState extends State<_SearchField> {
-  late final TextEditingController _ctl = TextEditingController(text: widget.query);
+  late final TextEditingController _ctl =
+      TextEditingController(text: widget.query);
 
   @override
   void didUpdateWidget(_SearchField old) {
@@ -1422,7 +1630,8 @@ class _SearchFieldState extends State<_SearchField> {
         borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
       ),
       child: Row(children: [
-        Icon(Icons.search_rounded, size: 15, color: has ? SuperTokens.accent : t.fg3),
+        Icon(Icons.search_rounded,
+            size: 15, color: has ? SuperTokens.accent : t.fg3),
         const SizedBox(width: 7),
         Expanded(
           child: TextField(
@@ -1494,8 +1703,14 @@ class _IssuesPanel extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(13, 9, 8, 9),
             child: Row(children: [
-              Icon(summary.isClean ? Icons.verified_rounded : Icons.report_problem_outlined,
-                  size: 14, color: summary.isClean ? SuperTokens.success : SuperTokens.warning),
+              Icon(
+                  summary.isClean
+                      ? Icons.verified_rounded
+                      : Icons.report_problem_outlined,
+                  size: 14,
+                  color: summary.isClean
+                      ? SuperTokens.success
+                      : SuperTokens.warning),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -1512,8 +1727,10 @@ class _IssuesPanel extends StatelessWidget {
           if (issues.isEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(13, 14, 13, 16),
-              child: Text('No problems found. The diagram is structurally sound.',
-                  style: SuperText.caption.copyWith(fontSize: 12, color: t.fg3)),
+              child: Text(
+                  'No problems found. The diagram is structurally sound.',
+                  style:
+                      SuperText.caption.copyWith(fontSize: 12, color: t.fg3)),
             )
           else
             Flexible(
@@ -1522,7 +1739,8 @@ class _IssuesPanel extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 itemCount: issues.length,
                 separatorBuilder: (_, __) => const Hairline(),
-                itemBuilder: (context, i) => _IssueRow(issue: issues[i], onTap: () => onPick(issues[i])),
+                itemBuilder: (context, i) =>
+                    _IssueRow(issue: issues[i], onTap: () => onPick(issues[i])),
               ),
             ),
         ],
@@ -1545,8 +1763,14 @@ class _IssueRowState extends State<_IssueRow> {
   Widget build(BuildContext context) {
     final t = context.superTheme;
     final (icon, color) = switch (widget.issue.severity) {
-      MapIssueSeverity.error => (Icons.error_outline_rounded, SuperTokens.danger),
-      MapIssueSeverity.warning => (Icons.warning_amber_rounded, SuperTokens.warning),
+      MapIssueSeverity.error => (
+          Icons.error_outline_rounded,
+          SuperTokens.danger
+        ),
+      MapIssueSeverity.warning => (
+          Icons.warning_amber_rounded,
+          SuperTokens.warning
+        ),
       MapIssueSeverity.info => (Icons.info_outline_rounded, SuperTokens.accent),
     };
     final tappable = widget.issue.nodeId != null || widget.issue.edgeId != null;
@@ -1561,11 +1785,14 @@ class _IssueRowState extends State<_IssueRow> {
           color: _hover && tappable ? t.hover : const Color(0x00000000),
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Padding(padding: const EdgeInsets.only(top: 1), child: Icon(icon, size: 14, color: color)),
+            Padding(
+                padding: const EdgeInsets.only(top: 1),
+                child: Icon(icon, size: 14, color: color)),
             const SizedBox(width: 9),
             Expanded(
               child: Text(widget.issue.message,
-                  style: SuperText.caption.copyWith(fontSize: 11.5, color: t.fg2, height: 1.3)),
+                  style: SuperText.caption
+                      .copyWith(fontSize: 11.5, color: t.fg2, height: 1.3)),
             ),
           ]),
         ),

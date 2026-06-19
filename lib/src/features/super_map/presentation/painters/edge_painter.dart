@@ -68,16 +68,18 @@ class EdgePainter extends CustomPainter {
       ..scale(scale);
     final m = matrix.storage;
 
-    for (final g in geometry) {
+    for (var i = 0; i < geometry.length; i++) {
+      final g = geometry[i];
       final on = incident.contains(g.edge.id);
       final dim = selectedNodeId != null && !on;
       final isSel = selectedEdgeId == g.edge.id;
       final color = isSel
           ? accent
-          : (selectedNodeId != null && on ? accentForEdge(g.edge) : borderStrong);
-      final opacity = dim
-          ? 0.18
-          : (isSel || (selectedNodeId != null && on) ? 0.95 : 0.55);
+          : (selectedNodeId != null && on
+              ? accentForEdge(g.edge)
+              : borderStrong);
+      final opacity =
+          dim ? 0.18 : (isSel || (selectedNodeId != null && on) ? 0.95 : 0.55);
       final width = (isSel ? 2.8 : (on ? 2.4 : 1.6)) * scale;
 
       final worldPath = MapLogic.buildPath(g.a, g.b, edgeStyle);
@@ -89,11 +91,21 @@ class EdgePainter extends CustomPainter {
         ..strokeJoin = StrokeJoin.round
         ..color = color.withOpacity(opacity);
 
-      if (flow) {
-        canvas.drawPath(_dashed(screenPath, 7 * scale, 6 * scale, dashPhase * scale), paint);
-        _flowDot(canvas, screenPath, on, color, dim);
-      } else {
-        canvas.drawPath(screenPath, paint);
+      canvas.drawPath(screenPath, paint);
+
+      if (flow && !dim) {
+        final pulsePaint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = width + 0.6 * scale
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..color = color.withOpacity((isSel || on) ? 0.78 : 0.48);
+        final phase = (dashPhase + i * 9.0) * scale;
+        canvas.drawPath(
+          _dashed(screenPath, 12 * scale, 22 * scale, phase),
+          pulsePaint,
+        );
+        _flowDot(canvas, screenPath, on || isSel, color, flowT + i * 0.11);
       }
       _arrowhead(canvas, g, color.withOpacity(opacity));
     }
@@ -113,15 +125,16 @@ class EdgePainter extends CustomPainter {
   }
 
   // a pulse dot travelling source → target along the screen path
-  void _flowDot(Canvas canvas, Path screenPath, bool on, Color color, bool dim) {
+  void _flowDot(
+      Canvas canvas, Path screenPath, bool on, Color color, double t) {
     for (final metric in screenPath.computeMetrics()) {
       if (metric.length <= 0) continue;
-      final tan = metric.getTangentForOffset(metric.length * (flowT % 1.0));
+      final tan = metric.getTangentForOffset(metric.length * (t % 1.0));
       if (tan == null) continue;
       canvas.drawCircle(
         tan.position,
         (on ? 3.6 : 3.0) * scale,
-        Paint()..color = color.withOpacity(dim ? 0.12 : 0.95),
+        Paint()..color = color.withOpacity(on ? 0.95 : 0.72),
       );
     }
   }
@@ -146,7 +159,11 @@ class EdgePainter extends CustomPainter {
       ..lineTo(p1.dx, p1.dy)
       ..lineTo(p2.dx, p2.dy)
       ..close();
-    canvas.drawPath(arrow, Paint()..color = color..style = PaintingStyle.fill);
+    canvas.drawPath(
+        arrow,
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.fill);
   }
 
   Path _dashed(Path source, double on, double off, double phase) {
@@ -157,7 +174,9 @@ class EdgePainter extends CustomPainter {
       while (dist < metric.length) {
         final start = math.max(0.0, dist);
         final end = math.min(metric.length, dist + on);
-        if (end > start) out.addPath(metric.extractPath(start, end), Offset.zero);
+        if (end > start) {
+          out.addPath(metric.extractPath(start, end), Offset.zero);
+        }
         dist += span;
       }
     }
