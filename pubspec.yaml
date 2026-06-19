@@ -1,18 +1,9 @@
 name: super_map
 description: >
-  Super Map — a GeniusLink design-system Flutter package providing SuperMap, a
-  pannable, zoomable, draggable node-graph canvas with READ and EDIT modes built
-  for ERP / accounting diagrams: pan/zoom/drag/inspect in read; four-sided ports
-  (drag to connect), add / rename / re-kind / recolour / duplicate / delete
-  nodes, text-labelled connections, per-node notes, edge editing, undo and JSON
-  import/export in edit. v1.0.0 adds an ERP layer — workflow status, audit
-  locks, source-record refs + metadata, a per-graph currency, node search,
-  layered / grid / radial auto-layout, an audit-grade validator (dangling /
-  duplicate / cycle / orphan + double-entry flow-balance checks) and CSV export.
-  Curved/orthogonal/straight edge routing, card/chip/pill node styles, a dot
-  grid, a live minimap, a selection details panel, an all-nodes data panel, an
-  optional animated edge flow, and image / PDF / Word / CSV export. Five bundled
-  sample graphs share one engine. Light/dark + LTR/RTL.
+  GeniusLink design-system Flutter package for pannable, zoomable, draggable
+  node-graph canvases. Includes read/edit modes, ERP workflow metadata, audit
+  locks, node search, auto-layout, validation, minimap, JSON import/export, and
+  PNG, PDF, Word, and CSV export for accounting and process diagrams.
 
 version: 1.0.0
 homepage: https://geniussystems24.github.io/super_map
