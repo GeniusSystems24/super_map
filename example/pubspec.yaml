@@ -1,7 +1,14 @@
 name: super_map_example
 description: Runnable showcase for the super_map Flutter package.
-publish_to: "none"
+
 version: 1.0.0
+
+topics:
+  - flutter
+  - widgets
+  - material-design
+  - design-system
+  - theme
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -11,8 +18,7 @@ dependencies:
   flutter:
     sdk: flutter
   # Shared GeniusLink foundation (transitive via the package; listed for resolution).
-  super_core:
-    path: ../../super_core
+  super_core: ^0.1.0
   super_map:
     path: ../
   # Used only by the "Editable + Export" example to save/share exported bytes.

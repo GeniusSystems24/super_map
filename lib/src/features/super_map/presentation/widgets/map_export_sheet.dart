@@ -83,10 +83,12 @@ class _MapExportSheetState extends State<_MapExportSheet> {
         case MapExportFormat.pdf:
           bytes = await MapExporter.pngToPdf(png,
               width: w, height: h, title: widget.title);
-        case MapExportFormat.csv:
         case MapExportFormat.docx:
           bytes = MapExporter.pngToDocx(png,
               width: w, height: h, title: widget.title);
+        case MapExportFormat.csv:
+          throw UnsupportedError(
+              'CSV export is not available from this sheet.');
       }
       if (!mounted) return;
       widget.onExport(bytes, '$_safeName.${format.ext}', format);

@@ -13,8 +13,18 @@ description: >
   grid, a live minimap, a selection details panel, an all-nodes data panel, an
   optional animated edge flow, and image / PDF / Word / CSV export. Five bundled
   sample graphs share one engine. Light/dark + LTR/RTL.
-publish_to: "none"
+
 version: 1.0.0
+homepage: https://geniussystems24.github.io/super_map
+repository: https://github.com/GeniusSystems24/super_map
+issue_tracker: https://github.com/GeniusSystems24/super_map/issues
+
+topics:
+  - flutter
+  - widgets
+  - diagram
+  - graph
+  - canvas
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -24,8 +34,7 @@ dependencies:
   flutter:
     sdk: flutter
   # Shared GeniusLink design-system foundation (theme, tokens, type, widgets).
-  super_core:
-    path: ../super_core
+  super_core: ^0.1.0
   # Export pipeline (v0.2.0): PDF assembly + DOCX (zip) packaging.
   pdf: ^3.10.0
   archive: ^3.4.0
