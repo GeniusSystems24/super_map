@@ -16,8 +16,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:super_map/super_map.dart';
 
+import '../../../../../super_map.dart';
 import '../../../../core/core.dart';
 import '../../domain/entities/map_node.dart';
 import '../../domain/usecases/map_logic.dart';

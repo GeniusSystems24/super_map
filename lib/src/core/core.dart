@@ -1,38 +1,15 @@
 // ============================================================
-// core/core.dart — barrel for the shared foundation.
-// Re-exports theme, constants, errors, typedefs, usecases, utils, extensions
-// and shared widgets. Features import from here, never from each other.
+// core/core.dart — facade over the shared `super_core` foundation.
+// ------------------------------------------------------------
+// The GeniusLink theme tokens, `SuperThemeData`, text styles, formatters and
+// design-system widgets now live in the standalone `super_core` package so the
+// whole Super toolkit shares one identity. This file re-exports them — plus the
+// SuperMap-specific `MapExporter` util — so the package's existing
+// `import '.../core/core.dart';` call sites keep working.
+// Features import from here, never from each other.
 // ============================================================
 
-// Theme
-export 'theme/super_tokens.dart';
-export 'theme/super_theme.dart';
-export 'theme/super_text_styles.dart';
+export 'package:super_core/super_core.dart';
 
-// Constants
-export 'constants/super_constants.dart';
-
-// Errors
-export 'errors/failures.dart';
-
-// Typedefs
-export 'typedefs/typedefs.dart';
-
-// Usecases
-export 'usecases/usecase.dart';
-
-// Utils
-export 'utils/key_directions.dart';
-export 'utils/super_format.dart';
+// SuperMap-specific export pipeline (stays in this package).
 export 'utils/map_exporter.dart';
-
-// Extensions
-export 'extensions/context_extensions.dart';
-
-// Widgets
-export 'widgets/hairline.dart';
-export 'widgets/section_header.dart';
-export 'widgets/section_card.dart';
-export 'widgets/status_pill.dart';
-export 'widgets/super_button.dart';
-export 'widgets/field_shell.dart';

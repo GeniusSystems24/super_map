@@ -10,6 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Shared GeniusLink foundation (transitive via the package; listed for resolution).
+  super_core:
+    path: ../../super_core
   super_map:
     path: ../
   # Used only by the "Editable + Export" example to save/share exported bytes.

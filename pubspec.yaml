@@ -19,6 +19,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Shared GeniusLink design-system foundation (theme, tokens, type, widgets).
+  super_core:
+    path: ../super_core
   # Export pipeline (v0.2.0): PDF assembly + DOCX (zip) packaging.
   pdf: ^3.10.0
   archive: ^3.4.0

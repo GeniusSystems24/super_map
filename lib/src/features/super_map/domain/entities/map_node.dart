@@ -9,9 +9,9 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
-import '../../../../core/theme/super_theme.dart';
-import '../../../../core/theme/super_tokens.dart';
+import 'package:super_core/super_core.dart';
 
 /// The kind of a [MapNode] — drives its accent color, icon and tag. Ported 1:1
 /// from the React `KIND` table. Neutral kinds (`leaf`, `document`) carry a null
