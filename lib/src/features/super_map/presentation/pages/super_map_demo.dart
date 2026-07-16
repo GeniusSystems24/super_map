@@ -67,7 +67,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
                 children: [
                   Text('SUPER MAP \u2022 SHOWCASE',
                       style: SuperText.eyebrow
-                          .copyWith(color: SuperTokens.accent)),
+                          .copyWith(color: Theme.of(context).colorScheme.primary)),
                   const SizedBox(height: SuperTokens.space2),
                   Text.rich(
                     TextSpan(children: [
@@ -159,7 +159,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
           const SizedBox(width: SuperTokens.space2),
           Switch(
             value: _showData,
-            activeColor: SuperTokens.accent,
+            activeColor: Theme.of(context).colorScheme.primary,
             onChanged: (v) => setState(() => _showData = v),
           ),
         ]),
@@ -168,7 +168,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
           const SizedBox(width: SuperTokens.space2),
           Switch(
             value: _flow,
-            activeColor: SuperTokens.accent,
+            activeColor: Theme.of(context).colorScheme.primary,
             onChanged: (v) => setState(() => _flow = v),
           ),
         ]),
@@ -214,12 +214,12 @@ class _Chip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: selected ? t.selectionFill(0.14) : t.surface,
-          border: Border.all(color: selected ? SuperTokens.accent : t.border),
+          border: Border.all(color: selected ? Theme.of(context).colorScheme.primary : t.border),
           borderRadius: BorderRadius.circular(999),
         ),
         child: Text(label,
             style: SuperText.button.copyWith(
-                fontSize: 13, color: selected ? SuperTokens.accent : t.fg2)),
+                fontSize: 13, color: selected ? Theme.of(context).colorScheme.primary : t.fg2)),
       ),
     );
   }
@@ -261,7 +261,7 @@ class _OptionGroup<T> extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: value == entry.key
-                      ? SuperTokens.accent
+                      ? Theme.of(context).colorScheme.primary
                       : const Color(0x00000000),
                   borderRadius:
                       BorderRadius.circular(SuperTokens.radiusControl - 1),

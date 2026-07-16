@@ -41,6 +41,7 @@ class _MapJsonSheetState extends State<_MapJsonSheet> {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     return Center(
       child: Material(
         color: const Color(0x00000000),
@@ -61,7 +62,7 @@ class _MapJsonSheetState extends State<_MapJsonSheet> {
                 padding: const EdgeInsets.fromLTRB(18, 15, 12, 15),
                 child: Row(
                   children: [
-                    const Icon(Icons.data_object_rounded, size: 17, color: SuperTokens.accent),
+                    Icon(Icons.data_object_rounded, size: 17, color: cs.primary),
                     const SizedBox(width: 10),
                     Text('Diagram JSON', style: SuperText.heading.copyWith(fontSize: 15, color: t.fg1)),
                     const SizedBox(width: 8),

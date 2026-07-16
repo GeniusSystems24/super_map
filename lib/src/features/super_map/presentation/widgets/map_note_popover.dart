@@ -98,7 +98,7 @@ class _MapNotePopoverState extends State<MapNotePopover> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
-                        borderSide: const BorderSide(color: SuperTokens.accent, width: 1.5),
+                        borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
                       ),
                     ),
                     onChanged: widget.onSave,

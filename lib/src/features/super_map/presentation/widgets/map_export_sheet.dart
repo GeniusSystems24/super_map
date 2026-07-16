@@ -67,8 +67,7 @@ class _MapExportSheetState extends State<_MapExportSheet> {
       _error = null;
     });
     try {
-      final png =
-          await MapExporter.capturePng(widget.boundaryKey, pixelRatio: 2.5);
+      final png = await MapExporter.capturePng(widget.boundaryKey, pixelRatio: 2.5);
       if (png == null) throw StateError('Canvas is not ready to capture.');
       // decode dimensions for correct PDF/DOCX sizing
       final codec = await ui.instantiateImageCodec(png);
@@ -81,11 +80,9 @@ class _MapExportSheetState extends State<_MapExportSheet> {
         case MapExportFormat.png:
           bytes = png;
         case MapExportFormat.pdf:
-          bytes = await MapExporter.pngToPdf(png,
-              width: w, height: h, title: widget.title);
+          bytes = await MapExporter.pngToPdf(png, width: w, height: h, title: widget.title);
         case MapExportFormat.docx:
-          bytes = MapExporter.pngToDocx(png,
-              width: w, height: h, title: widget.title);
+          bytes = MapExporter.pngToDocx(png, width: w, height: h, title: widget.title);
         case MapExportFormat.csv:
           throw UnsupportedError(
               'CSV export is not available from this sheet.');
@@ -103,6 +100,7 @@ class _MapExportSheetState extends State<_MapExportSheet> {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     return Center(
       child: Material(
         color: const Color(0x00000000),
@@ -123,12 +121,10 @@ class _MapExportSheetState extends State<_MapExportSheet> {
                 padding: const EdgeInsets.fromLTRB(18, 15, 12, 13),
                 child: Row(
                   children: [
-                    const Icon(Icons.ios_share_rounded,
-                        size: 16, color: SuperTokens.accent),
+                    Icon(Icons.ios_share_rounded, size: 16, color: cs.primary),
                     const SizedBox(width: 10),
                     Text('Export diagram',
-                        style: SuperText.heading
-                            .copyWith(fontSize: 15, color: t.fg1)),
+                        style: SuperText.heading.copyWith(fontSize: 15, color: t.fg1)),
                     const Spacer(),
                     SuperIconButton(
                         icon: Icons.close_rounded,
@@ -170,16 +166,12 @@ class _MapExportSheetState extends State<_MapExportSheet> {
                   child: _busy
                       ? Row(children: [
                           const SizedBox(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(strokeWidth: 2)),
+                              width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
                           const SizedBox(width: 10),
-                          Text('Rendering…',
-                              style: SuperText.caption.copyWith(color: t.fg3)),
+                          Text('Rendering…', style: SuperText.caption.copyWith(color: t.fg3)),
                         ])
                       : Text(_error!,
-                          style: SuperText.caption
-                              .copyWith(color: SuperTokens.danger)),
+                          style: SuperText.caption.copyWith(color: Theme.of(context).colorScheme.error)),
                 ),
             ],
           ),
@@ -211,6 +203,7 @@ class _ExportOptionState extends State<_ExportOption> {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hover = true),
@@ -232,11 +225,10 @@ class _ExportOptionState extends State<_ExportOption> {
                 height: 34,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: t.tintFill(SuperTokens.accent, 0.14),
-                  borderRadius:
-                      BorderRadius.circular(SuperTokens.radiusControl),
+                  color: t.tintFill(cs.primary, 0.14),
+                  borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
                 ),
-                child: Icon(widget.icon, size: 18, color: SuperTokens.accent),
+                child: Icon(widget.icon, size: 18, color: cs.primary),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -244,10 +236,8 @@ class _ExportOptionState extends State<_ExportOption> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(widget.label,
-                        style: SuperText.body.copyWith(
-                            fontWeight: FontWeight.w700, color: t.fg1)),
-                    Text(widget.sub,
-                        style: SuperText.caption.copyWith(color: t.fg3)),
+                        style: SuperText.body.copyWith(fontWeight: FontWeight.w700, color: t.fg1)),
+                    Text(widget.sub, style: SuperText.caption.copyWith(color: t.fg3)),
                   ],
                 ),
               ),

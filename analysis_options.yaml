@@ -5,6 +5,7 @@ analyzer:
     strict-casts: true
     strict-raw-types: true
   errors:
+    deprecated_member_use: ignore
     invalid_annotation_target: ignore
 
 linter:

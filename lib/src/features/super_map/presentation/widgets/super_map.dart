@@ -18,21 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../../super_map.dart';
-import '../../../../core/core.dart';
-import '../../domain/entities/map_node.dart';
-import '../../domain/usecases/map_logic.dart';
-import '../../domain/usecases/map_layout.dart';
-import '../../domain/usecases/map_validator.dart';
-import '../controllers/super_map_controller.dart';
-import '../painters/edge_painter.dart';
-import '../painters/grid_painter.dart';
-import 'map_context_menu.dart';
-import 'map_details_panel.dart';
-import 'map_export_sheet.dart';
-import 'map_json_sheet.dart';
-import 'map_minimap.dart';
-import 'map_node_card.dart';
-import 'map_note_popover.dart';
 
 class _MenuReq {
   const _MenuReq(this.local, this.type, this.id);
@@ -91,7 +76,7 @@ class SuperMap extends StatefulWidget {
 }
 
 class _SuperMapState extends State<SuperMap>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final GlobalKey _canvasKey = GlobalKey();
   final GlobalKey _repaintKey = GlobalKey();
   final FocusNode _focus = FocusNode();
@@ -147,10 +132,11 @@ class _SuperMapState extends State<SuperMap>
   Offset _toLocal(Offset global) => _box?.globalToLocal(global) ?? global;
 
   String? _edgeAt(Offset local) {
-    final m = (Matrix4.identity()
-          ..translate(c.offset.dx, c.offset.dy)
-          ..scale(c.scale))
-        .storage;
+    final m =
+        (Matrix4.identity()
+              ..translate(c.offset.dx, c.offset.dy)
+              ..scale(c.scale))
+            .storage;
     var bestId = '';
     var best = double.infinity;
     for (final g in c.geometry) {
@@ -225,8 +211,9 @@ class _SuperMapState extends State<SuperMap>
     if (edited == null || !mounted) return;
     final err = c.importJson(edited);
     if (err != null && mounted) {
-      ScaffoldMessenger.maybeOf(context)
-          ?.showSnackBar(SnackBar(content: Text(err)));
+      ScaffoldMessenger.maybeOf(
+        context,
+      )?.showSnackBar(SnackBar(content: Text(err)));
     }
   }
 
@@ -241,8 +228,10 @@ class _SuperMapState extends State<SuperMap>
         } else if (mounted) {
           ScaffoldMessenger.maybeOf(context)?.showSnackBar(
             SnackBar(
-                content: Text(
-                    'Exported $filename (${bytes.length} bytes) — wire SuperMap.onExport to save it.')),
+              content: Text(
+                'Exported $filename (${bytes.length} bytes) — wire SuperMap.onExport to save it.',
+              ),
+            ),
           );
         }
       },
@@ -260,8 +249,12 @@ class _SuperMapState extends State<SuperMap>
     final t = context.superTheme;
     final kind = await showMenu<MapLayoutKind>(
       context: context,
-      position:
-          RelativeRect.fromLTRB(global.dx, global.dy, global.dx, global.dy),
+      position: RelativeRect.fromLTRB(
+        global.dx,
+        global.dy,
+        global.dx,
+        global.dy,
+      ),
       color: t.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
@@ -280,12 +273,20 @@ class _SuperMapState extends State<SuperMap>
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(label,
-                    style: SuperText.button
-                        .copyWith(fontSize: 12.5, color: t.fg1)),
-                Text(sub,
-                    style: SuperText.caption
-                        .copyWith(fontSize: 10.5, color: t.fg4)),
+                Text(
+                  label,
+                  style: SuperText.button.copyWith(
+                    fontSize: 12.5,
+                    color: t.fg1,
+                  ),
+                ),
+                Text(
+                  sub,
+                  style: SuperText.caption.copyWith(
+                    fontSize: 10.5,
+                    color: t.fg4,
+                  ),
+                ),
               ],
             ),
           ),
@@ -383,7 +384,7 @@ class _SuperMapState extends State<SuperMap>
                   final box = btnCtx.findRenderObject() as RenderBox?;
                   final pos =
                       box?.localToGlobal(box.size.bottomLeft(Offset.zero)) ??
-                          Offset.zero;
+                      Offset.zero;
                   _pickLayout(pos);
                 },
               ),
@@ -394,8 +395,11 @@ class _SuperMapState extends State<SuperMap>
             icon: const Icon(Icons.add_rounded),
             onPressed: () {
               if (_viewport.isEmpty) return;
-              c.addNodeAt(c.screenToWorld(
-                  Offset(_viewport.width / 2, _viewport.height / 2)));
+              c.addNodeAt(
+                c.screenToWorld(
+                  Offset(_viewport.width / 2, _viewport.height / 2),
+                ),
+              );
             },
           ),
           SuperButton(
@@ -423,6 +427,7 @@ class _SuperMapState extends State<SuperMap>
 
   // ── canvas ──
   Widget _canvas(SuperThemeData t) {
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = Size(constraints.maxWidth, constraints.maxHeight);
@@ -435,7 +440,7 @@ class _SuperMapState extends State<SuperMap>
         }
 
         final accentBorder = c.isEdit
-            ? Color.alphaBlend(SuperTokens.accent.withOpacity(0.4), t.border)
+            ? Color.alphaBlend(cs.primary.withOpacity(0.4), t.border)
             : t.border;
 
         return Focus(
@@ -470,9 +475,10 @@ class _SuperMapState extends State<SuperMap>
                         Positioned.fill(
                           child: CustomPaint(
                             painter: GridPainter(
-                                offset: c.offset,
-                                scale: c.scale,
-                                color: t.border),
+                              offset: c.offset,
+                              scale: c.scale,
+                              color: t.border,
+                            ),
                           ),
                         ),
                       // pan / zoom / tap surface (below nodes)
@@ -490,7 +496,8 @@ class _SuperMapState extends State<SuperMap>
                       ),
                       // edges
                       Positioned.fill(
-                          child: IgnorePointer(child: _edgesLayer(t))),
+                        child: IgnorePointer(child: _edgesLayer(t)),
+                      ),
                       // nodes + ports + edge labels (world space)
                       Positioned.fill(child: _worldLayer(t)),
                       // overlays
@@ -509,12 +516,16 @@ class _SuperMapState extends State<SuperMap>
 
   Widget _edgesLayer(SuperThemeData t) {
     Offset? linkFrom, linkTo;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     final link = c.link;
     if (link != null) {
       final from = c.nodeById(link.fromId);
       if (from != null) {
         final a = MapLogic.sideAnchor(
-            from.center, MapLogic.sizeOf(from, c.nodeStyle), link.cursor);
+          from.center,
+          MapLogic.sizeOf(from, c.nodeStyle),
+          link.cursor,
+        );
         linkFrom = a.point;
         linkTo = link.cursor;
       }
@@ -533,7 +544,7 @@ class _SuperMapState extends State<SuperMap>
           return from?.accentOf(t) ?? MapNodeKind.leaf.colorOf(t);
         },
         borderStrong: t.borderStrong,
-        accent: SuperTokens.accent,
+        accent: cs.primary,
         linkFrom: linkFrom,
         linkTo: linkTo,
         flow: widget.animateFlow,
@@ -582,9 +593,11 @@ class _SuperMapState extends State<SuperMap>
                             )
                           : _EdgeLabel(
                               label: g.edge.label,
-                              value:
-                                  widget.showEdgeLabels ? g.edge.value : null,
-                              dim: selId != null &&
+                              value: widget.showEdgeLabels
+                                  ? g.edge.value
+                                  : null,
+                              dim:
+                                  selId != null &&
                                   !c.incidentEdges.contains(g.edge.id),
                               onTap: c.isEdit
                                   ? () => c.startEdgeLabel(g.edge.id)
@@ -608,7 +621,7 @@ class _SuperMapState extends State<SuperMap>
     final size = MapLogic.sizeOf(n, c.nodeStyle);
     final dim =
         (selId != null && selId != n.id && !neighbours.contains(n.id)) ||
-            _searchDimmed(n.id);
+        _searchDimmed(n.id);
     return Positioned(
       left: n.x - size.width / 2,
       top: n.y - size.height / 2,
@@ -636,8 +649,10 @@ class _SuperMapState extends State<SuperMap>
         onDoubleTap: () => c.startRename(n.id),
         onContextMenu: (global) {
           c.selectNode(n.id);
-          setState(() =>
-              _menu = _MenuReq(_toLocal(global), MapSelectionType.node, n.id));
+          setState(
+            () =>
+                _menu = _MenuReq(_toLocal(global), MapSelectionType.node, n.id),
+          );
         },
         onHover: (h) => c.setHover(h ? n.id : null),
         onCommitRename: c.commitRename,
@@ -688,17 +703,21 @@ class _SuperMapState extends State<SuperMap>
       PositionedDirectional(
         top: 12,
         start: 12,
-        child: Row(children: [
-          _RoundBtn(
+        child: Row(
+          children: [
+            _RoundBtn(
               icon: Icons.fullscreen_rounded,
               tooltip: 'Fit to view',
-              onTap: () => c.fitToView(_viewport)),
-          const SizedBox(width: 7),
-          _RoundBtn(
+              onTap: () => c.fitToView(_viewport),
+            ),
+            const SizedBox(width: 7),
+            _RoundBtn(
               icon: Icons.refresh_rounded,
               tooltip: 'Reset layout',
-              onTap: c.reset),
-        ]),
+              onTap: c.reset,
+            ),
+          ],
+        ),
       ),
       // top-right: title chip
       PositionedDirectional(
@@ -710,17 +729,21 @@ class _SuperMapState extends State<SuperMap>
       PositionedDirectional(
         bottom: 12,
         end: 12,
-        child: Column(children: [
-          _RoundBtn(
+        child: Column(
+          children: [
+            _RoundBtn(
               icon: Icons.add_rounded,
               tooltip: 'Zoom in',
-              onTap: () => _zoomCenter(1.2)),
-          const SizedBox(height: 7),
-          _RoundBtn(
+              onTap: () => _zoomCenter(1.2),
+            ),
+            const SizedBox(height: 7),
+            _RoundBtn(
               icon: Icons.remove_rounded,
               tooltip: 'Zoom out',
-              onTap: () => _zoomCenter(1 / 1.2)),
-        ]),
+              onTap: () => _zoomCenter(1 / 1.2),
+            ),
+          ],
+        ),
       ),
       // bottom-left: minimap
       if (widget.showMinimap && c.bounds != null && !_viewport.isEmpty)
@@ -804,7 +827,10 @@ class _SuperMapState extends State<SuperMap>
           right: 0,
           child: Center(
             child: _Toast(
-                message: c.toast!, tick: c.toastTick, onDone: c.clearToast),
+              message: c.toast!,
+              tick: c.toastTick,
+              onDone: c.clearToast,
+            ),
           ),
         ),
       // note popover (v0.2.0)
@@ -816,13 +842,18 @@ class _SuperMapState extends State<SuperMap>
   List<Widget> _notePopoverLayer(SuperThemeData t) {
     final n = c.nodeById(_noteId!)!;
     final size = MapLogic.sizeOf(n, c.nodeStyle);
-    final corner =
-        c.worldToScreen(Offset(n.x + size.width / 2, n.y - size.height / 2));
+    final corner = c.worldToScreen(
+      Offset(n.x + size.width / 2, n.y - size.height / 2),
+    );
     const w = 236.0;
-    final left = (corner.dx + 6)
-        .clamp(8.0, (_viewport.width - w - 8).clamp(8.0, double.infinity));
-    final top = (corner.dy - 6)
-        .clamp(8.0, (_viewport.height - 170).clamp(8.0, double.infinity));
+    final left = (corner.dx + 6).clamp(
+      8.0,
+      (_viewport.width - w - 8).clamp(8.0, double.infinity),
+    );
+    final top = (corner.dy - 6).clamp(
+      8.0,
+      (_viewport.height - 170).clamp(8.0, double.infinity),
+    );
     void close() => setState(() => _noteId = null);
     return [
       Positioned.fill(
@@ -873,75 +904,84 @@ class _SuperMapState extends State<SuperMap>
         };
         items.addAll([
           MapMenuItem(
-              icon: Icons.edit_outlined,
-              label: 'Rename',
-              kbd: '↵',
-              onTap: () {
-                c.startRename(req.id!);
-                close();
-              }),
+            icon: Icons.edit_outlined,
+            label: 'Rename',
+            kbd: '↵',
+            onTap: () {
+              c.startRename(req.id!);
+              close();
+            },
+          ),
           MapMenuItem(
+            icon: Icons.sticky_note_2_outlined,
+            label: (n?.note != null) ? 'Edit note' : 'Add note',
+            onTap: () {
+              setState(() {
+                _menu = null;
+                _noteId = req.id;
+              });
+            },
+          ),
+          MapMenuItem(
+            icon: Icons.link_rounded,
+            label: 'Connect from here',
+            onTap: () {
+              final n2 = c.nodeById(req.id!);
+              if (n2 != null) {
+                c.startLink(req.id!, NodeSide.right, n2.center, click: true);
+              }
+              close();
+            },
+          ),
+          MapMenuItem(
+            icon: Icons.copy_rounded,
+            label: 'Duplicate',
+            onTap: () {
+              c.duplicateNode(req.id!);
+              close();
+            },
+          ),
+          const _MenuDivider(),
+          MapMenuItem(
+            icon: Icons.delete_outline_rounded,
+            label: 'Delete',
+            danger: true,
+            kbd: '⌫',
+            onTap: () {
+              c.deleteNode(req.id!);
+              close();
+            },
+          ),
+        ]);
+      } else {
+        items.addAll([
+          MapMenuItem(
+            icon: Icons.my_location_rounded,
+            label: 'Inspect',
+            onTap: () {
+              c.selectNode(req.id!);
+              close();
+            },
+          ),
+          if (n?.note != null)
+            MapMenuItem(
               icon: Icons.sticky_note_2_outlined,
-              label: (n?.note != null) ? 'Edit note' : 'Add note',
+              label: 'View note',
               onTap: () {
                 setState(() {
                   _menu = null;
                   _noteId = req.id;
                 });
-              }),
+              },
+            ),
           MapMenuItem(
-              icon: Icons.link_rounded,
-              label: 'Connect from here',
-              onTap: () {
-                final n2 = c.nodeById(req.id!);
-                if (n2 != null)
-                  c.startLink(req.id!, NodeSide.right, n2.center, click: true);
-                close();
-              }),
-          MapMenuItem(
-              icon: Icons.copy_rounded,
-              label: 'Duplicate',
-              onTap: () {
-                c.duplicateNode(req.id!);
-                close();
-              }),
-          const _MenuDivider(),
-          MapMenuItem(
-              icon: Icons.delete_outline_rounded,
-              label: 'Delete',
-              danger: true,
-              kbd: '⌫',
-              onTap: () {
-                c.deleteNode(req.id!);
-                close();
-              }),
-        ]);
-      } else {
-        items.addAll([
-          MapMenuItem(
-              icon: Icons.my_location_rounded,
-              label: 'Inspect',
-              onTap: () {
-                c.selectNode(req.id!);
-                close();
-              }),
-          if (n?.note != null)
-            MapMenuItem(
-                icon: Icons.sticky_note_2_outlined,
-                label: 'View note',
-                onTap: () {
-                  setState(() {
-                    _menu = null;
-                    _noteId = req.id;
-                  });
-                }),
-          MapMenuItem(
-              icon: Icons.center_focus_strong_rounded,
-              label: 'Center on node',
-              onTap: () {
-                c.centerOn(req.id!, _viewport);
-                close();
-              }),
+            icon: Icons.center_focus_strong_rounded,
+            label: 'Center on node',
+            onTap: () {
+              c.centerOn(req.id!, _viewport);
+              close();
+            },
+          ),
         ]);
       }
     } else if (req.type == MapSelectionType.edge) {
@@ -950,72 +990,87 @@ class _SuperMapState extends State<SuperMap>
         final e = c.edgeById(req.id!);
         items.addAll([
           MapMenuItem(
-              icon: Icons.edit_outlined,
-              label: (e?.label != null) ? 'Edit label' : 'Label connection',
-              onTap: () {
-                c.startEdgeLabel(req.id!);
-                close();
-              }),
+            icon: Icons.edit_outlined,
+            label: (e?.label != null) ? 'Edit label' : 'Label connection',
+            onTap: () {
+              c.startEdgeLabel(req.id!);
+              close();
+            },
+          ),
           MapMenuItem(
-              icon: Icons.delete_outline_rounded,
-              label: 'Delete connection',
-              danger: true,
-              onTap: () {
-                c.deleteEdge(req.id!);
-                close();
-              }),
+            icon: Icons.delete_outline_rounded,
+            label: 'Delete connection',
+            danger: true,
+            onTap: () {
+              c.deleteEdge(req.id!);
+              close();
+            },
+          ),
         ]);
       } else {
-        items.add(MapMenuItem(
+        items.add(
+          MapMenuItem(
             icon: Icons.my_location_rounded,
             label: 'Select connection',
             onTap: () {
               c.selectEdge(req.id!);
               close();
-            }));
+            },
+          ),
+        );
       }
     } else {
       title = 'Canvas';
       if (c.isEdit) {
-        items.add(MapMenuItem(
+        items.add(
+          MapMenuItem(
             icon: Icons.add_rounded,
             label: 'Add node here',
             onTap: () {
               c.addNodeAt(c.screenToWorld(req.local));
               close();
-            }));
+            },
+          ),
+        );
       }
       items.addAll([
         MapMenuItem(
-            icon: Icons.fullscreen_rounded,
-            label: 'Fit to view',
-            onTap: () {
-              c.fitToView(_viewport);
-              close();
-            }),
+          icon: Icons.fullscreen_rounded,
+          label: 'Fit to view',
+          onTap: () {
+            c.fitToView(_viewport);
+            close();
+          },
+        ),
         MapMenuItem(
-            icon: Icons.refresh_rounded,
-            label: 'Reset layout',
-            onTap: () {
-              c.reset();
-              close();
-            }),
+          icon: Icons.refresh_rounded,
+          label: 'Reset layout',
+          onTap: () {
+            c.reset();
+            close();
+          },
+        ),
         const _MenuDivider(),
         MapMenuItem(
-            icon: Icons.data_object_rounded,
-            label: 'Diagram JSON…',
-            onTap: () {
-              close();
-              _openJson();
-            }),
+          icon: Icons.data_object_rounded,
+          label: 'Diagram JSON…',
+          onTap: () {
+            close();
+            _openJson();
+          },
+        ),
       ]);
     }
 
     const w = MapContextMenu.width;
-    final left = req.local.dx
-        .clamp(6.0, (_viewport.width - w - 6).clamp(6.0, double.infinity));
-    final top = req.local.dy
-        .clamp(6.0, (_viewport.height - 40).clamp(6.0, double.infinity));
+    final left = req.local.dx.clamp(
+      6.0,
+      (_viewport.width - w - 6).clamp(6.0, double.infinity),
+    );
+    final top = req.local.dy.clamp(
+      6.0,
+      (_viewport.height - 40).clamp(6.0, double.infinity),
+    );
 
     return [
       Positioned.fill(
@@ -1029,12 +1084,13 @@ class _SuperMapState extends State<SuperMap>
         left: left,
         top: top,
         child: MapContextMenu(
-            title: title,
-            items: items,
-            currentKind: currentKind,
-            onPickKind: onPickKind,
-            currentColor: currentColor,
-            onPickColor: onPickColor),
+          title: title,
+          items: items,
+          currentKind: currentKind,
+          onPickKind: onPickKind,
+          currentColor: currentColor,
+          onPickColor: onPickColor,
+        ),
       ),
     ];
   }
@@ -1050,6 +1106,7 @@ class _ModeToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     Widget seg(String label, MapMode m) {
       final on = mode == m;
       return GestureDetector(
@@ -1059,12 +1116,16 @@ class _ModeToggle extends StatelessWidget {
           duration: SuperTokens.durBase,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
           decoration: BoxDecoration(
-            color: on ? SuperTokens.accent : const Color(0x00000000),
+            color: on ? cs.primary : const Color(0x00000000),
             borderRadius: BorderRadius.circular(SuperTokens.radiusControl - 1),
           ),
-          child: Text(label,
-              style: SuperText.button
-                  .copyWith(fontSize: 13, color: on ? Colors.white : t.fg2)),
+          child: Text(
+            label,
+            style: SuperText.button.copyWith(
+              fontSize: 13,
+              color: on ? Colors.white : t.fg2,
+            ),
+          ),
         ),
       );
     }
@@ -1077,15 +1138,19 @@ class _ModeToggle extends StatelessWidget {
         borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
       ),
       child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [seg('Read', MapMode.read), seg('Edit', MapMode.edit)]),
+        mainAxisSize: MainAxisSize.min,
+        children: [seg('Read', MapMode.read), seg('Edit', MapMode.edit)],
+      ),
     );
   }
 }
 
 class _RoundBtn extends StatefulWidget {
-  const _RoundBtn(
-      {required this.icon, required this.tooltip, required this.onTap});
+  const _RoundBtn({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
   final IconData icon;
   final String tooltip;
   final VoidCallback onTap;
@@ -1099,6 +1164,7 @@ class _RoundBtnState extends State<_RoundBtn> {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    
     return Tooltip(
       message: widget.tooltip,
       child: MouseRegion(
@@ -1133,6 +1199,7 @@ class _TitleChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -1140,17 +1207,26 @@ class _TitleChip extends StatelessWidget {
         border: Border.all(color: t.border),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.my_location_rounded,
-            size: 13, color: SuperTokens.accent),
-        const SizedBox(width: 8),
-        Text(title,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.my_location_rounded, size: 13, color: cs.primary),
+          const SizedBox(width: 8),
+          Text(
+            title,
             style: SuperText.caption.copyWith(
-                fontSize: 11.5, fontWeight: FontWeight.w700, color: t.fg1)),
-        const SizedBox(width: 8),
-        Text('$zoom%',
-            style: SuperText.mono.copyWith(fontSize: 10.5, color: t.fg3)),
-      ]),
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+              color: t.fg1,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '$zoom%',
+            style: SuperText.mono.copyWith(fontSize: 10.5, color: t.fg3),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1166,14 +1242,14 @@ class _EdgeLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.superTheme;
     Widget pill(Widget child) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
-            color: t.surface,
-            border: Border.all(color: t.border),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: child,
-        );
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: t.surface,
+        border: Border.all(color: t.border),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: child,
+    );
     return AnimatedOpacity(
       duration: SuperTokens.durBase,
       opacity: dim ? 0.2 : 1,
@@ -1187,23 +1263,33 @@ class _EdgeLabel extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (label != null)
-                pill(ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 168),
-                  child: Text(label!,
+                pill(
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 168),
+                    child: Text(
+                      label!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: SuperText.caption.copyWith(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w600,
-                          color: t.fg2)),
-                )),
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w600,
+                        color: t.fg2,
+                      ),
+                    ),
+                  ),
+                ),
               if (label != null && value != null) const SizedBox(height: 2),
               if (value != null)
-                pill(Text(mapCompact(value!),
+                pill(
+                  Text(
+                    mapCompact(value!),
                     style: SuperText.mono.copyWith(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: t.fg3))),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: t.fg3,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -1214,8 +1300,11 @@ class _EdgeLabel extends StatelessWidget {
 
 /// Inline editor for an edge's text label, rendered at the edge midpoint.
 class _EdgeLabelEditor extends StatefulWidget {
-  const _EdgeLabelEditor(
-      {required this.initial, required this.onCommit, required this.onCancel});
+  const _EdgeLabelEditor({
+    required this.initial,
+    required this.onCommit,
+    required this.onCancel,
+  });
   final String initial;
   final ValueChanged<String> onCommit;
   final VoidCallback onCancel;
@@ -1227,8 +1316,10 @@ class _EdgeLabelEditor extends StatefulWidget {
 class _EdgeLabelEditorState extends State<_EdgeLabelEditor> {
   late final TextEditingController _ctl =
       TextEditingController(text: widget.initial)
-        ..selection =
-            TextSelection(baseOffset: 0, extentOffset: widget.initial.length);
+        ..selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: widget.initial.length,
+        );
   final FocusNode _focus = FocusNode();
 
   @override
@@ -1247,6 +1338,7 @@ class _EdgeLabelEditorState extends State<_EdgeLabelEditor> {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     return SizedBox(
       width: 132,
       height: 24,
@@ -1254,23 +1346,25 @@ class _EdgeLabelEditorState extends State<_EdgeLabelEditor> {
         controller: _ctl,
         focusNode: _focus,
         textAlign: TextAlign.center,
-        cursorColor: SuperTokens.accent,
+        cursorColor: cs.primary,
         style: SuperText.body.copyWith(fontSize: 11, color: t.fg1),
         decoration: InputDecoration(
           isDense: true,
           hintText: 'Label…',
           hintStyle: SuperText.body.copyWith(fontSize: 11, color: t.fg4),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 2,
+          ),
           filled: true,
           fillColor: t.inputBg,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(999),
-            borderSide: const BorderSide(color: SuperTokens.accent, width: 1.5),
+            borderSide: BorderSide(color: cs.primary, width: 1.5),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(999),
-            borderSide: const BorderSide(color: SuperTokens.accent, width: 1.5),
+            borderSide: BorderSide(color: cs.primary, width: 1.5),
           ),
         ),
         onSubmitted: widget.onCommit,
@@ -1282,8 +1376,11 @@ class _EdgeLabelEditorState extends State<_EdgeLabelEditor> {
 
 /// A compact segmented control used in the canvas toolbar (node / edge style).
 class _CanvasSeg<T> extends StatelessWidget {
-  const _CanvasSeg(
-      {required this.value, required this.options, required this.onChanged});
+  const _CanvasSeg({
+    required this.value,
+    required this.options,
+    required this.onChanged,
+  });
   final T value;
   final Map<T, String> options;
   final ValueChanged<T> onChanged;
@@ -1291,6 +1388,7 @@ class _CanvasSeg<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
@@ -1298,28 +1396,38 @@ class _CanvasSeg<T> extends StatelessWidget {
         border: Border.all(color: t.border),
         borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
       ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        for (final entry in options.entries)
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => onChanged(entry.key),
-            child: AnimatedContainer(
-              duration: SuperTokens.durBase,
-              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
-              decoration: BoxDecoration(
-                color: value == entry.key
-                    ? SuperTokens.accent
-                    : const Color(0x00000000),
-                borderRadius:
-                    BorderRadius.circular(SuperTokens.radiusControl - 1),
-              ),
-              child: Text(entry.value,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final entry in options.entries)
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => onChanged(entry.key),
+              child: AnimatedContainer(
+                duration: SuperTokens.durBase,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 11,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: value == entry.key
+                      ? cs.primary
+                      : const Color(0x00000000),
+                  borderRadius: BorderRadius.circular(
+                    SuperTokens.radiusControl - 1,
+                  ),
+                ),
+                child: Text(
+                  entry.value,
                   style: SuperText.button.copyWith(
-                      fontSize: 11.5,
-                      color: value == entry.key ? Colors.white : t.fg2)),
+                    fontSize: 11.5,
+                    color: value == entry.key ? Colors.white : t.fg2,
+                  ),
+                ),
+              ),
             ),
-          ),
-      ]),
+        ],
+      ),
     );
   }
 }
@@ -1342,6 +1450,7 @@ class _DataPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     final c = controller;
     return Container(
       width: 222,
@@ -1359,17 +1468,22 @@ class _DataPanel extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 9, 8, 9),
-            child: Row(children: [
-              const Icon(Icons.layers_outlined,
-                  size: 13, color: SuperTokens.accent),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text('ALL NODES · ${c.nodes.length}',
-                    style:
-                        SuperText.label.copyWith(fontSize: 10.5, color: t.fg2)),
-              ),
-              SuperIconButton(icon: Icons.close_rounded, onPressed: onClose),
-            ]),
+            child: Row(
+              children: [
+                Icon(Icons.layers_outlined, size: 13, color: cs.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'ALL NODES · ${c.nodes.length}',
+                    style: SuperText.label.copyWith(
+                      fontSize: 10.5,
+                      color: t.fg2,
+                    ),
+                  ),
+                ),
+                SuperIconButton(icon: Icons.close_rounded, onPressed: onClose),
+              ],
+            ),
           ),
           const Hairline(),
           Flexible(
@@ -1422,6 +1536,7 @@ class _DataRowState extends State<_DataRow> {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     final n = widget.node, s = widget.stats;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -1432,42 +1547,56 @@ class _DataRowState extends State<_DataRow> {
         onTap: widget.onTap,
         child: Container(
           color: widget.selected
-              ? t.tintFill(SuperTokens.accent, 0.10)
+              ? t.tintFill(cs.primary, 0.10)
               : (_hover ? t.hover : const Color(0x00000000)),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-          child: Row(children: [
-            Container(
+          child: Row(
+            children: [
+              Container(
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                    color: widget.accent, shape: BoxShape.circle)),
-            const SizedBox(width: 9),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(n.label,
+                  color: widget.accent,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      n.label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: SuperText.caption.copyWith(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: t.fg1)),
-                  Text(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: t.fg1,
+                      ),
+                    ),
+                    Text(
                       'in ${s.inCount} · out ${s.outCount}${n.note != null ? ' · note' : ''}',
-                      style:
-                          SuperText.mono.copyWith(fontSize: 9.5, color: t.fg4)),
-                ],
+                      style: SuperText.mono.copyWith(
+                        fontSize: 9.5,
+                        color: t.fg4,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            if (n.value != null)
-              Text(mapCompact(n.value!),
+              if (n.value != null)
+                Text(
+                  mapCompact(n.value!),
                   style: SuperText.mono.copyWith(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
-                      color: widget.accent)),
-          ]),
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    color: widget.accent,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -1475,11 +1604,12 @@ class _DataRowState extends State<_DataRow> {
 }
 
 class _Port extends StatefulWidget {
-  const _Port(
-      {required this.lit,
-      required this.onStart,
-      required this.onUpdate,
-      required this.onEnd});
+  const _Port({
+    required this.lit,
+    required this.onStart,
+    required this.onUpdate,
+    required this.onEnd,
+  });
   final bool lit;
   final ValueChanged<Offset> onStart; // global position
   final ValueChanged<Offset> onUpdate;
@@ -1495,6 +1625,7 @@ class _PortState extends State<_Port> {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     return MouseRegion(
       cursor: SystemMouseCursors.precise,
       child: GestureDetector(
@@ -1513,8 +1644,8 @@ class _PortState extends State<_Port> {
           width: 12,
           height: 12,
           decoration: BoxDecoration(
-            color: widget.lit ? SuperTokens.accent : t.surface,
-            border: Border.all(color: SuperTokens.accent, width: 1.5),
+            color: widget.lit ? cs.primary : t.surface,
+            border: Border.all(color: cs.primary, width: 1.5),
             shape: BoxShape.circle,
           ),
         ),
@@ -1527,14 +1658,17 @@ class _MenuDivider extends StatelessWidget {
   const _MenuDivider();
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Hairline(color: context.superTheme.border),
-      );
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Hairline(color: context.superTheme.border),
+  );
 }
 
 class _Toast extends StatefulWidget {
-  const _Toast(
-      {required this.message, required this.tick, required this.onDone});
+  const _Toast({
+    required this.message,
+    required this.tick,
+    required this.onDone,
+  });
   final String message;
   final int tick;
   final VoidCallback onDone;
@@ -1572,12 +1706,17 @@ class _ToastState extends State<_Toast> {
         borderRadius: BorderRadius.circular(999),
         boxShadow: t.cardShadow,
       ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.check_rounded, size: 13, color: t.bg),
-        const SizedBox(width: 7),
-        Text(widget.message,
-            style: SuperText.button.copyWith(fontSize: 12, color: t.bg)),
-      ]),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.check_rounded, size: 13, color: t.bg),
+          const SizedBox(width: 7),
+          Text(
+            widget.message,
+            style: SuperText.button.copyWith(fontSize: 12, color: t.bg),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1601,8 +1740,9 @@ class _SearchField extends StatefulWidget {
 }
 
 class _SearchFieldState extends State<_SearchField> {
-  late final TextEditingController _ctl =
-      TextEditingController(text: widget.query);
+  late final TextEditingController _ctl = TextEditingController(
+    text: widget.query,
+  );
 
   @override
   void didUpdateWidget(_SearchField old) {
@@ -1619,6 +1759,7 @@ class _SearchFieldState extends State<_SearchField> {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     final has = widget.query.trim().isNotEmpty;
     return Container(
       width: 188,
@@ -1626,42 +1767,48 @@ class _SearchFieldState extends State<_SearchField> {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: t.inputBg,
-        border: Border.all(color: has ? SuperTokens.accent : t.border),
+        border: Border.all(color: has ? cs.primary : t.border),
         borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
       ),
-      child: Row(children: [
-        Icon(Icons.search_rounded,
-            size: 15, color: has ? SuperTokens.accent : t.fg3),
-        const SizedBox(width: 7),
-        Expanded(
-          child: TextField(
-            controller: _ctl,
-            cursorColor: SuperTokens.accent,
-            style: SuperText.body.copyWith(fontSize: 12.5, color: t.fg1),
-            decoration: InputDecoration(
-              isDense: true,
-              isCollapsed: true,
-              border: InputBorder.none,
-              hintText: 'Search nodes…',
-              hintStyle: SuperText.body.copyWith(fontSize: 12.5, color: t.fg4),
+      child: Row(
+        children: [
+          Icon(Icons.search_rounded, size: 15, color: has ? cs.primary : t.fg3),
+          const SizedBox(width: 7),
+          Expanded(
+            child: TextField(
+              controller: _ctl,
+              cursorColor: cs.primary,
+              style: SuperText.body.copyWith(fontSize: 12.5, color: t.fg1),
+              decoration: InputDecoration(
+                isDense: true,
+                isCollapsed: true,
+                border: InputBorder.none,
+                hintText: 'Search nodes…',
+                hintStyle: SuperText.body.copyWith(
+                  fontSize: 12.5,
+                  color: t.fg4,
+                ),
+              ),
+              onChanged: widget.onChanged,
             ),
-            onChanged: widget.onChanged,
           ),
-        ),
-        if (has) ...[
-          Text('${widget.count ?? 0}',
-              style: SuperText.mono.copyWith(fontSize: 10.5, color: t.fg3)),
-          const SizedBox(width: 4),
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              _ctl.clear();
-              widget.onClear();
-            },
-            child: Icon(Icons.close_rounded, size: 14, color: t.fg3),
-          ),
+          if (has) ...[
+            Text(
+              '${widget.count ?? 0}',
+              style: SuperText.mono.copyWith(fontSize: 10.5, color: t.fg3),
+            ),
+            const SizedBox(width: 4),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                _ctl.clear();
+                widget.onClear();
+              },
+              child: Icon(Icons.close_rounded, size: 14, color: t.fg3),
+            ),
+          ],
         ],
-      ]),
+      ),
     );
   }
 }
@@ -1702,35 +1849,38 @@ class _IssuesPanel extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(13, 9, 8, 9),
-            child: Row(children: [
-              Icon(
+            child: Row(
+              children: [
+                Icon(
                   summary.isClean
                       ? Icons.verified_rounded
                       : Icons.report_problem_outlined,
                   size: 14,
                   color: summary.isClean
                       ? SuperTokens.success
-                      : SuperTokens.warning),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  summary.isClean
-                      ? 'VALIDATION PASSED'
-                      : 'ISSUES · ${summary.errors} ERR · ${summary.warnings} WARN · ${summary.infos} INFO',
-                  style: SuperText.label.copyWith(fontSize: 10, color: t.fg2),
+                      : SuperTokens.warning,
                 ),
-              ),
-              SuperIconButton(icon: Icons.close_rounded, onPressed: onClose),
-            ]),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    summary.isClean
+                        ? 'VALIDATION PASSED'
+                        : 'ISSUES · ${summary.errors} ERR · ${summary.warnings} WARN · ${summary.infos} INFO',
+                    style: SuperText.label.copyWith(fontSize: 10, color: t.fg2),
+                  ),
+                ),
+                SuperIconButton(icon: Icons.close_rounded, onPressed: onClose),
+              ],
+            ),
           ),
           const Hairline(),
           if (issues.isEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(13, 14, 13, 16),
               child: Text(
-                  'No problems found. The diagram is structurally sound.',
-                  style:
-                      SuperText.caption.copyWith(fontSize: 12, color: t.fg3)),
+                'No problems found. The diagram is structurally sound.',
+                style: SuperText.caption.copyWith(fontSize: 12, color: t.fg3),
+              ),
             )
           else
             Flexible(
@@ -1762,16 +1912,14 @@ class _IssueRowState extends State<_IssueRow> {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     final (icon, color) = switch (widget.issue.severity) {
-      MapIssueSeverity.error => (
-          Icons.error_outline_rounded,
-          SuperTokens.danger
-        ),
+      MapIssueSeverity.error => (Icons.error_outline_rounded, cs.error),
       MapIssueSeverity.warning => (
-          Icons.warning_amber_rounded,
-          SuperTokens.warning
-        ),
-      MapIssueSeverity.info => (Icons.info_outline_rounded, SuperTokens.accent),
+        Icons.warning_amber_rounded,
+        SuperTokens.warning,
+      ),
+      MapIssueSeverity.info => (Icons.info_outline_rounded, cs.primary),
     };
     final tappable = widget.issue.nodeId != null || widget.issue.edgeId != null;
     return MouseRegion(
@@ -1784,17 +1932,26 @@ class _IssueRowState extends State<_IssueRow> {
         child: Container(
           color: _hover && tappable ? t.hover : const Color(0x00000000),
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Padding(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
                 padding: const EdgeInsets.only(top: 1),
-                child: Icon(icon, size: 14, color: color)),
-            const SizedBox(width: 9),
-            Expanded(
-              child: Text(widget.issue.message,
-                  style: SuperText.caption
-                      .copyWith(fontSize: 11.5, color: t.fg2, height: 1.3)),
-            ),
-          ]),
+                child: Icon(icon, size: 14, color: color),
+              ),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Text(
+                  widget.issue.message,
+                  style: SuperText.caption.copyWith(
+                    fontSize: 11.5,
+                    color: t.fg2,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

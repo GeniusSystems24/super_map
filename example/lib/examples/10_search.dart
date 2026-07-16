@@ -40,7 +40,9 @@ class _SearchExampleState extends State<SearchExample> {
 
   @override
   Widget build(BuildContext context) {
-    final t = context.superTheme;
+    var theme = SuperMaterialThemeData.of(context);
+    final t = theme.superTheme;
+    final cs = theme.colorScheme;
     final c = _controller;
     return Scaffold(
       backgroundColor: t.bg,
@@ -69,7 +71,7 @@ class _SearchExampleState extends State<SearchExample> {
                     ),
                     if (c.hasQuery)
                       Text('${c.matches.length} match(es)',
-                          style: SuperText.mono.copyWith(fontSize: 12, color: SuperTokens.accent)),
+                          style: SuperText.mono.copyWith(fontSize: 12, color: cs.primary)),
                   ]),
                   const SizedBox(height: SuperTokens.space3),
                   Wrap(spacing: 8, runSpacing: 8, children: [

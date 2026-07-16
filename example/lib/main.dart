@@ -37,16 +37,11 @@ class _ExampleAppState extends State<ExampleApp> {
   ThemeMode _mode = ThemeMode.dark;
   TextDirection _dir = TextDirection.ltr;
 
-  ThemeData _theme(SuperThemeData s) => ThemeData(
-        brightness: s.brightness,
-        scaffoldBackgroundColor: s.bg,
-        extensions: [s],
-      );
 
-  void _toggleTheme() =>
-      setState(() => _mode = _mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
-  void _toggleDir() =>
-      setState(() => _dir = _dir == TextDirection.ltr ? TextDirection.rtl : TextDirection.ltr);
+  void _toggleTheme() => setState(
+      () => _mode = _mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
+  void _toggleDir() => setState(() =>
+      _dir = _dir == TextDirection.ltr ? TextDirection.rtl : TextDirection.ltr);
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +49,10 @@ class _ExampleAppState extends State<ExampleApp> {
       debugShowCheckedModeBanner: false,
       title: 'Super Map',
       themeMode: _mode,
-      theme: _theme(SuperThemeData.light),
-      darkTheme: _theme(SuperThemeData.dark),
-      builder: (context, child) => Directionality(textDirection: _dir, child: child!),
+      theme: SuperMaterialThemeData.light(),
+      darkTheme: SuperMaterialThemeData.dark(),
+      builder: (context, child) =>
+          Directionality(textDirection: _dir, child: child!),
       home: _Launcher(
         mode: _mode,
         dir: _dir,
@@ -89,37 +85,65 @@ class _Launcher extends StatelessWidget {
   final VoidCallback onToggleDir;
 
   static final List<_Demo> _demos = [
-    _Demo('Sample Graphs', 'Five MapGraphData seeds · read/edit · card/chip/pill · curved/ortho/straight',
-        Icons.account_tree_outlined, (_) => const SuperMapDemo()),
+    _Demo(
+        'Sample Graphs',
+        'Five MapGraphData seeds · read/edit · card/chip/pill · curved/ortho/straight',
+        Icons.account_tree_outlined,
+        (_) => const SuperMapDemo()),
     _Demo('Custom Graph', 'A hand-built MapGraph wired straight into SuperMap',
         Icons.hub_outlined, (_) => const CustomMapDemo()),
     _Demo('1 · Minimal (read)', 'The shortest path — a 3-node read-only canvas',
         Icons.visibility_outlined, (_) => const MinimalReadExample()),
-    _Demo('2 · Editable + Export', 'Edit mode with Image / PDF / Word export wired to printing',
-        Icons.ios_share_rounded, (_) => const EditableExportExample()),
-    _Demo('3 · Colours · labels · notes', 'Per-node colours, labelled connections and notes (v0.2.0)',
-        Icons.palette_outlined, (_) => const StyledFeaturesExample()),
-    _Demo('4 · Controller-driven', 'Drive the canvas from app chrome via controller intents',
-        Icons.tune_rounded, (_) => const ControllerDrivenExample()),
+    _Demo(
+        '2 · Editable + Export',
+        'Edit mode with Image / PDF / Word export wired to printing',
+        Icons.ios_share_rounded,
+        (_) => const EditableExportExample()),
+    _Demo(
+        '3 · Colours · labels · notes',
+        'Per-node colours, labelled connections and notes (v0.2.0)',
+        Icons.palette_outlined,
+        (_) => const StyledFeaturesExample()),
+    _Demo(
+        '4 · Controller-driven',
+        'Drive the canvas from app chrome via controller intents',
+        Icons.tune_rounded,
+        (_) => const ControllerDrivenExample()),
     _Demo('5 · JSON-driven', 'Parse a graph from JSON with MapGraph.fromJson',
         Icons.data_object_rounded, (_) => const JsonDrivenExample()),
-    _Demo('6 · ERP workflow', 'Status, audit lock, source ref + metadata, currency (v1.0.0)',
-        Icons.fact_check_outlined, (_) => const ErpWorkflowExample()),
-    _Demo('7 · Validation', 'MapValidator — dangling / cycle / orphan + flow balance (v1.0.0)',
-        Icons.verified_outlined, (_) => const ValidationExample()),
+    _Demo(
+        '6 · ERP workflow',
+        'Status, audit lock, source ref + metadata, currency (v1.0.0)',
+        Icons.fact_check_outlined,
+        (_) => const ErpWorkflowExample()),
+    _Demo(
+        '7 · Validation',
+        'MapValidator — dangling / cycle / orphan + flow balance (v1.0.0)',
+        Icons.verified_outlined,
+        (_) => const ValidationExample()),
     _Demo('8 · Auto-layout', 'Layered / grid / radial via MapLayout (v1.0.0)',
         Icons.auto_awesome_mosaic_outlined, (_) => const AutoLayoutExample()),
-    _Demo('9 · CSV export', 'Nodes / edges spreadsheet tables via MapExporter (v1.0.0)',
-        Icons.table_chart_outlined, (_) => const CsvExportExample()),
-    _Demo('10 · Node search', 'Filter + dim a dense diagram from the toolbar (v1.0.0)',
-        Icons.search_rounded, (_) => const SearchExample()),
-    _Demo('11 · Audit locks', 'Pinned posted records that resist edits (v1.0.0)',
-        Icons.lock_outline_rounded, (_) => const AuditLocksExample()),
+    _Demo(
+        '9 · CSV export',
+        'Nodes / edges spreadsheet tables via MapExporter (v1.0.0)',
+        Icons.table_chart_outlined,
+        (_) => const CsvExportExample()),
+    _Demo(
+        '10 · Node search',
+        'Filter + dim a dense diagram from the toolbar (v1.0.0)',
+        Icons.search_rounded,
+        (_) => const SearchExample()),
+    _Demo(
+        '11 · Audit locks',
+        'Pinned posted records that resist edits (v1.0.0)',
+        Icons.lock_outline_rounded,
+        (_) => const AuditLocksExample()),
   ];
 
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     return Scaffold(
       backgroundColor: t.bg,
       body: SafeArea(
@@ -127,12 +151,13 @@ class _Launcher extends StatelessWidget {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(SuperTokens.space10),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: SuperTokens.contentColumn),
+              constraints:
+                  const BoxConstraints(maxWidth: SuperTokens.contentColumn),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('SUPER MAP \u2022 GALLERY',
-                      style: SuperText.eyebrow.copyWith(color: SuperTokens.accent)),
+                      style: SuperText.eyebrow.copyWith(color: cs.primary)),
                   const SizedBox(height: SuperTokens.space2),
                   Text('Component Demos مكتبة المكونات',
                       style: SuperText.h1.copyWith(color: t.fg1)),
@@ -146,13 +171,17 @@ class _Launcher extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SuperButton(
-                        label: mode == ThemeMode.dark ? 'Light Theme' : 'Dark Theme',
+                        label: mode == ThemeMode.dark
+                            ? 'Light Theme'
+                            : 'Dark Theme',
                         variant: SuperButtonVariant.secondary,
                         onPressed: onToggleTheme,
                       ),
                       const SizedBox(width: SuperTokens.space3),
                       SuperButton(
-                        label: dir == TextDirection.ltr ? 'العربية (RTL)' : 'English (LTR)',
+                        label: dir == TextDirection.ltr
+                            ? 'العربية (RTL)'
+                            : 'English (LTR)',
                         variant: SuperButtonVariant.secondary,
                         onPressed: onToggleDir,
                       ),
@@ -175,12 +204,13 @@ class _DemoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(SuperTokens.radiusCard),
-        onTap: () =>
-            Navigator.of(context).push(MaterialPageRoute<void>(builder: demo.builder)),
+        onTap: () => Navigator.of(context)
+            .push(MaterialPageRoute<void>(builder: demo.builder)),
         child: Container(
           padding: const EdgeInsets.all(SuperTokens.space4),
           decoration: BoxDecoration(
@@ -196,19 +226,23 @@ class _DemoCard extends StatelessWidget {
                 height: 44,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Color.alphaBlend(SuperTokens.accent.withOpacity(0.14), t.surface),
-                  borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+                  color:
+                      Color.alphaBlend(cs.primary.withOpacity(0.14), t.surface),
+                  borderRadius:
+                      BorderRadius.circular(SuperTokens.radiusControl),
                 ),
-                child: Icon(demo.icon, size: 22, color: SuperTokens.accent),
+                child: Icon(demo.icon, size: 22, color: cs.primary),
               ),
               const SizedBox(width: SuperTokens.space4),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(demo.title, style: SuperText.heading.copyWith(color: t.fg1)),
+                    Text(demo.title,
+                        style: SuperText.heading.copyWith(color: t.fg1)),
                     const SizedBox(height: 2),
-                    Text(demo.subtitle, style: SuperText.caption.copyWith(color: t.fg3)),
+                    Text(demo.subtitle,
+                        style: SuperText.caption.copyWith(color: t.fg3)),
                   ],
                 ),
               ),

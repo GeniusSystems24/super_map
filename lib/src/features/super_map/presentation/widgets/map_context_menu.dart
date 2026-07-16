@@ -52,9 +52,10 @@ class _MapMenuItemState extends State<MapMenuItem> {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
-    final fg = widget.danger ? SuperTokens.danger : t.fg1;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
+    final fg = widget.danger ? cs.error : t.fg1;
     final bg = _hover
-        ? (widget.danger ? t.tintFill(SuperTokens.danger, 0.12) : t.hover)
+        ? (widget.danger ? t.tintFill(cs.error, 0.12) : t.hover)
         : const Color(0x00000000);
     return MouseRegion(
       cursor: SystemMouseCursors.click,

@@ -41,6 +41,7 @@ class MapMinimap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.superTheme;
+    final cs = SuperMaterialThemeData.of(context).colorScheme;
     return Container(
       width: w,
       height: h,
@@ -60,7 +61,7 @@ class MapMinimap extends StatelessWidget {
           viewport: viewport,
           selectedNodeId: selectedNodeId,
           edgeColor: t.borderStrong,
-          accent: SuperTokens.accent,
+          accent: cs.primary,
           accentForNode: (n) => n.accentOf(t),
         ),
       ),
