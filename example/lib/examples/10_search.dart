@@ -56,7 +56,7 @@ class _SearchExampleState extends State<SearchExample> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokens.space8),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -73,7 +73,7 @@ class _SearchExampleState extends State<SearchExample> {
                       Text('${c.matches.length} match(es)',
                           style: SuperText.mono.copyWith(fontSize: 12, color: cs.primary)),
                   ]),
-                  const SizedBox(height: SuperTokens.space3),
+                  const SizedBox(height: SuperTokensData.defaultSpace3),
                   Wrap(spacing: 8, runSpacing: 8, children: [
                     for (final q in const ['income', 'expense', 'payroll', 'GeniusLink'])
                       SuperButton(
@@ -88,7 +88,7 @@ class _SearchExampleState extends State<SearchExample> {
                       onPressed: c.clearQuery,
                     ),
                   ]),
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   SuperMap(
                     controller: c,
                     height: 560,

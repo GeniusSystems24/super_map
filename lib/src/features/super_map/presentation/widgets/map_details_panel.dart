@@ -70,7 +70,7 @@ class MapDetailsPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: t.surface,
         border: Border.all(color: t.borderStrong),
-        borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
         boxShadow: t.cardShadow,
       ),
       clipBehavior: Clip.antiAlias,
@@ -94,7 +94,7 @@ class MapDetailsPanel extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: accent.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+                        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
                       ),
                       child: Icon(node.kind.icon, size: 16, color: accent),
                     ),
@@ -110,7 +110,7 @@ class MapDetailsPanel extends StatelessWidget {
                             Text(node.ar!,
                                 textDirection: TextDirection.rtl,
                                 style: SuperText.caption.copyWith(
-                                    fontFamily: SuperTokens.arabicFont, color: t.fg3)),
+                                    fontFamily: SuperTokensData.defaultArabicFont, color: t.fg3)),
                         ],
                       ),
                     ),
@@ -170,13 +170,13 @@ class MapDetailsPanel extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
                       decoration: BoxDecoration(
-                        color: t.tintFill(SuperTokens.warning, 0.08),
+                        color: t.tintFill(SuperTokensData.defaultWarning, 0.08),
                         border: Border.all(color: t.border),
-                        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+                        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.sticky_note_2_outlined, size: 13, color: SuperTokens.warning),
+                          const Icon(Icons.sticky_note_2_outlined, size: 13, color: SuperTokensData.defaultWarning),
                           const SizedBox(width: 7),
                           Expanded(
                             child: Text(node.note!,
@@ -236,10 +236,10 @@ class MapDetailsPanel extends StatelessWidget {
   }
 
   PillTone _toneFor(MapNodeKind kind, Color accent) {
-    if (accent == SuperTokens.success) return PillTone.success;
-    if (accent == SuperTokens.warning) return PillTone.warning;
-    if (accent == SuperTokens.danger) return PillTone.danger;
-    if (accent == SuperTokens.accent) return PillTone.accent;
+    if (accent == SuperTokensData.defaultSuccess) return PillTone.success;
+    if (accent == SuperTokensData.defaultWarning) return PillTone.warning;
+    if (accent == SuperTokensData.defaultDanger) return PillTone.danger;
+    if (accent == SuperTokensData.defaultAccent) return PillTone.accent;
     return PillTone.neutral;
   }
 
@@ -365,7 +365,7 @@ class _StatusSwatch extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? t.tintFill(c, 0.16) : t.inputBg,
           border: Border.all(color: selected ? c : t.border),
-          borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+          borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -396,7 +396,7 @@ class _Stat extends StatelessWidget {
       decoration: BoxDecoration(
         color: t.inputBg,
         border: Border.all(color: t.border),
-        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

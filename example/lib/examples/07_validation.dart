@@ -75,7 +75,7 @@ class _ValidationExampleState extends State<ValidationExample> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokens.space8),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -85,12 +85,12 @@ class _ValidationExampleState extends State<ValidationExample> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
                     decoration: BoxDecoration(
-                      color: t.tintFill(SuperTokens.warning, 0.10),
+                      color: t.tintFill(SuperTokensData.defaultWarning, 0.10),
                       border: Border.all(color: t.border),
-                      borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+                      borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
                     ),
                     child: Row(children: [
-                      const Icon(Icons.report_problem_outlined, size: 16, color: SuperTokens.warning),
+                      const Icon(Icons.report_problem_outlined, size: 16, color: SuperTokensData.defaultWarning),
                       const SizedBox(width: 9),
                       Expanded(
                         child: Text(
@@ -102,7 +102,7 @@ class _ValidationExampleState extends State<ValidationExample> {
                       ),
                     ]),
                   ),
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   SuperMap(
                     controller: _controller,
                     height: 560,

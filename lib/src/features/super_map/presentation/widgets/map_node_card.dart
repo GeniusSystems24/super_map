@@ -133,7 +133,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
     final decoration = BoxDecoration(
       color: t.surface,
       border: Border.all(color: frame),
-      borderRadius: BorderRadius.circular(isChip ? 999 : SuperTokens.radiusMd),
+      borderRadius: BorderRadius.circular(isChip ? 999 : SuperTokensData.defaultRadiusMd),
       boxShadow: [
         ...t.cardShadow,
         if (widget.selected)
@@ -145,7 +145,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
     Widget content = widget.editing ? _editor(t, accent) : _label(t, accent);
 
     final card = AnimatedOpacity(
-      duration: SuperTokens.durBase,
+      duration: SuperTokensData.defaultDurBase,
       opacity: widget.dimmed ? 0.36 : 1,
       child: Container(
         width: widget.size.width,
@@ -284,7 +284,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: SuperText.caption.copyWith(
-              fontFamily: SuperTokens.arabicFont,
+              fontFamily: SuperTokensData.defaultArabicFont,
               fontSize: 11.5,
               color: t.fg4,
             ),
@@ -362,7 +362,7 @@ class _IconBox extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: color.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+          borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
         ),
         child: Icon(icon, size: 16, color: color),
       );
@@ -413,11 +413,11 @@ class _NoteButtonState extends State<_NoteButton> {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: widget.has
-                  ? SuperTokens.warning
+                  ? SuperTokensData.defaultWarning
                   : (_hover ? t.hover : t.surface),
               shape: BoxShape.circle,
               border: Border.all(
-                  color: widget.has ? SuperTokens.warning : t.borderStrong),
+                  color: widget.has ? SuperTokensData.defaultWarning : t.borderStrong),
               boxShadow: t.cardShadow,
             ),
             child: Icon(Icons.sticky_note_2_outlined,

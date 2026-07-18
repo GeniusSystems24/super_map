@@ -69,14 +69,14 @@ class _JsonDrivenExampleState extends State<JsonDrivenExample> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(SuperTokens.space8),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text('Parsed from a JSON string via MapGraph.fromJson. '
                   'Open the JSON button to see it round-trip.',
                   style: SuperText.body.copyWith(color: t.fg3)),
-              const SizedBox(height: SuperTokens.space6),
+              const SizedBox(height: SuperTokensData.defaultSpace6),
               SuperMap(controller: _controller, height: 500),
             ],
           ),

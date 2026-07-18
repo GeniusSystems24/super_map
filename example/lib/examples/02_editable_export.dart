@@ -52,7 +52,7 @@ class _EditableExportExampleState extends State<EditableExportExample> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokens.space8),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -61,7 +61,7 @@ class _EditableExportExampleState extends State<EditableExportExample> {
                 children: [
                   Text('Edit the diagram, then use Export → Image / PDF / Word.',
                       style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   SuperMap(
                     controller: _controller,
                     height: 560,

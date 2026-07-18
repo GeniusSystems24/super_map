@@ -46,7 +46,7 @@ class _CsvExportExampleState extends State<CsvExportExample> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokens.space8),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 980),
@@ -56,7 +56,7 @@ class _CsvExportExampleState extends State<CsvExportExample> {
                   Text('MapExporter.nodesCsv / edgesCsv turn any MapGraph into an '
                       'audit-ready spreadsheet. ${bytes.length} bytes ready to save.',
                       style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokens.space4),
+                  const SizedBox(height: SuperTokensData.defaultSpace4),
                   Wrap(spacing: 8, runSpacing: 8, children: [
                     SuperButton(
                       label: 'Nodes table',
@@ -82,14 +82,14 @@ class _CsvExportExampleState extends State<CsvExportExample> {
                       },
                     ),
                   ]),
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(SuperTokens.space4),
+                    padding: const EdgeInsets.all(SuperTokensData.defaultSpace4),
                     decoration: BoxDecoration(
                       color: t.surface,
                       border: Border.all(color: t.border),
-                      borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
+                      borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
                       boxShadow: t.cardShadow,
                     ),
                     child: SelectableText(

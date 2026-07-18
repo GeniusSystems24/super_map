@@ -58,7 +58,7 @@ class _MinimalReadExampleState extends State<MinimalReadExample> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(SuperTokens.space8),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
           // The toolbar is hidden — this is a pure, read-only view.
           child: SuperMap(
             controller: _controller,

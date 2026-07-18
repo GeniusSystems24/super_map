@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   # Shared GeniusLink foundation (transitive via the package; listed for resolution).
-  super_core: ">=1.2.0 <2.0.0"
+  super_core: ">=2.0.0 <3.0.0"
   super_map:
     path: ../
   # Used only by the "Editable + Export" example to save/share exported bytes.

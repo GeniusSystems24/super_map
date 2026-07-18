@@ -67,7 +67,7 @@ class _AutoLayoutExampleState extends State<AutoLayoutExample> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokens.space8),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -77,7 +77,7 @@ class _AutoLayoutExampleState extends State<AutoLayoutExample> {
                   Text('Tidy the scrambled diagram with one click. The toolbar Layout '
                       'button offers the same three algorithms.',
                       style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokens.space4),
+                  const SizedBox(height: SuperTokensData.defaultSpace4),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -101,7 +101,7 @@ class _AutoLayoutExampleState extends State<AutoLayoutExample> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   SuperMap(
                     controller: _controller,
                     height: 560,

@@ -48,7 +48,7 @@ class MapMinimap extends StatelessWidget {
       decoration: BoxDecoration(
         color: Color.alphaBlend(t.surface.withOpacity(0.9), t.bg),
         border: Border.all(color: t.border),
-        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
       ),
       clipBehavior: Clip.antiAlias,
       child: CustomPaint(

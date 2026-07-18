@@ -124,7 +124,7 @@ class _MapContextMenuState extends State<MapContextMenu> {
       decoration: BoxDecoration(
         color: t.surface,
         border: Border.all(color: t.borderStrong),
-        borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
         boxShadow: SuperThemeData.popShadow,
       ),
       clipBehavior: Clip.antiAlias,

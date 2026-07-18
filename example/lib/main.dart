@@ -149,24 +149,24 @@ class _Launcher extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(SuperTokens.space10),
+            padding: const EdgeInsets.all(SuperTokensData.defaultSpace10),
             child: ConstrainedBox(
               constraints:
-                  const BoxConstraints(maxWidth: SuperTokens.contentColumn),
+                  const BoxConstraints(maxWidth: SuperTokensData.defaultContentColumn),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('SUPER MAP \u2022 GALLERY',
                       style: SuperText.eyebrow.copyWith(color: cs.primary)),
-                  const SizedBox(height: SuperTokens.space2),
+                  const SizedBox(height: SuperTokensData.defaultSpace2),
                   Text('Component Demos مكتبة المكونات',
                       style: SuperText.h1.copyWith(color: t.fg1)),
-                  const SizedBox(height: SuperTokens.space8),
+                  const SizedBox(height: SuperTokensData.defaultSpace8),
                   for (final d in _demos) ...[
                     _DemoCard(demo: d),
-                    const SizedBox(height: SuperTokens.space3),
+                    const SizedBox(height: SuperTokensData.defaultSpace3),
                   ],
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -177,7 +177,7 @@ class _Launcher extends StatelessWidget {
                         variant: SuperButtonVariant.secondary,
                         onPressed: onToggleTheme,
                       ),
-                      const SizedBox(width: SuperTokens.space3),
+                      const SizedBox(width: SuperTokensData.defaultSpace3),
                       SuperButton(
                         label: dir == TextDirection.ltr
                             ? 'العربية (RTL)'
@@ -208,14 +208,14 @@ class _DemoCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(SuperTokens.radiusCard),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
         onTap: () => Navigator.of(context)
             .push(MaterialPageRoute<void>(builder: demo.builder)),
         child: Container(
-          padding: const EdgeInsets.all(SuperTokens.space4),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace4),
           decoration: BoxDecoration(
             color: t.surface,
-            borderRadius: BorderRadius.circular(SuperTokens.radiusCard),
+            borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
             border: Border.all(color: t.border),
             boxShadow: t.cardShadow,
           ),
@@ -229,11 +229,11 @@ class _DemoCard extends StatelessWidget {
                   color:
                       Color.alphaBlend(cs.primary.withOpacity(0.14), t.surface),
                   borderRadius:
-                      BorderRadius.circular(SuperTokens.radiusControl),
+                      BorderRadius.circular(SuperTokensData.defaultRadiusControl),
                 ),
                 child: Icon(demo.icon, size: 22, color: cs.primary),
               ),
-              const SizedBox(width: SuperTokens.space4),
+              const SizedBox(width: SuperTokensData.defaultSpace4),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -17,21 +17,21 @@ import 'package:super_core/super_core.dart';
 /// color and resolve to the theme's tertiary foreground at render time so they
 /// read correctly in both light and dark.
 enum MapNodeKind {
-  income(SuperTokens.success, Icons.bar_chart_rounded, 'Income'),
-  hub(SuperTokens.accent, Icons.hub_outlined, 'Entity'),
-  expense(SuperTokens.danger, Icons.call_split_rounded, 'Expense'),
+  income(SuperTokensData.defaultSuccess, Icons.bar_chart_rounded, 'Income'),
+  hub(SuperTokensData.defaultAccent, Icons.hub_outlined, 'Entity'),
+  expense(SuperTokensData.defaultDanger, Icons.call_split_rounded, 'Expense'),
   equity(_violet, Icons.verified_outlined, 'Equity'),
-  topic(SuperTokens.accent, Icons.tag_rounded, 'Topic'),
-  branch(SuperTokens.warning, Icons.folder_open_rounded, 'Branch'),
+  topic(SuperTokensData.defaultAccent, Icons.tag_rounded, 'Topic'),
+  branch(SuperTokensData.defaultWarning, Icons.folder_open_rounded, 'Branch'),
   leaf(null, Icons.description_outlined, 'Idea'),
-  process(SuperTokens.accent, Icons.bolt_rounded, 'Process'),
+  process(SuperTokensData.defaultAccent, Icons.bolt_rounded, 'Process'),
   role(_sky, Icons.person_outline_rounded, 'Role'),
-  approval(SuperTokens.warning, Icons.check_circle_outline_rounded, 'Approval'),
+  approval(SuperTokensData.defaultWarning, Icons.check_circle_outline_rounded, 'Approval'),
   document(null, Icons.insert_drive_file_outlined, 'Document'),
-  account(SuperTokens.success, Icons.menu_book_outlined, 'Account'),
+  account(SuperTokensData.defaultSuccess, Icons.menu_book_outlined, 'Account'),
   statement(_violet, Icons.receipt_long_outlined, 'Statement'),
-  party(SuperTokens.accent, Icons.people_outline_rounded, 'Party'),
-  payment(SuperTokens.success, Icons.payments_outlined, 'Payment');
+  party(SuperTokensData.defaultAccent, Icons.people_outline_rounded, 'Party'),
+  payment(SuperTokensData.defaultSuccess, Icons.payments_outlined, 'Payment');
 
   const MapNodeKind(this._color, this.icon, this.tag);
 
@@ -65,10 +65,10 @@ enum MapNodeKind {
 enum MapNodeStatus {
   none(null, ''),
   draft(null, 'Draft'),
-  pending(SuperTokens.warning, 'Pending'),
-  approved(SuperTokens.success, 'Approved'),
-  posted(SuperTokens.accent, 'Posted'),
-  rejected(SuperTokens.danger, 'Rejected'),
+  pending(SuperTokensData.defaultWarning, 'Pending'),
+  approved(SuperTokensData.defaultSuccess, 'Approved'),
+  posted(SuperTokensData.defaultAccent, 'Posted'),
+  rejected(SuperTokensData.defaultDanger, 'Rejected'),
   onHold(_holdViolet, 'On Hold');
 
   const MapNodeStatus(this._color, this.tag);

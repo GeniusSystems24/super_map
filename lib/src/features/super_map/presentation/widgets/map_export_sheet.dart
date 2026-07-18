@@ -109,7 +109,7 @@ class _MapExportSheetState extends State<_MapExportSheet> {
           decoration: BoxDecoration(
             color: t.surface,
             border: Border.all(color: t.borderStrong),
-            borderRadius: BorderRadius.circular(SuperTokens.radiusCard),
+            borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
             boxShadow: SuperThemeData.popShadow,
           ),
           clipBehavior: Clip.antiAlias,
@@ -216,7 +216,7 @@ class _ExportOptionState extends State<_ExportOption> {
           decoration: BoxDecoration(
             color: _hover ? t.hover : t.inputBg,
             border: Border.all(color: t.border),
-            borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+            borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
           ),
           child: Row(
             children: [
@@ -226,7 +226,7 @@ class _ExportOptionState extends State<_ExportOption> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: t.tintFill(cs.primary, 0.14),
-                  borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+                  borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
                 ),
                 child: Icon(widget.icon, size: 18, color: cs.primary),
               ),

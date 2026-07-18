@@ -77,13 +77,13 @@ class _ControllerDrivenExampleState extends State<ControllerDrivenExample> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(SuperTokens.space8),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Wrap(
-                spacing: SuperTokens.space3,
-                runSpacing: SuperTokens.space2,
+                spacing: SuperTokensData.defaultSpace3,
+                runSpacing: SuperTokensData.defaultSpace2,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   SuperButton(label: 'Add service', icon: const Icon(Icons.add_rounded), onPressed: _addService),
@@ -105,7 +105,7 @@ class _ControllerDrivenExampleState extends State<ControllerDrivenExample> {
                   ),
                 ],
               ),
-              const SizedBox(height: SuperTokens.space6),
+              const SizedBox(height: SuperTokensData.defaultSpace6),
               SuperMap(controller: _controller, height: 500, showToolbar: false, showData: true),
             ],
           ),

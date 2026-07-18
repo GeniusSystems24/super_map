@@ -71,7 +71,7 @@ class _StyledFeaturesExampleState extends State<StyledFeaturesExample> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(SuperTokens.space8),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
           child: SuperMap(
             controller: _controller,
             height: 520,

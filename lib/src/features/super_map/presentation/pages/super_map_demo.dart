@@ -59,7 +59,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(SuperTokens.space8),
+            padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1120),
               child: Column(
@@ -68,7 +68,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
                   Text('SUPER MAP \u2022 SHOWCASE',
                       style: SuperText.eyebrow
                           .copyWith(color: Theme.of(context).colorScheme.primary)),
-                  const SizedBox(height: SuperTokens.space2),
+                  const SizedBox(height: SuperTokensData.defaultSpace2),
                   Text.rich(
                     TextSpan(children: [
                       TextSpan(
@@ -78,31 +78,31 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
                         TextSpan(
                             text: '  ${_graph.ar}',
                             style: SuperText.h1.copyWith(
-                                fontFamily: SuperTokens.arabicFont,
+                                fontFamily: SuperTokensData.defaultArabicFont,
                                 fontSize: 20,
                                 color: t.fg3)),
                     ]),
                   ),
                   if (_graph.subtitle != null) ...[
-                    const SizedBox(height: SuperTokens.space2),
+                    const SizedBox(height: SuperTokensData.defaultSpace2),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 720),
                       child: Text(_graph.subtitle!,
                           style: SuperText.body.copyWith(color: t.fg3)),
                     ),
                   ],
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   _seedChips(t),
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   SuperMap(
                     controller: _controller,
                     height: 560,
                     animateFlow: _flow,
                     showData: _showData,
                   ),
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   _settings(t),
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   _legend(t),
                 ],
               ),
@@ -115,8 +115,8 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
 
   Widget _seedChips(SuperThemeData t) {
     return Wrap(
-      spacing: SuperTokens.space2,
-      runSpacing: SuperTokens.space2,
+      spacing: SuperTokensData.defaultSpace2,
+      runSpacing: SuperTokensData.defaultSpace2,
       children: [
         for (var i = 0; i < MapGraphData.all.length; i++)
           _Chip(
@@ -130,8 +130,8 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
 
   Widget _settings(SuperThemeData t) {
     return Wrap(
-      spacing: SuperTokens.space6,
-      runSpacing: SuperTokens.space3,
+      spacing: SuperTokensData.defaultSpace6,
+      runSpacing: SuperTokensData.defaultSpace3,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         _OptionGroup<MapNodeStyle>(
@@ -156,7 +156,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
         ),
         Row(mainAxisSize: MainAxisSize.min, children: [
           Text('DATA', style: SuperText.label.copyWith(color: t.fg3)),
-          const SizedBox(width: SuperTokens.space2),
+          const SizedBox(width: SuperTokensData.defaultSpace2),
           Switch(
             value: _showData,
             activeColor: Theme.of(context).colorScheme.primary,
@@ -165,7 +165,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
         ]),
         Row(mainAxisSize: MainAxisSize.min, children: [
           Text('FLOW', style: SuperText.label.copyWith(color: t.fg3)),
-          const SizedBox(width: SuperTokens.space2),
+          const SizedBox(width: SuperTokensData.defaultSpace2),
           Switch(
             value: _flow,
             activeColor: Theme.of(context).colorScheme.primary,
@@ -178,8 +178,8 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
 
   Widget _legend(SuperThemeData t) {
     return Wrap(
-      spacing: SuperTokens.space4,
-      runSpacing: SuperTokens.space2,
+      spacing: SuperTokensData.defaultSpace4,
+      runSpacing: SuperTokensData.defaultSpace2,
       children: [
         for (final k in _graph.legend)
           Row(mainAxisSize: MainAxisSize.min, children: [
@@ -210,7 +210,7 @@ class _Chip extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: AnimatedContainer(
-        duration: SuperTokens.durBase,
+        duration: SuperTokensData.defaultDurBase,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: selected ? t.selectionFill(0.14) : t.surface,
@@ -242,13 +242,13 @@ class _OptionGroup<T> extends StatelessWidget {
     final t = context.superTheme;
     return Row(mainAxisSize: MainAxisSize.min, children: [
       Text(label.toUpperCase(), style: SuperText.label.copyWith(color: t.fg3)),
-      const SizedBox(width: SuperTokens.space2),
+      const SizedBox(width: SuperTokensData.defaultSpace2),
       Container(
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
           color: t.inputBg,
           border: Border.all(color: t.border),
-          borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+          borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           for (final entry in options.entries)
@@ -256,7 +256,7 @@ class _OptionGroup<T> extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               onTap: () => onChanged(entry.key),
               child: AnimatedContainer(
-                duration: SuperTokens.durBase,
+                duration: SuperTokensData.defaultDurBase,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
@@ -264,7 +264,7 @@ class _OptionGroup<T> extends StatelessWidget {
                       ? Theme.of(context).colorScheme.primary
                       : const Color(0x00000000),
                   borderRadius:
-                      BorderRadius.circular(SuperTokens.radiusControl - 1),
+                      BorderRadius.circular(SuperTokensData.defaultRadiusControl - 1),
                 ),
                 child: Text(entry.value,
                     style: SuperText.button.copyWith(

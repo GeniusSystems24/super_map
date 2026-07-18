@@ -66,16 +66,16 @@ class _CustomMapDemoState extends State<CustomMapDemo> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(SuperTokens.space8),
+            padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1000),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(_graph.title, style: SuperText.h1.copyWith(color: t.fg1)),
-                  const SizedBox(height: SuperTokens.space2),
+                  const SizedBox(height: SuperTokensData.defaultSpace2),
                   Text(_graph.subtitle!, style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   SuperMap(controller: _controller, height: 520),
                 ],
               ),

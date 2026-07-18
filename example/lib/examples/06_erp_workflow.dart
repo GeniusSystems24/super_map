@@ -106,7 +106,7 @@ class _ErpWorkflowExampleState extends State<ErpWorkflowExample> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokens.space8),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -116,7 +116,7 @@ class _ErpWorkflowExampleState extends State<ErpWorkflowExample> {
                   Text('Draft → Pending → Approved → Posted. Tap a node to inspect its '
                       'status, source ref and audit metadata. The Posted record is locked.',
                       style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   SuperMap(
                     controller: _controller,
                     height: 560,

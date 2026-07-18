@@ -6,7 +6,7 @@ description: >
   PNG, PDF, Word, and CSV export for accounting and process diagrams.
 
 # package version
-version: 1.1.0
+version: 1.1.1
 
 # package homepage, repository, and issue tracker
 homepage: https://geniussystems24.github.io/super_map
@@ -28,7 +28,7 @@ dependencies:
   flutter:
     sdk: flutter
   # Shared GeniusLink design-system foundation (theme, tokens, type, widgets).
-  super_core: ">=1.2.0 <2.0.0"
+  super_core: ">=2.0.0 <3.0.0"
   # Export pipeline (v0.2.0): PDF assembly + DOCX (zip) packaging.
   pdf: ^3.10.0
   archive: ^3.4.0

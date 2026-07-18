@@ -51,7 +51,7 @@ class _MapJsonSheetState extends State<_MapJsonSheet> {
           decoration: BoxDecoration(
             color: t.surface,
             border: Border.all(color: t.borderStrong),
-            borderRadius: BorderRadius.circular(SuperTokens.radiusCard),
+            borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
             boxShadow: SuperThemeData.popShadow,
           ),
           clipBehavior: Clip.antiAlias,

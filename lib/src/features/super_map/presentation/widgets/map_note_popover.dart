@@ -48,7 +48,7 @@ class _MapNotePopoverState extends State<MapNotePopover> {
       decoration: BoxDecoration(
         color: t.surface,
         border: Border.all(color: t.borderStrong),
-        borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
         boxShadow: SuperThemeData.popShadow,
       ),
       clipBehavior: Clip.antiAlias,
@@ -56,7 +56,7 @@ class _MapNotePopoverState extends State<MapNotePopover> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(height: 4, color: SuperTokens.warning),
+          Container(height: 4, color: SuperTokensData.defaultWarning),
           Padding(
             padding: const EdgeInsets.fromLTRB(13, 11, 11, 13),
             child: Column(
@@ -66,7 +66,7 @@ class _MapNotePopoverState extends State<MapNotePopover> {
                 Row(
                   children: [
                     const Icon(Icons.sticky_note_2_outlined,
-                        size: 14, color: SuperTokens.warning),
+                        size: 14, color: SuperTokensData.defaultWarning),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text('NOTE · ${widget.node.label}',
@@ -93,11 +93,11 @@ class _MapNotePopoverState extends State<MapNotePopover> {
                       fillColor: t.inputBg,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+                        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
                         borderSide: BorderSide(color: t.border),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+                        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
                         borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
                       ),
                     ),

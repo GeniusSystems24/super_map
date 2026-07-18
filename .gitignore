@@ -46,6 +46,7 @@ ios/Flutter/Generated.xcconfig
 
 # Android
 android/.gradle/
+android/.kotlin/
 android/app/build/
 android/gradle/
 

@@ -257,7 +257,7 @@ class _SuperMapState extends State<SuperMap>
       ),
       color: t.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
         side: BorderSide(color: t.borderStrong),
       ),
       items: [
@@ -459,12 +459,12 @@ class _SuperMapState extends State<SuperMap>
             child: RepaintBoundary(
               key: _repaintKey,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(SuperTokens.radiusCard),
+                borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
                 child: Container(
                   decoration: BoxDecoration(
                     color: t.bg,
                     border: Border.all(color: accentBorder),
-                    borderRadius: BorderRadius.circular(SuperTokens.radiusCard),
+                    borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
                   ),
                   child: Stack(
                     key: _canvasKey,
@@ -1113,11 +1113,11 @@ class _ModeToggle extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: () => onChanged(m),
         child: AnimatedContainer(
-          duration: SuperTokens.durBase,
+          duration: SuperTokensData.defaultDurBase,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
           decoration: BoxDecoration(
             color: on ? cs.primary : const Color(0x00000000),
-            borderRadius: BorderRadius.circular(SuperTokens.radiusControl - 1),
+            borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl - 1),
           ),
           child: Text(
             label,
@@ -1135,7 +1135,7 @@ class _ModeToggle extends StatelessWidget {
       decoration: BoxDecoration(
         color: t.inputBg,
         border: Border.all(color: t.border),
-        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1174,14 +1174,14 @@ class _RoundBtnState extends State<_RoundBtn> {
         child: GestureDetector(
           onTap: widget.onTap,
           child: AnimatedContainer(
-            duration: SuperTokens.durBase,
+            duration: SuperTokensData.defaultDurBase,
             width: 34,
             height: 34,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: _hover ? t.hover : t.surface,
               border: Border.all(color: t.borderStrong),
-              borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+              borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
             ),
             child: Icon(widget.icon, size: 16, color: _hover ? t.fg1 : t.fg2),
           ),
@@ -1251,7 +1251,7 @@ class _EdgeLabel extends StatelessWidget {
       child: child,
     );
     return AnimatedOpacity(
-      duration: SuperTokens.durBase,
+      duration: SuperTokensData.defaultDurBase,
       opacity: dim ? 0.2 : 1,
       child: MouseRegion(
         cursor: onTap != null ? SystemMouseCursors.text : MouseCursor.defer,
@@ -1394,7 +1394,7 @@ class _CanvasSeg<T> extends StatelessWidget {
       decoration: BoxDecoration(
         color: t.inputBg,
         border: Border.all(color: t.border),
-        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1404,7 +1404,7 @@ class _CanvasSeg<T> extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               onTap: () => onChanged(entry.key),
               child: AnimatedContainer(
-                duration: SuperTokens.durBase,
+                duration: SuperTokensData.defaultDurBase,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 11,
                   vertical: 5,
@@ -1414,7 +1414,7 @@ class _CanvasSeg<T> extends StatelessWidget {
                       ? cs.primary
                       : const Color(0x00000000),
                   borderRadius: BorderRadius.circular(
-                    SuperTokens.radiusControl - 1,
+                    SuperTokensData.defaultRadiusControl - 1,
                   ),
                 ),
                 child: Text(
@@ -1458,7 +1458,7 @@ class _DataPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: Color.alphaBlend(t.surface.withOpacity(0.96), t.bg),
         border: Border.all(color: t.borderStrong),
-        borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
         boxShadow: t.cardShadow,
       ),
       clipBehavior: Clip.antiAlias,
@@ -1768,7 +1768,7 @@ class _SearchFieldState extends State<_SearchField> {
       decoration: BoxDecoration(
         color: t.inputBg,
         border: Border.all(color: has ? cs.primary : t.border),
-        borderRadius: BorderRadius.circular(SuperTokens.radiusControl),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
       ),
       child: Row(
         children: [
@@ -1839,7 +1839,7 @@ class _IssuesPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: Color.alphaBlend(t.surface.withOpacity(0.97), t.bg),
         border: Border.all(color: t.borderStrong),
-        borderRadius: BorderRadius.circular(SuperTokens.radiusMd),
+        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
         boxShadow: t.cardShadow,
       ),
       clipBehavior: Clip.antiAlias,
@@ -1857,8 +1857,8 @@ class _IssuesPanel extends StatelessWidget {
                       : Icons.report_problem_outlined,
                   size: 14,
                   color: summary.isClean
-                      ? SuperTokens.success
-                      : SuperTokens.warning,
+                      ? SuperTokensData.defaultSuccess
+                      : SuperTokensData.defaultWarning,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -1917,7 +1917,7 @@ class _IssueRowState extends State<_IssueRow> {
       MapIssueSeverity.error => (Icons.error_outline_rounded, cs.error),
       MapIssueSeverity.warning => (
         Icons.warning_amber_rounded,
-        SuperTokens.warning,
+        SuperTokensData.defaultWarning,
       ),
       MapIssueSeverity.info => (Icons.info_outline_rounded, cs.primary),
     };

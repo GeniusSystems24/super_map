@@ -99,7 +99,7 @@ class _AuditLocksExampleState extends State<AuditLocksExample> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokens.space8),
+          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -110,7 +110,7 @@ class _AuditLocksExampleState extends State<AuditLocksExample> {
                       'drag or delete one — it refuses. Select it and use the lock toggle '
                       'in the details panel to release it.',
                       style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokens.space6),
+                  const SizedBox(height: SuperTokensData.defaultSpace6),
                   SuperMap(
                     controller: _controller,
                     height: 560,
