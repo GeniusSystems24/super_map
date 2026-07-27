@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // features/super_map/presentation/widgets/map_note_popover.dart
 // ------------------------------------------------------------
 // The per-node note popover (v0.2.0). Anchored near a node's note button, it
@@ -48,7 +48,7 @@ class _MapNotePopoverState extends State<MapNotePopover> {
       decoration: BoxDecoration(
         color: t.surface,
         border: Border.all(color: t.borderStrong),
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusMd),
         boxShadow: SuperThemeData.popShadow,
       ),
       clipBehavior: Clip.antiAlias,
@@ -56,7 +56,7 @@ class _MapNotePopoverState extends State<MapNotePopover> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(height: 4, color: SuperTokensData.defaultWarning),
+          Container(height: 4, color: SuperThemeData.of(context).tokens.warning),
           Padding(
             padding: const EdgeInsets.fromLTRB(13, 11, 11, 13),
             child: Column(
@@ -65,14 +65,14 @@ class _MapNotePopoverState extends State<MapNotePopover> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.sticky_note_2_outlined,
-                        size: 14, color: SuperTokensData.defaultWarning),
+                    Icon(Icons.sticky_note_2_outlined,
+                        size: 14, color: SuperThemeData.of(context).tokens.warning),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text('NOTE · ${widget.node.label}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: SuperText.label.copyWith(fontSize: 10.5, color: t.fg3)),
+                          style: t.textTheme.label.copyWith(fontSize: 10.5, color: t.fg3)),
                     ),
                     SuperIconButton(icon: Icons.close_rounded, onPressed: widget.onClose),
                   ],
@@ -84,20 +84,20 @@ class _MapNotePopoverState extends State<MapNotePopover> {
                     autofocus: true,
                     minLines: 3,
                     maxLines: 6,
-                    style: SuperText.body.copyWith(fontSize: 12.5, height: 1.5, color: t.fg1),
+                    style: t.textTheme.body.copyWith(fontSize: 12.5, height: 1.5, color: t.fg1),
                     decoration: InputDecoration(
                       isDense: true,
                       hintText: 'Write a note for this node…',
-                      hintStyle: SuperText.body.copyWith(fontSize: 12.5, color: t.fg4),
+                      hintStyle: t.textTheme.body.copyWith(fontSize: 12.5, color: t.fg4),
                       filled: true,
                       fillColor: t.inputBg,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+                        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
                         borderSide: BorderSide(color: t.border),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+                        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
                         borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
                       ),
                     ),
@@ -108,7 +108,7 @@ class _MapNotePopoverState extends State<MapNotePopover> {
                     widget.node.note?.isNotEmpty == true
                         ? widget.node.note!
                         : 'No note on this node.',
-                    style: SuperText.body.copyWith(
+                    style: t.textTheme.body.copyWith(
                         fontSize: 12.5,
                         height: 1.6,
                         color: widget.node.note?.isNotEmpty == true ? t.fg2 : t.fg4),

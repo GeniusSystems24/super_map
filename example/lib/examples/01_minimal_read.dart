@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/examples/01_minimal_read.dart
 // ------------------------------------------------------------
 // Example 1 · The shortest path. Build a tiny MapGraph, hand it to a
@@ -54,11 +54,11 @@ class _MinimalReadExampleState extends State<MinimalReadExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('1 · Minimal (read)', style: SuperText.heading.copyWith(color: t.fg1)),
+        title: Text('1 · Minimal (read)', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+          padding: EdgeInsets.all(context.superTheme.spacing.space8),
           // The toolbar is hidden — this is a pure, read-only view.
           child: SuperMap(
             controller: _controller,

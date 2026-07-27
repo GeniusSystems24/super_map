@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/examples/07_validation.dart
 // ------------------------------------------------------------
 // Example 7 · Audit validation (v1.0.0). A deliberately broken settlement graph
@@ -71,11 +71,11 @@ class _ValidationExampleState extends State<ValidationExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('7 · Validation', style: SuperText.heading.copyWith(color: t.fg1)),
+        title: Text('7 · Validation', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+          padding: EdgeInsets.all(context.superTheme.spacing.space8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -85,24 +85,24 @@ class _ValidationExampleState extends State<ValidationExample> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
                     decoration: BoxDecoration(
-                      color: t.tintFill(SuperTokensData.defaultWarning, 0.10),
+                      color: t.tintFill(SuperThemeData.of(context).tokens.warning, 0.10),
                       border: Border.all(color: t.border),
-                      borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+                      borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
                     ),
                     child: Row(children: [
-                      const Icon(Icons.report_problem_outlined, size: 16, color: SuperTokensData.defaultWarning),
+                      Icon(Icons.report_problem_outlined, size: 16, color: SuperThemeData.of(context).tokens.warning),
                       const SizedBox(width: 9),
                       Expanded(
                         child: Text(
                           'MapValidator found ${summary.errors} error(s), '
                           '${summary.warnings} warning(s) and ${summary.infos} info note(s). '
                           'Press Validate to explore them.',
-                          style: SuperText.caption.copyWith(fontSize: 12, color: t.fg2),
+                          style: t.textTheme.caption.copyWith(fontSize: 12, color: t.fg2),
                         ),
                       ),
                     ]),
                   ),
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   SuperMap(
                     controller: _controller,
                     height: 560,

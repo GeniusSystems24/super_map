@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // features/super_map/presentation/widgets/super_map.dart
 // ------------------------------------------------------------
 // The SuperMap canvas — the composed View. A pannable / zoomable / draggable
@@ -257,7 +257,7 @@ class _SuperMapState extends State<SuperMap>
       ),
       color: t.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusMd),
         side: BorderSide(color: t.borderStrong),
       ),
       items: [
@@ -275,14 +275,14 @@ class _SuperMapState extends State<SuperMap>
               children: [
                 Text(
                   label,
-                  style: SuperText.button.copyWith(
+                  style: t.textTheme.button.copyWith(
                     fontSize: 12.5,
                     color: t.fg1,
                   ),
                 ),
                 Text(
                   sub,
-                  style: SuperText.caption.copyWith(
+                  style: t.textTheme.caption.copyWith(
                     fontSize: 10.5,
                     color: t.fg4,
                   ),
@@ -459,12 +459,12 @@ class _SuperMapState extends State<SuperMap>
             child: RepaintBoundary(
               key: _repaintKey,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
+                borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusCard),
                 child: Container(
                   decoration: BoxDecoration(
                     color: t.bg,
                     border: Border.all(color: accentBorder),
-                    borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
+                    borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusCard),
                   ),
                   child: Stack(
                     key: _canvasKey,
@@ -1113,15 +1113,15 @@ class _ModeToggle extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: () => onChanged(m),
         child: AnimatedContainer(
-          duration: SuperTokensData.defaultDurBase,
+          duration: SuperThemeData.of(context).tokens.durBase,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
           decoration: BoxDecoration(
             color: on ? cs.primary : const Color(0x00000000),
-            borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl - 1),
+            borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl - 1),
           ),
           child: Text(
             label,
-            style: SuperText.button.copyWith(
+            style: t.textTheme.button.copyWith(
               fontSize: 13,
               color: on ? Colors.white : t.fg2,
             ),
@@ -1135,7 +1135,7 @@ class _ModeToggle extends StatelessWidget {
       decoration: BoxDecoration(
         color: t.inputBg,
         border: Border.all(color: t.border),
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1174,14 +1174,14 @@ class _RoundBtnState extends State<_RoundBtn> {
         child: GestureDetector(
           onTap: widget.onTap,
           child: AnimatedContainer(
-            duration: SuperTokensData.defaultDurBase,
+            duration: SuperThemeData.of(context).tokens.durBase,
             width: 34,
             height: 34,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: _hover ? t.hover : t.surface,
               border: Border.all(color: t.borderStrong),
-              borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+              borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
             ),
             child: Icon(widget.icon, size: 16, color: _hover ? t.fg1 : t.fg2),
           ),
@@ -1214,7 +1214,7 @@ class _TitleChip extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             title,
-            style: SuperText.caption.copyWith(
+            style: t.textTheme.caption.copyWith(
               fontSize: 11.5,
               fontWeight: FontWeight.w700,
               color: t.fg1,
@@ -1223,7 +1223,7 @@ class _TitleChip extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             '$zoom%',
-            style: SuperText.mono.copyWith(fontSize: 10.5, color: t.fg3),
+            style: t.textTheme.mono.copyWith(fontSize: 10.5, color: t.fg3),
           ),
         ],
       ),
@@ -1251,7 +1251,7 @@ class _EdgeLabel extends StatelessWidget {
       child: child,
     );
     return AnimatedOpacity(
-      duration: SuperTokensData.defaultDurBase,
+      duration: SuperThemeData.of(context).tokens.durBase,
       opacity: dim ? 0.2 : 1,
       child: MouseRegion(
         cursor: onTap != null ? SystemMouseCursors.text : MouseCursor.defer,
@@ -1270,7 +1270,7 @@ class _EdgeLabel extends StatelessWidget {
                       label!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: SuperText.caption.copyWith(
+                      style: t.textTheme.caption.copyWith(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w600,
                         color: t.fg2,
@@ -1283,7 +1283,7 @@ class _EdgeLabel extends StatelessWidget {
                 pill(
                   Text(
                     mapCompact(value!),
-                    style: SuperText.mono.copyWith(
+                    style: t.textTheme.mono.copyWith(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       color: t.fg3,
@@ -1347,11 +1347,11 @@ class _EdgeLabelEditorState extends State<_EdgeLabelEditor> {
         focusNode: _focus,
         textAlign: TextAlign.center,
         cursorColor: cs.primary,
-        style: SuperText.body.copyWith(fontSize: 11, color: t.fg1),
+        style: t.textTheme.body.copyWith(fontSize: 11, color: t.fg1),
         decoration: InputDecoration(
           isDense: true,
           hintText: 'Label…',
-          hintStyle: SuperText.body.copyWith(fontSize: 11, color: t.fg4),
+          hintStyle: t.textTheme.body.copyWith(fontSize: 11, color: t.fg4),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 8,
             vertical: 2,
@@ -1394,7 +1394,7 @@ class _CanvasSeg<T> extends StatelessWidget {
       decoration: BoxDecoration(
         color: t.inputBg,
         border: Border.all(color: t.border),
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1404,7 +1404,7 @@ class _CanvasSeg<T> extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               onTap: () => onChanged(entry.key),
               child: AnimatedContainer(
-                duration: SuperTokensData.defaultDurBase,
+                duration: SuperThemeData.of(context).tokens.durBase,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 11,
                   vertical: 5,
@@ -1414,12 +1414,12 @@ class _CanvasSeg<T> extends StatelessWidget {
                       ? cs.primary
                       : const Color(0x00000000),
                   borderRadius: BorderRadius.circular(
-                    SuperTokensData.defaultRadiusControl - 1,
+                    context.superTheme.spacing.radiusControl - 1,
                   ),
                 ),
                 child: Text(
                   entry.value,
-                  style: SuperText.button.copyWith(
+                  style: t.textTheme.button.copyWith(
                     fontSize: 11.5,
                     color: value == entry.key ? Colors.white : t.fg2,
                   ),
@@ -1458,7 +1458,7 @@ class _DataPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: Color.alphaBlend(t.surface.withOpacity(0.96), t.bg),
         border: Border.all(color: t.borderStrong),
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusMd),
         boxShadow: t.cardShadow,
       ),
       clipBehavior: Clip.antiAlias,
@@ -1475,7 +1475,7 @@ class _DataPanel extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'ALL NODES · ${c.nodes.length}',
-                    style: SuperText.label.copyWith(
+                    style: t.textTheme.label.copyWith(
                       fontSize: 10.5,
                       color: t.fg2,
                     ),
@@ -1570,7 +1570,7 @@ class _DataRowState extends State<_DataRow> {
                       n.label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: SuperText.caption.copyWith(
+                      style: t.textTheme.caption.copyWith(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: t.fg1,
@@ -1578,7 +1578,7 @@ class _DataRowState extends State<_DataRow> {
                     ),
                     Text(
                       'in ${s.inCount} · out ${s.outCount}${n.note != null ? ' · note' : ''}',
-                      style: SuperText.mono.copyWith(
+                      style: t.textTheme.mono.copyWith(
                         fontSize: 9.5,
                         color: t.fg4,
                       ),
@@ -1589,7 +1589,7 @@ class _DataRowState extends State<_DataRow> {
               if (n.value != null)
                 Text(
                   mapCompact(n.value!),
-                  style: SuperText.mono.copyWith(
+                  style: t.textTheme.mono.copyWith(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
                     color: widget.accent,
@@ -1713,7 +1713,7 @@ class _ToastState extends State<_Toast> {
           const SizedBox(width: 7),
           Text(
             widget.message,
-            style: SuperText.button.copyWith(fontSize: 12, color: t.bg),
+            style: t.textTheme.button.copyWith(fontSize: 12, color: t.bg),
           ),
         ],
       ),
@@ -1768,7 +1768,7 @@ class _SearchFieldState extends State<_SearchField> {
       decoration: BoxDecoration(
         color: t.inputBg,
         border: Border.all(color: has ? cs.primary : t.border),
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
       ),
       child: Row(
         children: [
@@ -1778,13 +1778,13 @@ class _SearchFieldState extends State<_SearchField> {
             child: TextField(
               controller: _ctl,
               cursorColor: cs.primary,
-              style: SuperText.body.copyWith(fontSize: 12.5, color: t.fg1),
+              style: t.textTheme.body.copyWith(fontSize: 12.5, color: t.fg1),
               decoration: InputDecoration(
                 isDense: true,
                 isCollapsed: true,
                 border: InputBorder.none,
                 hintText: 'Search nodes…',
-                hintStyle: SuperText.body.copyWith(
+                hintStyle: t.textTheme.body.copyWith(
                   fontSize: 12.5,
                   color: t.fg4,
                 ),
@@ -1795,7 +1795,7 @@ class _SearchFieldState extends State<_SearchField> {
           if (has) ...[
             Text(
               '${widget.count ?? 0}',
-              style: SuperText.mono.copyWith(fontSize: 10.5, color: t.fg3),
+              style: t.textTheme.mono.copyWith(fontSize: 10.5, color: t.fg3),
             ),
             const SizedBox(width: 4),
             GestureDetector(
@@ -1839,7 +1839,7 @@ class _IssuesPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: Color.alphaBlend(t.surface.withOpacity(0.97), t.bg),
         border: Border.all(color: t.borderStrong),
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusMd),
         boxShadow: t.cardShadow,
       ),
       clipBehavior: Clip.antiAlias,
@@ -1857,8 +1857,8 @@ class _IssuesPanel extends StatelessWidget {
                       : Icons.report_problem_outlined,
                   size: 14,
                   color: summary.isClean
-                      ? SuperTokensData.defaultSuccess
-                      : SuperTokensData.defaultWarning,
+                      ? SuperThemeData.of(context).tokens.success
+                      : SuperThemeData.of(context).tokens.warning,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -1866,7 +1866,7 @@ class _IssuesPanel extends StatelessWidget {
                     summary.isClean
                         ? 'VALIDATION PASSED'
                         : 'ISSUES · ${summary.errors} ERR · ${summary.warnings} WARN · ${summary.infos} INFO',
-                    style: SuperText.label.copyWith(fontSize: 10, color: t.fg2),
+                    style: t.textTheme.label.copyWith(fontSize: 10, color: t.fg2),
                   ),
                 ),
                 SuperIconButton(icon: Icons.close_rounded, onPressed: onClose),
@@ -1879,7 +1879,7 @@ class _IssuesPanel extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(13, 14, 13, 16),
               child: Text(
                 'No problems found. The diagram is structurally sound.',
-                style: SuperText.caption.copyWith(fontSize: 12, color: t.fg3),
+                style: t.textTheme.caption.copyWith(fontSize: 12, color: t.fg3),
               ),
             )
           else
@@ -1917,7 +1917,7 @@ class _IssueRowState extends State<_IssueRow> {
       MapIssueSeverity.error => (Icons.error_outline_rounded, cs.error),
       MapIssueSeverity.warning => (
         Icons.warning_amber_rounded,
-        SuperTokensData.defaultWarning,
+        SuperThemeData.of(context).tokens.warning,
       ),
       MapIssueSeverity.info => (Icons.info_outline_rounded, cs.primary),
     };
@@ -1943,7 +1943,7 @@ class _IssueRowState extends State<_IssueRow> {
               Expanded(
                 child: Text(
                   widget.issue.message,
-                  style: SuperText.caption.copyWith(
+                  style: t.textTheme.caption.copyWith(
                     fontSize: 11.5,
                     color: t.fg2,
                     height: 1.3,

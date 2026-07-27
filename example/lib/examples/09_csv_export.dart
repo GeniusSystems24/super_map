@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/examples/09_csv_export.dart
 // ------------------------------------------------------------
 // Example 9 · CSV export (v1.0.0). MapExporter gains spreadsheet output for the
@@ -42,11 +42,11 @@ class _CsvExportExampleState extends State<CsvExportExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('9 · CSV Export', style: SuperText.heading.copyWith(color: t.fg1)),
+        title: Text('9 · CSV Export', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+          padding: EdgeInsets.all(context.superTheme.spacing.space8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 980),
@@ -55,8 +55,8 @@ class _CsvExportExampleState extends State<CsvExportExample> {
                 children: [
                   Text('MapExporter.nodesCsv / edgesCsv turn any MapGraph into an '
                       'audit-ready spreadsheet. ${bytes.length} bytes ready to save.',
-                      style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokensData.defaultSpace4),
+                      style: t.textTheme.body.copyWith(color: t.fg3)),
+                  SizedBox(height: context.superTheme.spacing.space4),
                   Wrap(spacing: 8, runSpacing: 8, children: [
                     SuperButton(
                       label: 'Nodes table',
@@ -82,19 +82,19 @@ class _CsvExportExampleState extends State<CsvExportExample> {
                       },
                     ),
                   ]),
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(SuperTokensData.defaultSpace4),
+                    padding: EdgeInsets.all(context.superTheme.spacing.space4),
                     decoration: BoxDecoration(
                       color: t.surface,
                       border: Border.all(color: t.border),
-                      borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
+                      borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusMd),
                       boxShadow: t.cardShadow,
                     ),
                     child: SelectableText(
                       _csv,
-                      style: SuperText.mono.copyWith(fontSize: 12, color: t.fg2, height: 1.5),
+                      style: t.textTheme.mono.copyWith(fontSize: 12, color: t.fg2, height: 1.5),
                     ),
                   ),
                 ],

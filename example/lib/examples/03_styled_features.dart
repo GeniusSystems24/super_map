@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/examples/03_styled_features.dart
 // ------------------------------------------------------------
 // Example 3 · The v0.2.0 expressive features. A hand-built graph that uses
@@ -67,11 +67,11 @@ class _StyledFeaturesExampleState extends State<StyledFeaturesExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('3 · Colours · labels · notes', style: SuperText.heading.copyWith(color: t.fg1)),
+        title: Text('3 · Colours · labels · notes', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+          padding: EdgeInsets.all(context.superTheme.spacing.space8),
           child: SuperMap(
             controller: _controller,
             height: 520,

@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // features/super_map/presentation/widgets/map_json_sheet.dart
 // ------------------------------------------------------------
 // The diagram-JSON dialog: a monospace editor over the current `{ meta, nodes,
@@ -51,7 +51,7 @@ class _MapJsonSheetState extends State<_MapJsonSheet> {
           decoration: BoxDecoration(
             color: t.surface,
             border: Border.all(color: t.borderStrong),
-            borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
+            borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusCard),
             boxShadow: SuperThemeData.popShadow,
           ),
           clipBehavior: Clip.antiAlias,
@@ -64,11 +64,11 @@ class _MapJsonSheetState extends State<_MapJsonSheet> {
                   children: [
                     Icon(Icons.data_object_rounded, size: 17, color: cs.primary),
                     const SizedBox(width: 10),
-                    Text('Diagram JSON', style: SuperText.heading.copyWith(fontSize: 15, color: t.fg1)),
+                    Text('Diagram JSON', style: t.textTheme.heading.copyWith(fontSize: 15, color: t.fg1)),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text('· edit & apply, or copy',
-                          style: SuperText.caption.copyWith(color: t.fg3)),
+                          style: t.textTheme.caption.copyWith(color: t.fg3)),
                     ),
                     SuperIconButton(icon: Icons.close_rounded, onPressed: () => Navigator.of(context).pop()),
                   ],
@@ -83,7 +83,7 @@ class _MapJsonSheetState extends State<_MapJsonSheet> {
                     maxLines: null,
                     expands: true,
                     textAlignVertical: TextAlignVertical.top,
-                    style: SuperText.mono.copyWith(fontSize: 12, color: t.fg1, height: 1.6),
+                    style: t.textTheme.mono.copyWith(fontSize: 12, color: t.fg1, height: 1.6),
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),

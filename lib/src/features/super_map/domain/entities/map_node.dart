@@ -17,26 +17,32 @@ import 'package:super_core/super_core.dart';
 /// color and resolve to the theme's tertiary foreground at render time so they
 /// read correctly in both light and dark.
 enum MapNodeKind {
-  income(SuperTokensData.defaultSuccess, Icons.bar_chart_rounded, 'Income'),
-  hub(SuperTokensData.defaultAccent, Icons.hub_outlined, 'Entity'),
-  expense(SuperTokensData.defaultDanger, Icons.call_split_rounded, 'Expense'),
+  income(_success, Icons.bar_chart_rounded, 'Income'),
+  hub(_accent, Icons.hub_outlined, 'Entity'),
+  expense(_danger, Icons.call_split_rounded, 'Expense'),
   equity(_violet, Icons.verified_outlined, 'Equity'),
-  topic(SuperTokensData.defaultAccent, Icons.tag_rounded, 'Topic'),
-  branch(SuperTokensData.defaultWarning, Icons.folder_open_rounded, 'Branch'),
+  topic(_accent, Icons.tag_rounded, 'Topic'),
+  branch(_warning, Icons.folder_open_rounded, 'Branch'),
   leaf(null, Icons.description_outlined, 'Idea'),
-  process(SuperTokensData.defaultAccent, Icons.bolt_rounded, 'Process'),
+  process(_accent, Icons.bolt_rounded, 'Process'),
   role(_sky, Icons.person_outline_rounded, 'Role'),
-  approval(SuperTokensData.defaultWarning, Icons.check_circle_outline_rounded, 'Approval'),
+  approval(_warning, Icons.check_circle_outline_rounded, 'Approval'),
   document(null, Icons.insert_drive_file_outlined, 'Document'),
-  account(SuperTokensData.defaultSuccess, Icons.menu_book_outlined, 'Account'),
+  account(_success, Icons.menu_book_outlined, 'Account'),
   statement(_violet, Icons.receipt_long_outlined, 'Statement'),
-  party(SuperTokensData.defaultAccent, Icons.people_outline_rounded, 'Party'),
-  payment(SuperTokensData.defaultSuccess, Icons.payments_outlined, 'Payment');
+  party(_accent, Icons.people_outline_rounded, 'Party'),
+  payment(_success, Icons.payments_outlined, 'Payment');
 
   const MapNodeKind(this._color, this.icon, this.tag);
 
+  // Brand-token literals (enum constants must be const; the live theme still
+  // drives neutral kinds via [colorOf]).
   static const Color _violet = Color(0xFFA855F7);
   static const Color _sky = Color(0xFF0EA5E9);
+  static const Color _success = Color(0xFF1DB88A);
+  static const Color _accent = Color(0xFF4A7CFF);
+  static const Color _danger = Color(0xFFEF4444);
+  static const Color _warning = Color(0xFFF97316);
 
   /// The raw accent color, or null for neutral kinds (resolved by [colorOf]).
   final Color? _color;
@@ -65,15 +71,19 @@ enum MapNodeKind {
 enum MapNodeStatus {
   none(null, ''),
   draft(null, 'Draft'),
-  pending(SuperTokensData.defaultWarning, 'Pending'),
-  approved(SuperTokensData.defaultSuccess, 'Approved'),
-  posted(SuperTokensData.defaultAccent, 'Posted'),
-  rejected(SuperTokensData.defaultDanger, 'Rejected'),
+  pending(_warning, 'Pending'),
+  approved(_success, 'Approved'),
+  posted(_accent, 'Posted'),
+  rejected(_danger, 'Rejected'),
   onHold(_holdViolet, 'On Hold');
 
   const MapNodeStatus(this._color, this.tag);
 
   static const Color _holdViolet = Color(0xFFA855F7);
+  static const Color _warning = Color(0xFFF97316);
+  static const Color _success = Color(0xFF1DB88A);
+  static const Color _accent = Color(0xFF4A7CFF);
+  static const Color _danger = Color(0xFFEF4444);
 
   /// The raw status color, or null for the neutral `none` / `draft` states.
   final Color? _color;

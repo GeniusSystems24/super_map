@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/examples/04_controller_driven.dart
 // ------------------------------------------------------------
 // Example 4 · Drive SuperMap from the outside. The SuperMapController is a
@@ -73,17 +73,17 @@ class _ControllerDrivenExampleState extends State<ControllerDrivenExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('4 · Controller-driven', style: SuperText.heading.copyWith(color: t.fg1)),
+        title: Text('4 · Controller-driven', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+          padding: EdgeInsets.all(context.superTheme.spacing.space8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Wrap(
-                spacing: SuperTokensData.defaultSpace3,
-                runSpacing: SuperTokensData.defaultSpace2,
+                spacing: context.superTheme.spacing.space3,
+                runSpacing: context.superTheme.spacing.space2,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   SuperButton(label: 'Add service', icon: const Icon(Icons.add_rounded), onPressed: _addService),
@@ -101,11 +101,11 @@ class _ControllerDrivenExampleState extends State<ControllerDrivenExample> {
                   ),
                   Text(
                     sel == null ? 'Nothing selected' : 'Selected: ${sel.label}',
-                    style: SuperText.caption.copyWith(color: t.fg3),
+                    style: t.textTheme.caption.copyWith(color: t.fg3),
                   ),
                 ],
               ),
-              const SizedBox(height: SuperTokensData.defaultSpace6),
+              SizedBox(height: context.superTheme.spacing.space6),
               SuperMap(controller: _controller, height: 500, showToolbar: false, showData: true),
             ],
           ),

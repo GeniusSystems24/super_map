@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // features/super_map/presentation/widgets/map_node_card.dart
 // ------------------------------------------------------------
 // One node on the canvas — the View atom. Renders the card / chip / pill form
@@ -133,7 +133,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
     final decoration = BoxDecoration(
       color: t.surface,
       border: Border.all(color: frame),
-      borderRadius: BorderRadius.circular(isChip ? 999 : SuperTokensData.defaultRadiusMd),
+      borderRadius: BorderRadius.circular(isChip ? 999 : context.superTheme.spacing.radiusMd),
       boxShadow: [
         ...t.cardShadow,
         if (widget.selected)
@@ -145,7 +145,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
     Widget content = widget.editing ? _editor(t, accent) : _label(t, accent);
 
     final card = AnimatedOpacity(
-      duration: SuperTokensData.defaultDurBase,
+      duration: SuperThemeData.of(context).tokens.durBase,
       opacity: widget.dimmed ? 0.36 : 1,
       child: Container(
         width: widget.size.width,
@@ -262,13 +262,13 @@ class _MapNodeCardState extends State<MapNodeCard> {
         children: [
           if (value != null)
             Text(_compact(value),
-                style: SuperText.mono.copyWith(
+                style: t.textTheme.mono.copyWith(
                     fontSize: isChip ? 10.5 : 11,
                     fontWeight: FontWeight.w700,
                     color: accent)),
           if (showDegree)
             Text('${s.inCount}→${s.outCount}',
-                style: SuperText.mono.copyWith(fontSize: 9.5, color: t.fg4)),
+                style: t.textTheme.mono.copyWith(fontSize: 9.5, color: t.fg4)),
         ],
       ),
     );
@@ -283,8 +283,8 @@ class _MapNodeCardState extends State<MapNodeCard> {
             textDirection: TextDirection.rtl,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: SuperText.caption.copyWith(
-              fontFamily: SuperTokensData.defaultArabicFont,
+            style: t.textTheme.caption.copyWith(
+              fontFamily: SuperThemeData.of(context).tokens.arabicFont,
               fontSize: 11.5,
               color: t.fg4,
             ),
@@ -294,7 +294,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
                 node.sub!.toUpperCase(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: SuperText.pill.copyWith(fontSize: 10, color: t.fg4),
+                style: t.textTheme.pill.copyWith(fontSize: 10, color: t.fg4),
               )
             : null);
 
@@ -303,8 +303,8 @@ class _MapNodeCardState extends State<MapNodeCard> {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: (isChip
-              ? SuperText.caption.copyWith(fontSize: 12.5)
-              : SuperText.body.copyWith(fontSize: 13.5))
+              ? t.textTheme.caption.copyWith(fontSize: 12.5)
+              : t.textTheme.body.copyWith(fontSize: 13.5))
           .copyWith(fontWeight: FontWeight.w700, color: t.fg1),
     );
 
@@ -325,7 +325,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
         focusNode: _focus,
         autofocus: true,
         cursorColor: accent,
-        style: SuperText.body.copyWith(fontSize: 13, color: t.fg1),
+        style: t.textTheme.body.copyWith(fontSize: 13, color: t.fg1),
         decoration: InputDecoration(
           isDense: true,
           contentPadding:
@@ -362,7 +362,7 @@ class _IconBox extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: color.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+          borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
         ),
         child: Icon(icon, size: 16, color: color),
       );
@@ -413,11 +413,11 @@ class _NoteButtonState extends State<_NoteButton> {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: widget.has
-                  ? SuperTokensData.defaultWarning
+                  ? SuperThemeData.of(context).tokens.warning
                   : (_hover ? t.hover : t.surface),
               shape: BoxShape.circle,
               border: Border.all(
-                  color: widget.has ? SuperTokensData.defaultWarning : t.borderStrong),
+                  color: widget.has ? SuperThemeData.of(context).tokens.warning : t.borderStrong),
               boxShadow: t.cardShadow,
             ),
             child: Icon(Icons.sticky_note_2_outlined,

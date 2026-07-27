@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // features/super_map/presentation/widgets/map_minimap.dart
 // ------------------------------------------------------------
 // The bottom-left minimap: a 168×108 overview that fits the whole graph, draws
@@ -48,7 +48,7 @@ class MapMinimap extends StatelessWidget {
       decoration: BoxDecoration(
         color: Color.alphaBlend(t.surface.withOpacity(0.9), t.bg),
         border: Border.all(color: t.border),
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
       ),
       clipBehavior: Clip.antiAlias,
       child: CustomPaint(

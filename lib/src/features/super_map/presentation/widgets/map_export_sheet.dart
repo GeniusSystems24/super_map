@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // features/super_map/presentation/widgets/map_export_sheet.dart
 // ------------------------------------------------------------
 // The export chooser (v0.2.0): a small dialog offering Image (PNG) / PDF /
@@ -109,7 +109,7 @@ class _MapExportSheetState extends State<_MapExportSheet> {
           decoration: BoxDecoration(
             color: t.surface,
             border: Border.all(color: t.borderStrong),
-            borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
+            borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusCard),
             boxShadow: SuperThemeData.popShadow,
           ),
           clipBehavior: Clip.antiAlias,
@@ -124,7 +124,7 @@ class _MapExportSheetState extends State<_MapExportSheet> {
                     Icon(Icons.ios_share_rounded, size: 16, color: cs.primary),
                     const SizedBox(width: 10),
                     Text('Export diagram',
-                        style: SuperText.heading.copyWith(fontSize: 15, color: t.fg1)),
+                        style: t.textTheme.heading.copyWith(fontSize: 15, color: t.fg1)),
                     const Spacer(),
                     SuperIconButton(
                         icon: Icons.close_rounded,
@@ -168,10 +168,10 @@ class _MapExportSheetState extends State<_MapExportSheet> {
                           const SizedBox(
                               width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
                           const SizedBox(width: 10),
-                          Text('Rendering…', style: SuperText.caption.copyWith(color: t.fg3)),
+                          Text('Rendering…', style: t.textTheme.caption.copyWith(color: t.fg3)),
                         ])
                       : Text(_error!,
-                          style: SuperText.caption.copyWith(color: Theme.of(context).colorScheme.error)),
+                          style: t.textTheme.caption.copyWith(color: Theme.of(context).colorScheme.error)),
                 ),
             ],
           ),
@@ -216,7 +216,7 @@ class _ExportOptionState extends State<_ExportOption> {
           decoration: BoxDecoration(
             color: _hover ? t.hover : t.inputBg,
             border: Border.all(color: t.border),
-            borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+            borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
           ),
           child: Row(
             children: [
@@ -226,7 +226,7 @@ class _ExportOptionState extends State<_ExportOption> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: t.tintFill(cs.primary, 0.14),
-                  borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+                  borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
                 ),
                 child: Icon(widget.icon, size: 18, color: cs.primary),
               ),
@@ -236,8 +236,8 @@ class _ExportOptionState extends State<_ExportOption> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(widget.label,
-                        style: SuperText.body.copyWith(fontWeight: FontWeight.w700, color: t.fg1)),
-                    Text(widget.sub, style: SuperText.caption.copyWith(color: t.fg3)),
+                        style: t.textTheme.body.copyWith(fontWeight: FontWeight.w700, color: t.fg1)),
+                    Text(widget.sub, style: t.textTheme.caption.copyWith(color: t.fg3)),
                   ],
                 ),
               ),

@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/custom_map_demo.dart
 // ------------------------------------------------------------
 // The shortest path to a working SuperMap: build a MapGraph by hand, hand it to
@@ -61,21 +61,21 @@ class _CustomMapDemoState extends State<CustomMapDemo> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('Custom Graph', style: SuperText.heading.copyWith(color: t.fg1)),
+        title: Text('Custom Graph', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+            padding: EdgeInsets.all(context.superTheme.spacing.space8),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1000),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(_graph.title, style: SuperText.h1.copyWith(color: t.fg1)),
-                  const SizedBox(height: SuperTokensData.defaultSpace2),
-                  Text(_graph.subtitle!, style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                  Text(_graph.title, style: t.textTheme.h1.copyWith(color: t.fg1)),
+                  SizedBox(height: context.superTheme.spacing.space2),
+                  Text(_graph.subtitle!, style: t.textTheme.body.copyWith(color: t.fg3)),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   SuperMap(controller: _controller, height: 520),
                 ],
               ),

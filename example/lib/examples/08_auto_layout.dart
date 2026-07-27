@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/examples/08_auto_layout.dart
 // ------------------------------------------------------------
 // Example 8 · Auto-layout (v1.0.0). A scrambled order-to-cash graph with nodes
@@ -63,11 +63,11 @@ class _AutoLayoutExampleState extends State<AutoLayoutExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('8 · Auto-layout', style: SuperText.heading.copyWith(color: t.fg1)),
+        title: Text('8 · Auto-layout', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+          padding: EdgeInsets.all(context.superTheme.spacing.space8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -76,8 +76,8 @@ class _AutoLayoutExampleState extends State<AutoLayoutExample> {
                 children: [
                   Text('Tidy the scrambled diagram with one click. The toolbar Layout '
                       'button offers the same three algorithms.',
-                      style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokensData.defaultSpace4),
+                      style: t.textTheme.body.copyWith(color: t.fg3)),
+                  SizedBox(height: context.superTheme.spacing.space4),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -101,7 +101,7 @@ class _AutoLayoutExampleState extends State<AutoLayoutExample> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   SuperMap(
                     controller: _controller,
                     height: 560,

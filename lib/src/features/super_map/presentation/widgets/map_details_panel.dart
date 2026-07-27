@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // features/super_map/presentation/widgets/map_details_panel.dart
 // ------------------------------------------------------------
 // The selection inspector — a 240px floating card that appears when a node is
@@ -70,7 +70,7 @@ class MapDetailsPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: t.surface,
         border: Border.all(color: t.borderStrong),
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusMd),
         boxShadow: t.cardShadow,
       ),
       clipBehavior: Clip.antiAlias,
@@ -94,7 +94,7 @@ class MapDetailsPanel extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: accent.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+                        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
                       ),
                       child: Icon(node.kind.icon, size: 16, color: accent),
                     ),
@@ -104,13 +104,13 @@ class MapDetailsPanel extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(node.label,
-                              style: SuperText.body
+                              style: t.textTheme.body
                                   .copyWith(fontSize: 13.5, fontWeight: FontWeight.w700, color: t.fg1)),
                           if (node.ar != null)
                             Text(node.ar!,
                                 textDirection: TextDirection.rtl,
-                                style: SuperText.caption.copyWith(
-                                    fontFamily: SuperTokensData.defaultArabicFont, color: t.fg3)),
+                                style: t.textTheme.caption.copyWith(
+                                    fontFamily: SuperThemeData.of(context).tokens.arabicFont, color: t.fg3)),
                         ],
                       ),
                     ),
@@ -122,7 +122,7 @@ class MapDetailsPanel extends StatelessWidget {
                   spacing: 6,
                   runSpacing: 6,
                   children: [
-                    StatusPill(node.kind.tag, tone: _toneFor(node.kind, accent)),
+                    StatusPill(node.kind.tag, tone: _toneFor(node.kind, accent, t)),
                     if (!node.status.isNone)
                       StatusPill(node.status.tag, tone: _statusTone(node.status)),
                     if (node.locked)
@@ -156,9 +156,9 @@ class MapDetailsPanel extends StatelessWidget {
                     textBaseline: TextBaseline.alphabetic,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('NET', style: SuperText.label.copyWith(color: t.fg3)),
+                      Text('NET', style: t.textTheme.label.copyWith(color: t.fg3)),
                       Text(mapCompact(stats.net),
-                          style: SuperText.mono.copyWith(fontSize: 14, fontWeight: FontWeight.w700, color: t.fg1)),
+                          style: t.textTheme.mono.copyWith(fontSize: 14, fontWeight: FontWeight.w700, color: t.fg1)),
                     ],
                   ),
                 ],
@@ -170,19 +170,19 @@ class MapDetailsPanel extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
                       decoration: BoxDecoration(
-                        color: t.tintFill(SuperTokensData.defaultWarning, 0.08),
+                        color: t.tintFill(SuperThemeData.of(context).tokens.warning, 0.08),
                         border: Border.all(color: t.border),
-                        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+                        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.sticky_note_2_outlined, size: 13, color: SuperTokensData.defaultWarning),
+                          Icon(Icons.sticky_note_2_outlined, size: 13, color: SuperThemeData.of(context).tokens.warning),
                           const SizedBox(width: 7),
                           Expanded(
                             child: Text(node.note!,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: SuperText.caption.copyWith(fontSize: 11.5, color: t.fg2)),
+                                style: t.textTheme.caption.copyWith(fontSize: 11.5, color: t.fg2)),
                           ),
                         ],
                       ),
@@ -235,11 +235,11 @@ class MapDetailsPanel extends StatelessWidget {
     );
   }
 
-  PillTone _toneFor(MapNodeKind kind, Color accent) {
-    if (accent == SuperTokensData.defaultSuccess) return PillTone.success;
-    if (accent == SuperTokensData.defaultWarning) return PillTone.warning;
-    if (accent == SuperTokensData.defaultDanger) return PillTone.danger;
-    if (accent == SuperTokensData.defaultAccent) return PillTone.accent;
+  PillTone _toneFor(MapNodeKind kind, Color accent, SuperThemeData t) {
+    if (accent == t.tokens.success) return PillTone.success;
+    if (accent == t.tokens.warning) return PillTone.warning;
+    if (accent == t.tokens.danger) return PillTone.danger;
+    if (accent == t.tokens.accent) return PillTone.accent;
     return PillTone.neutral;
   }
 
@@ -268,7 +268,7 @@ class _RefRow extends StatelessWidget {
           child: Text(reference,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: SuperText.mono.copyWith(fontSize: 11.5, color: t.fg2)),
+              style: t.textTheme.mono.copyWith(fontSize: 11.5, color: t.fg2)),
         ),
       ],
     );
@@ -293,11 +293,11 @@ class _MetaRow extends StatelessWidget {
             child: Text(label.toUpperCase(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: SuperText.pill.copyWith(fontSize: 9.5, color: t.fg3)),
+                style: t.textTheme.pill.copyWith(fontSize: 9.5, color: t.fg3)),
           ),
           const SizedBox(width: 8),
           Text(value,
-              style: SuperText.mono.copyWith(fontSize: 11, color: t.fg1)),
+              style: t.textTheme.mono.copyWith(fontSize: 11, color: t.fg1)),
         ],
       ),
     );
@@ -327,7 +327,7 @@ class _StatusPicker extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('STATUS', style: SuperText.label.copyWith(color: t.fg3)),
+        Text('STATUS', style: t.textTheme.label.copyWith(color: t.fg3)),
         const SizedBox(height: 6),
         Wrap(
           spacing: 6,
@@ -365,7 +365,7 @@ class _StatusSwatch extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? t.tintFill(c, 0.16) : t.inputBg,
           border: Border.all(color: selected ? c : t.border),
-          borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+          borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -373,7 +373,7 @@ class _StatusSwatch extends StatelessWidget {
             Container(width: 7, height: 7, decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
             const SizedBox(width: 5),
             Text(label,
-                style: SuperText.pill.copyWith(
+                style: t.textTheme.pill.copyWith(
                     fontSize: 9.5, color: selected ? t.fg1 : t.fg3)),
           ],
         ),
@@ -396,15 +396,15 @@ class _Stat extends StatelessWidget {
       decoration: BoxDecoration(
         color: t.inputBg,
         border: Border.all(color: t.border),
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label.toUpperCase(), style: SuperText.pill.copyWith(fontSize: 9.5, color: t.fg3)),
-          Text(value, style: SuperText.mono.copyWith(fontSize: 16, fontWeight: FontWeight.w700, color: t.fg1)),
-          if (sub != null) Text(sub!, style: SuperText.mono.copyWith(fontSize: 10, color: t.fg4)),
+          Text(label.toUpperCase(), style: t.textTheme.pill.copyWith(fontSize: 9.5, color: t.fg3)),
+          Text(value, style: t.textTheme.mono.copyWith(fontSize: 16, fontWeight: FontWeight.w700, color: t.fg1)),
+          if (sub != null) Text(sub!, style: t.textTheme.mono.copyWith(fontSize: 10, color: t.fg4)),
         ],
       ),
     );

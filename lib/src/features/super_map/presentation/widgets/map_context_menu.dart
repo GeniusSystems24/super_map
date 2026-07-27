@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // features/super_map/presentation/widgets/map_context_menu.dart
 // ------------------------------------------------------------
 // The right-click / long-press context menu — a floating surface card with a
@@ -72,9 +72,9 @@ class _MapMenuItemState extends State<MapMenuItem> {
             children: [
               Icon(widget.icon, size: 14, color: fg),
               const SizedBox(width: 10),
-              Expanded(child: Text(widget.label, style: SuperText.caption.copyWith(fontSize: 12.5, color: fg))),
+              Expanded(child: Text(widget.label, style: t.textTheme.caption.copyWith(fontSize: 12.5, color: fg))),
               if (widget.kbd != null)
-                Text(widget.kbd!, style: SuperText.mono.copyWith(fontSize: 10.5, color: t.fg4)),
+                Text(widget.kbd!, style: t.textTheme.mono.copyWith(fontSize: 10.5, color: t.fg4)),
             ],
           ),
         ),
@@ -124,7 +124,7 @@ class _MapContextMenuState extends State<MapContextMenu> {
       decoration: BoxDecoration(
         color: t.surface,
         border: Border.all(color: t.borderStrong),
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusMd),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusMd),
         boxShadow: SuperThemeData.popShadow,
       ),
       clipBehavior: Clip.antiAlias,
@@ -140,7 +140,7 @@ class _MapContextMenuState extends State<MapContextMenu> {
                 widget.title!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: SuperText.label.copyWith(fontSize: 10.5, color: t.fg3),
+                style: t.textTheme.label.copyWith(fontSize: 10.5, color: t.fg3),
               ),
             ),
           if (widget.title != null) const Hairline(),
@@ -250,7 +250,7 @@ class _KindChip extends StatelessWidget {
               child: Text(kind.tag,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: SuperText.caption.copyWith(fontSize: 10.5, color: t.fg2)),
+                  style: t.textTheme.caption.copyWith(fontSize: 10.5, color: t.fg2)),
             ),
           ],
         ),

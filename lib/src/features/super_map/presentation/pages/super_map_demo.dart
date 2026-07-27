@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // features/super_map/presentation/pages/super_map_demo.dart
 // ------------------------------------------------------------
 // A ready-to-route showcase page for SuperMap. Switches between the five
@@ -54,55 +54,55 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
         title:
-            Text('Super Map', style: SuperText.heading.copyWith(color: t.fg1)),
+            Text('Super Map', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+            padding: EdgeInsets.all(context.superTheme.spacing.space8),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1120),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('SUPER MAP \u2022 SHOWCASE',
-                      style: SuperText.eyebrow
+                      style: t.textTheme.eyebrow
                           .copyWith(color: Theme.of(context).colorScheme.primary)),
-                  const SizedBox(height: SuperTokensData.defaultSpace2),
+                  SizedBox(height: context.superTheme.spacing.space2),
                   Text.rich(
                     TextSpan(children: [
                       TextSpan(
                           text: _graph.title,
-                          style: SuperText.h1.copyWith(color: t.fg1)),
+                          style: t.textTheme.h1.copyWith(color: t.fg1)),
                       if (_graph.ar != null)
                         TextSpan(
                             text: '  ${_graph.ar}',
-                            style: SuperText.h1.copyWith(
-                                fontFamily: SuperTokensData.defaultArabicFont,
+                            style: t.textTheme.h1.copyWith(
+                                fontFamily: SuperThemeData.of(context).tokens.arabicFont,
                                 fontSize: 20,
                                 color: t.fg3)),
                     ]),
                   ),
                   if (_graph.subtitle != null) ...[
-                    const SizedBox(height: SuperTokensData.defaultSpace2),
+                    SizedBox(height: context.superTheme.spacing.space2),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 720),
                       child: Text(_graph.subtitle!,
-                          style: SuperText.body.copyWith(color: t.fg3)),
+                          style: t.textTheme.body.copyWith(color: t.fg3)),
                     ),
                   ],
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   _seedChips(t),
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   SuperMap(
                     controller: _controller,
                     height: 560,
                     animateFlow: _flow,
                     showData: _showData,
                   ),
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   _settings(t),
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   _legend(t),
                 ],
               ),
@@ -115,8 +115,8 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
 
   Widget _seedChips(SuperThemeData t) {
     return Wrap(
-      spacing: SuperTokensData.defaultSpace2,
-      runSpacing: SuperTokensData.defaultSpace2,
+      spacing: context.superTheme.spacing.space2,
+      runSpacing: context.superTheme.spacing.space2,
       children: [
         for (var i = 0; i < MapGraphData.all.length; i++)
           _Chip(
@@ -130,8 +130,8 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
 
   Widget _settings(SuperThemeData t) {
     return Wrap(
-      spacing: SuperTokensData.defaultSpace6,
-      runSpacing: SuperTokensData.defaultSpace3,
+      spacing: context.superTheme.spacing.space6,
+      runSpacing: context.superTheme.spacing.space3,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         _OptionGroup<MapNodeStyle>(
@@ -155,8 +155,8 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
           onChanged: (v) => setState(() => _controller.setEdgeStyle(v)),
         ),
         Row(mainAxisSize: MainAxisSize.min, children: [
-          Text('DATA', style: SuperText.label.copyWith(color: t.fg3)),
-          const SizedBox(width: SuperTokensData.defaultSpace2),
+          Text('DATA', style: t.textTheme.label.copyWith(color: t.fg3)),
+          SizedBox(width: context.superTheme.spacing.space2),
           Switch(
             value: _showData,
             activeColor: Theme.of(context).colorScheme.primary,
@@ -164,8 +164,8 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
           ),
         ]),
         Row(mainAxisSize: MainAxisSize.min, children: [
-          Text('FLOW', style: SuperText.label.copyWith(color: t.fg3)),
-          const SizedBox(width: SuperTokensData.defaultSpace2),
+          Text('FLOW', style: t.textTheme.label.copyWith(color: t.fg3)),
+          SizedBox(width: context.superTheme.spacing.space2),
           Switch(
             value: _flow,
             activeColor: Theme.of(context).colorScheme.primary,
@@ -178,8 +178,8 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
 
   Widget _legend(SuperThemeData t) {
     return Wrap(
-      spacing: SuperTokensData.defaultSpace4,
-      runSpacing: SuperTokensData.defaultSpace2,
+      spacing: context.superTheme.spacing.space4,
+      runSpacing: context.superTheme.spacing.space2,
       children: [
         for (final k in _graph.legend)
           Row(mainAxisSize: MainAxisSize.min, children: [
@@ -189,7 +189,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
                 decoration:
                     BoxDecoration(color: k.colorOf(t), shape: BoxShape.circle)),
             const SizedBox(width: 6),
-            Text(k.tag, style: SuperText.caption.copyWith(color: t.fg2)),
+            Text(k.tag, style: t.textTheme.caption.copyWith(color: t.fg2)),
           ]),
       ],
     );
@@ -210,7 +210,7 @@ class _Chip extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: AnimatedContainer(
-        duration: SuperTokensData.defaultDurBase,
+        duration: SuperThemeData.of(context).tokens.durBase,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: selected ? t.selectionFill(0.14) : t.surface,
@@ -218,7 +218,7 @@ class _Chip extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
         ),
         child: Text(label,
-            style: SuperText.button.copyWith(
+            style: t.textTheme.button.copyWith(
                 fontSize: 13, color: selected ? Theme.of(context).colorScheme.primary : t.fg2)),
       ),
     );
@@ -241,14 +241,14 @@ class _OptionGroup<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.superTheme;
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      Text(label.toUpperCase(), style: SuperText.label.copyWith(color: t.fg3)),
-      const SizedBox(width: SuperTokensData.defaultSpace2),
+      Text(label.toUpperCase(), style: t.textTheme.label.copyWith(color: t.fg3)),
+      SizedBox(width: context.superTheme.spacing.space2),
       Container(
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
           color: t.inputBg,
           border: Border.all(color: t.border),
-          borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+          borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusControl),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           for (final entry in options.entries)
@@ -256,7 +256,7 @@ class _OptionGroup<T> extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               onTap: () => onChanged(entry.key),
               child: AnimatedContainer(
-                duration: SuperTokensData.defaultDurBase,
+                duration: SuperThemeData.of(context).tokens.durBase,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
@@ -264,10 +264,10 @@ class _OptionGroup<T> extends StatelessWidget {
                       ? Theme.of(context).colorScheme.primary
                       : const Color(0x00000000),
                   borderRadius:
-                      BorderRadius.circular(SuperTokensData.defaultRadiusControl - 1),
+                      BorderRadius.circular(context.superTheme.spacing.radiusControl - 1),
                 ),
                 child: Text(entry.value,
-                    style: SuperText.button.copyWith(
+                    style: t.textTheme.button.copyWith(
                         fontSize: 12.5,
                         color: value == entry.key ? Colors.white : t.fg2)),
               ),

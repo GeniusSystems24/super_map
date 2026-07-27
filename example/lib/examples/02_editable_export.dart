@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/examples/02_editable_export.dart
 // ------------------------------------------------------------
 // Example 2 · Edit mode + export. Opens a bundled seed in edit mode and wires
@@ -48,11 +48,11 @@ class _EditableExportExampleState extends State<EditableExportExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('2 · Editable + Export', style: SuperText.heading.copyWith(color: t.fg1)),
+        title: Text('2 · Editable + Export', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+          padding: EdgeInsets.all(context.superTheme.spacing.space8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -60,8 +60,8 @@ class _EditableExportExampleState extends State<EditableExportExample> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('Edit the diagram, then use Export → Image / PDF / Word.',
-                      style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                      style: t.textTheme.body.copyWith(color: t.fg3)),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   SuperMap(
                     controller: _controller,
                     height: 560,

@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/examples/11_audit_locks.dart
 // ------------------------------------------------------------
 // Example 11 · Audit locks (v1.0.0). In edit mode a node with locked == true is
@@ -95,11 +95,11 @@ class _AuditLocksExampleState extends State<AuditLocksExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('11 · Audit Locks', style: SuperText.heading.copyWith(color: t.fg1)),
+        title: Text('11 · Audit Locks', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+          padding: EdgeInsets.all(context.superTheme.spacing.space8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -109,8 +109,8 @@ class _AuditLocksExampleState extends State<AuditLocksExample> {
                   Text('The two posted entries are locked (lock glyph on the card). Try to '
                       'drag or delete one — it refuses. Select it and use the lock toggle '
                       'in the details panel to release it.',
-                      style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                      style: t.textTheme.body.copyWith(color: t.fg3)),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   SuperMap(
                     controller: _controller,
                     height: 560,

@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/main.dart
 // ------------------------------------------------------------
 // Showcase launcher for super_map. Registers the SuperThemeData extension (so
@@ -149,24 +149,24 @@ class _Launcher extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(SuperTokensData.defaultSpace10),
+            padding: EdgeInsets.all(context.superTheme.spacing.space10),
             child: ConstrainedBox(
               constraints:
-                  const BoxConstraints(maxWidth: SuperTokensData.defaultContentColumn),
+                  BoxConstraints(maxWidth: context.superTheme.sizing.contentColumn),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('SUPER MAP \u2022 GALLERY',
-                      style: SuperText.eyebrow.copyWith(color: cs.primary)),
-                  const SizedBox(height: SuperTokensData.defaultSpace2),
+                      style: t.textTheme.eyebrow.copyWith(color: cs.primary)),
+                  SizedBox(height: context.superTheme.spacing.space2),
                   Text('Component Demos مكتبة المكونات',
-                      style: SuperText.h1.copyWith(color: t.fg1)),
-                  const SizedBox(height: SuperTokensData.defaultSpace8),
+                      style: t.textTheme.h1.copyWith(color: t.fg1)),
+                  SizedBox(height: context.superTheme.spacing.space8),
                   for (final d in _demos) ...[
                     _DemoCard(demo: d),
-                    const SizedBox(height: SuperTokensData.defaultSpace3),
+                    SizedBox(height: context.superTheme.spacing.space3),
                   ],
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -177,7 +177,7 @@ class _Launcher extends StatelessWidget {
                         variant: SuperButtonVariant.secondary,
                         onPressed: onToggleTheme,
                       ),
-                      const SizedBox(width: SuperTokensData.defaultSpace3),
+                      SizedBox(width: context.superTheme.spacing.space3),
                       SuperButton(
                         label: dir == TextDirection.ltr
                             ? 'العربية (RTL)'
@@ -208,14 +208,14 @@ class _DemoCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
+        borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusCard),
         onTap: () => Navigator.of(context)
             .push(MaterialPageRoute<void>(builder: demo.builder)),
         child: Container(
-          padding: const EdgeInsets.all(SuperTokensData.defaultSpace4),
+          padding: EdgeInsets.all(context.superTheme.spacing.space4),
           decoration: BoxDecoration(
             color: t.surface,
-            borderRadius: BorderRadius.circular(SuperTokensData.defaultRadiusCard),
+            borderRadius: BorderRadius.circular(context.superTheme.spacing.radiusCard),
             border: Border.all(color: t.border),
             boxShadow: t.cardShadow,
           ),
@@ -229,20 +229,20 @@ class _DemoCard extends StatelessWidget {
                   color:
                       Color.alphaBlend(cs.primary.withOpacity(0.14), t.surface),
                   borderRadius:
-                      BorderRadius.circular(SuperTokensData.defaultRadiusControl),
+                      BorderRadius.circular(context.superTheme.spacing.radiusControl),
                 ),
                 child: Icon(demo.icon, size: 22, color: cs.primary),
               ),
-              const SizedBox(width: SuperTokensData.defaultSpace4),
+              SizedBox(width: context.superTheme.spacing.space4),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(demo.title,
-                        style: SuperText.heading.copyWith(color: t.fg1)),
+                        style: t.textTheme.heading.copyWith(color: t.fg1)),
                     const SizedBox(height: 2),
                     Text(demo.subtitle,
-                        style: SuperText.caption.copyWith(color: t.fg3)),
+                        style: t.textTheme.caption.copyWith(color: t.fg3)),
                   ],
                 ),
               ),

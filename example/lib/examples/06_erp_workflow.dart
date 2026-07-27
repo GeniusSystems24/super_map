@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/examples/06_erp_workflow.dart
 // ------------------------------------------------------------
 // Example 6 · ERP workflow overlay (v1.0.0). A journal-entry approval chain
@@ -102,11 +102,11 @@ class _ErpWorkflowExampleState extends State<ErpWorkflowExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('6 · ERP Workflow', style: SuperText.heading.copyWith(color: t.fg1)),
+        title: Text('6 · ERP Workflow', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+          padding: EdgeInsets.all(context.superTheme.spacing.space8),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -115,8 +115,8 @@ class _ErpWorkflowExampleState extends State<ErpWorkflowExample> {
                 children: [
                   Text('Draft → Pending → Approved → Posted. Tap a node to inspect its '
                       'status, source ref and audit metadata. The Posted record is locked.',
-                      style: SuperText.body.copyWith(color: t.fg3)),
-                  const SizedBox(height: SuperTokensData.defaultSpace6),
+                      style: t.textTheme.body.copyWith(color: t.fg3)),
+                  SizedBox(height: context.superTheme.spacing.space6),
                   SuperMap(
                     controller: _controller,
                     height: 560,

@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // example/lib/examples/05_json_driven.dart
 // ------------------------------------------------------------
 // Example 5 · Data in, diagram out. A graph defined entirely as JSON is parsed
@@ -65,18 +65,18 @@ class _JsonDrivenExampleState extends State<JsonDrivenExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('5 · JSON-driven', style: SuperText.heading.copyWith(color: t.fg1)),
+        title: Text('5 · JSON-driven', style: t.textTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(SuperTokensData.defaultSpace8),
+          padding: EdgeInsets.all(context.superTheme.spacing.space8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text('Parsed from a JSON string via MapGraph.fromJson. '
                   'Open the JSON button to see it round-trip.',
-                  style: SuperText.body.copyWith(color: t.fg3)),
-              const SizedBox(height: SuperTokensData.defaultSpace6),
+                  style: t.textTheme.body.copyWith(color: t.fg3)),
+              SizedBox(height: context.superTheme.spacing.space6),
               SuperMap(controller: _controller, height: 500),
             ],
           ),
