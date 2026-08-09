@@ -3,6 +3,37 @@
 All notable changes to **super_map** are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/); versioning is [SemVer](https://semver.org/).
 
+## [1.2.0] — 2026-08-10
+
+### Changed
+
+- Migrated the package to **super_core 3.3.0** and raised the minimum dependency to `super_core >=3.3.0 <4.0.0`.
+- Migrated all typography access from `SuperThemeData.textTheme` to the active `SuperTextTheme` exposed by `context.superTextTheme`.
+- Updated the example application to pass the now-required `textTheme` and `primaryTextTheme` values to `SuperMaterialThemeData.light` / `.dark`.
+- Updated README and agent skill guidance to use `SuperMaterialThemeData` instead of manually registering `SuperThemeData` as a theme extension.
+- Documented the `super_core 3.3.0` font-family rule: `_familyOf` inference is gone; token-level font-family overrides must be passed explicitly through `fontFamily`.
+
+### Migration
+
+```dart
+final typography = SuperTextTheme();
+
+MaterialApp(
+  theme: SuperMaterialThemeData.light(
+    textTheme: typography,
+    primaryTextTheme: typography,
+  ),
+  darkTheme: SuperMaterialThemeData.dark(
+    textTheme: typography,
+    primaryTextTheme: typography,
+  ),
+);
+```
+
+Use `context.superTextTheme` for branded typography. Do not use `context.superTheme.textTheme`.
+
+---
+
 ## [1.1.0] — 2026-07-16
 
 ### Changed
@@ -14,9 +45,19 @@ All notable changes to **super_map** are documented here. Format follows
   through with no extra wiring:
 
   ```dart
+  final typography = SuperTextTheme(isDesktop: true);
+
   MaterialApp(
-    theme:     SuperMaterialThemeData.light(mode: SuperDeviceMode.desktop),
-    darkTheme: SuperMaterialThemeData.dark(mode: SuperDeviceMode.desktop),
+    theme: SuperMaterialThemeData.light(
+      mode: SuperDeviceMode.desktop,
+      textTheme: typography,
+      primaryTextTheme: typography,
+    ),
+    darkTheme: SuperMaterialThemeData.dark(
+      mode: SuperDeviceMode.desktop,
+      textTheme: typography,
+      primaryTextTheme: typography,
+    ),
   );
   ```
 - Minimum raised to `dart >=3.8.0`, `flutter >=3.32.0`.
@@ -33,9 +74,19 @@ All notable changes to **super_map** are documented here. Format follows
   mode work without any extra wiring:
 
   ```dart
+  final typography = SuperTextTheme();
+
   MaterialApp(
-    theme:     SuperMaterialThemeData.light(palette: SuperPalette.bluePalette),
-    darkTheme: SuperMaterialThemeData.dark(palette: SuperPalette.bluePalette),
+    theme: SuperMaterialThemeData.light(
+      palette: SuperPalette.bluePalette,
+      textTheme: typography,
+      primaryTextTheme: typography,
+    ),
+    darkTheme: SuperMaterialThemeData.dark(
+      palette: SuperPalette.bluePalette,
+      textTheme: typography,
+      primaryTextTheme: typography,
+    ),
     // SuperMap canvas, minimap, toolbar and panels adapt automatically.
   );
   ```

@@ -95,7 +95,7 @@ class _AuditLocksExampleState extends State<AuditLocksExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('11 · Audit Locks', style: t.textTheme.heading.copyWith(color: t.fg1)),
+        title: Text('11 · Audit Locks', style: context.superTextTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -109,7 +109,7 @@ class _AuditLocksExampleState extends State<AuditLocksExample> {
                   Text('The two posted entries are locked (lock glyph on the card). Try to '
                       'drag or delete one — it refuses. Select it and use the lock toggle '
                       'in the details panel to release it.',
-                      style: t.textTheme.body.copyWith(color: t.fg3)),
+                      style: context.superTextTheme.body.copyWith(color: t.fg3)),
                   SizedBox(height: context.superTheme.spacing.space6),
                   SuperMap(
                     controller: _controller,

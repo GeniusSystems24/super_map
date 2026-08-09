@@ -65,7 +65,7 @@ class _JsonDrivenExampleState extends State<JsonDrivenExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('5 · JSON-driven', style: t.textTheme.heading.copyWith(color: t.fg1)),
+        title: Text('5 · JSON-driven', style: context.superTextTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Padding(
@@ -75,7 +75,7 @@ class _JsonDrivenExampleState extends State<JsonDrivenExample> {
             children: [
               Text('Parsed from a JSON string via MapGraph.fromJson. '
                   'Open the JSON button to see it round-trip.',
-                  style: t.textTheme.body.copyWith(color: t.fg3)),
+                  style: context.superTextTheme.body.copyWith(color: t.fg3)),
               SizedBox(height: context.superTheme.spacing.space6),
               SuperMap(controller: _controller, height: 500),
             ],

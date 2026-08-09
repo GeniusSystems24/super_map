@@ -61,7 +61,7 @@ class _CustomMapDemoState extends State<CustomMapDemo> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('Custom Graph', style: t.textTheme.heading.copyWith(color: t.fg1)),
+        title: Text('Custom Graph', style: context.superTextTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Center(
@@ -72,9 +72,9 @@ class _CustomMapDemoState extends State<CustomMapDemo> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(_graph.title, style: t.textTheme.h1.copyWith(color: t.fg1)),
+                  Text(_graph.title, style: context.superTextTheme.h1.copyWith(color: t.fg1)),
                   SizedBox(height: context.superTheme.spacing.space2),
-                  Text(_graph.subtitle!, style: t.textTheme.body.copyWith(color: t.fg3)),
+                  Text(_graph.subtitle!, style: context.superTextTheme.body.copyWith(color: t.fg3)),
                   SizedBox(height: context.superTheme.spacing.space6),
                   SuperMap(controller: _controller, height: 520),
                 ],

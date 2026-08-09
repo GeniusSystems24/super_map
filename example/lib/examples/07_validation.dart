@@ -71,7 +71,7 @@ class _ValidationExampleState extends State<ValidationExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('7 · Validation', style: t.textTheme.heading.copyWith(color: t.fg1)),
+        title: Text('7 · Validation', style: context.superTextTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -97,7 +97,7 @@ class _ValidationExampleState extends State<ValidationExample> {
                           'MapValidator found ${summary.errors} error(s), '
                           '${summary.warnings} warning(s) and ${summary.infos} info note(s). '
                           'Press Validate to explore them.',
-                          style: t.textTheme.caption.copyWith(fontSize: 12, color: t.fg2),
+                          style: context.superTextTheme.caption.copyWith(fontSize: 12, color: t.fg2),
                         ),
                       ),
                     ]),

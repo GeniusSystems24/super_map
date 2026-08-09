@@ -54,7 +54,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
         title:
-            Text('Super Map', style: t.textTheme.heading.copyWith(color: t.fg1)),
+            Text('Super Map', style: context.superTextTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Center(
@@ -66,18 +66,18 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('SUPER MAP \u2022 SHOWCASE',
-                      style: t.textTheme.eyebrow
+                      style: context.superTextTheme.eyebrow
                           .copyWith(color: Theme.of(context).colorScheme.primary)),
                   SizedBox(height: context.superTheme.spacing.space2),
                   Text.rich(
                     TextSpan(children: [
                       TextSpan(
                           text: _graph.title,
-                          style: t.textTheme.h1.copyWith(color: t.fg1)),
+                          style: context.superTextTheme.h1.copyWith(color: t.fg1)),
                       if (_graph.ar != null)
                         TextSpan(
                             text: '  ${_graph.ar}',
-                            style: t.textTheme.h1.copyWith(
+                            style: context.superTextTheme.h1.copyWith(
                                 fontFamily: SuperThemeData.of(context).tokens.arabicFont,
                                 fontSize: 20,
                                 color: t.fg3)),
@@ -88,7 +88,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 720),
                       child: Text(_graph.subtitle!,
-                          style: t.textTheme.body.copyWith(color: t.fg3)),
+                          style: context.superTextTheme.body.copyWith(color: t.fg3)),
                     ),
                   ],
                   SizedBox(height: context.superTheme.spacing.space6),
@@ -155,7 +155,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
           onChanged: (v) => setState(() => _controller.setEdgeStyle(v)),
         ),
         Row(mainAxisSize: MainAxisSize.min, children: [
-          Text('DATA', style: t.textTheme.label.copyWith(color: t.fg3)),
+          Text('DATA', style: context.superTextTheme.label.copyWith(color: t.fg3)),
           SizedBox(width: context.superTheme.spacing.space2),
           Switch(
             value: _showData,
@@ -164,7 +164,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
           ),
         ]),
         Row(mainAxisSize: MainAxisSize.min, children: [
-          Text('FLOW', style: t.textTheme.label.copyWith(color: t.fg3)),
+          Text('FLOW', style: context.superTextTheme.label.copyWith(color: t.fg3)),
           SizedBox(width: context.superTheme.spacing.space2),
           Switch(
             value: _flow,
@@ -189,7 +189,7 @@ class _SuperMapDemoState extends State<SuperMapDemo> {
                 decoration:
                     BoxDecoration(color: k.colorOf(t), shape: BoxShape.circle)),
             const SizedBox(width: 6),
-            Text(k.tag, style: t.textTheme.caption.copyWith(color: t.fg2)),
+            Text(k.tag, style: context.superTextTheme.caption.copyWith(color: t.fg2)),
           ]),
       ],
     );
@@ -218,7 +218,7 @@ class _Chip extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
         ),
         child: Text(label,
-            style: t.textTheme.button.copyWith(
+            style: context.superTextTheme.button.copyWith(
                 fontSize: 13, color: selected ? Theme.of(context).colorScheme.primary : t.fg2)),
       ),
     );
@@ -241,7 +241,7 @@ class _OptionGroup<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.superTheme;
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      Text(label.toUpperCase(), style: t.textTheme.label.copyWith(color: t.fg3)),
+      Text(label.toUpperCase(), style: context.superTextTheme.label.copyWith(color: t.fg3)),
       SizedBox(width: context.superTheme.spacing.space2),
       Container(
         padding: const EdgeInsets.all(3),
@@ -267,7 +267,7 @@ class _OptionGroup<T> extends StatelessWidget {
                       BorderRadius.circular(context.superTheme.spacing.radiusControl - 1),
                 ),
                 child: Text(entry.value,
-                    style: t.textTheme.button.copyWith(
+                    style: context.superTextTheme.button.copyWith(
                         fontSize: 12.5,
                         color: value == entry.key ? Colors.white : t.fg2)),
               ),

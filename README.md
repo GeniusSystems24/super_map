@@ -11,7 +11,7 @@ Extras: **per-node theme colours**, **text-labelled connections**, an **all-node
 
 The data model (`MapNode` / `MapEdge` / `MapGraph`) is **domain-neutral** — the five bundled `MapGraphData` seeds (cash-flow, mind-map, approval workflow, accounting cycle, order-to-cash) all share one engine. A faithful Dart port of the React `super-map` tool. Light + dark themes, LTR + RTL.
 
-> **1.0.0** — the ERP release: workflow status, audit locks, source refs + metadata, per-graph currency, node search, layered/grid/radial auto-layout, a graph validator (incl. double-entry balance) and CSV export. Fully backward-compatible with 0.2.0 graphs. See the [changelog](CHANGELOG.md).
+> **1.2.0** — migrated to **super_core 3.3.0**. Typography now comes from `SuperMaterialThemeData` / `context.superTextTheme`; `SuperThemeData.textTheme` is no longer part of the API. See the [changelog](CHANGELOG.md).
 
 ---
 
@@ -28,16 +28,26 @@ dependencies:
 import 'package:super_map/super_map.dart';
 ```
 
-### Register the theme extension
+### Register the Super material theme
 
-`SuperMap` themes through a `ThemeExtension`. Register it once on your `ThemeData` so colors track light/dark:
+`super_core 3.3.0` requires typography to be supplied explicitly as `SuperTextTheme`. `SuperMap` reads colors, spacing and tokens from `context.superTheme`, and reads typography from `context.superTextTheme`:
 
 ```dart
+final typography = SuperTextTheme();
+
 MaterialApp(
-  theme:     ThemeData(brightness: Brightness.light, extensions: [SuperThemeData.light]),
-  darkTheme: ThemeData(brightness: Brightness.dark,  extensions: [SuperThemeData.dark]),
+  theme: SuperMaterialThemeData.light(
+    textTheme: typography,
+    primaryTextTheme: typography,
+  ),
+  darkTheme: SuperMaterialThemeData.dark(
+    textTheme: typography,
+    primaryTextTheme: typography,
+  ),
 );
 ```
+
+Do not use `context.superTheme.textTheme` or `SuperThemeData.of(context).textTheme`; `SuperThemeData` no longer owns typography in `super_core 3.3.0`. If token-level font metadata must be overridden, pass `fontFamily` explicitly to `SuperMaterialThemeData`; the removed `_familyOf` behavior is not emulated by `super_map`.
 
 > Fonts: the design system uses Manrope (display), Inter (body), JetBrains Mono (numerics) and Noto Naskh Arabic. Drop the `.ttf` files under `assets/fonts/` and uncomment the `fonts:` block in `pubspec.yaml` to match it exactly; otherwise platform defaults are used.
 
@@ -263,7 +273,7 @@ lib/
 
 ## Example
 
-A runnable gallery lives in `example/` — it registers the theme extension, toggles light/dark and LTR/RTL, and links **thirteen** demos that share **one** engine:
+A runnable gallery lives in `example/` — it installs `SuperMaterialThemeData` with the required `SuperTextTheme`, toggles light/dark and LTR/RTL, and links **thirteen** demos that share **one** engine:
 
 ```bash
 cd example

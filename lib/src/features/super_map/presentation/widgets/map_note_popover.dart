@@ -72,7 +72,7 @@ class _MapNotePopoverState extends State<MapNotePopover> {
                       child: Text('NOTE · ${widget.node.label}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: t.textTheme.label.copyWith(fontSize: 10.5, color: t.fg3)),
+                          style: context.superTextTheme.label.copyWith(fontSize: 10.5, color: t.fg3)),
                     ),
                     SuperIconButton(icon: Icons.close_rounded, onPressed: widget.onClose),
                   ],
@@ -84,11 +84,11 @@ class _MapNotePopoverState extends State<MapNotePopover> {
                     autofocus: true,
                     minLines: 3,
                     maxLines: 6,
-                    style: t.textTheme.body.copyWith(fontSize: 12.5, height: 1.5, color: t.fg1),
+                    style: context.superTextTheme.body.copyWith(fontSize: 12.5, height: 1.5, color: t.fg1),
                     decoration: InputDecoration(
                       isDense: true,
                       hintText: 'Write a note for this node…',
-                      hintStyle: t.textTheme.body.copyWith(fontSize: 12.5, color: t.fg4),
+                      hintStyle: context.superTextTheme.body.copyWith(fontSize: 12.5, color: t.fg4),
                       filled: true,
                       fillColor: t.inputBg,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -108,7 +108,7 @@ class _MapNotePopoverState extends State<MapNotePopover> {
                     widget.node.note?.isNotEmpty == true
                         ? widget.node.note!
                         : 'No note on this node.',
-                    style: t.textTheme.body.copyWith(
+                    style: context.superTextTheme.body.copyWith(
                         fontSize: 12.5,
                         height: 1.6,
                         color: widget.node.note?.isNotEmpty == true ? t.fg2 : t.fg4),

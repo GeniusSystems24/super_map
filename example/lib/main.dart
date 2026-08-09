@@ -36,7 +36,7 @@ class ExampleApp extends StatefulWidget {
 class _ExampleAppState extends State<ExampleApp> {
   ThemeMode _mode = ThemeMode.dark;
   TextDirection _dir = TextDirection.ltr;
-
+  final SuperTextTheme _textTheme = SuperTextTheme();
 
   void _toggleTheme() => setState(
       () => _mode = _mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
@@ -49,8 +49,14 @@ class _ExampleAppState extends State<ExampleApp> {
       debugShowCheckedModeBanner: false,
       title: 'Super Map',
       themeMode: _mode,
-      theme: SuperMaterialThemeData.light(),
-      darkTheme: SuperMaterialThemeData.dark(),
+      theme: SuperMaterialThemeData.light(
+        textTheme: _textTheme,
+        primaryTextTheme: _textTheme,
+      ),
+      darkTheme: SuperMaterialThemeData.dark(
+        textTheme: _textTheme,
+        primaryTextTheme: _textTheme,
+      ),
       builder: (context, child) =>
           Directionality(textDirection: _dir, child: child!),
       home: _Launcher(
@@ -157,10 +163,10 @@ class _Launcher extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('SUPER MAP \u2022 GALLERY',
-                      style: t.textTheme.eyebrow.copyWith(color: cs.primary)),
+                      style: context.superTextTheme.eyebrow.copyWith(color: cs.primary)),
                   SizedBox(height: context.superTheme.spacing.space2),
                   Text('Component Demos مكتبة المكونات',
-                      style: t.textTheme.h1.copyWith(color: t.fg1)),
+                      style: context.superTextTheme.h1.copyWith(color: t.fg1)),
                   SizedBox(height: context.superTheme.spacing.space8),
                   for (final d in _demos) ...[
                     _DemoCard(demo: d),
@@ -239,10 +245,10 @@ class _DemoCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(demo.title,
-                        style: t.textTheme.heading.copyWith(color: t.fg1)),
+                        style: context.superTextTheme.heading.copyWith(color: t.fg1)),
                     const SizedBox(height: 2),
                     Text(demo.subtitle,
-                        style: t.textTheme.caption.copyWith(color: t.fg3)),
+                        style: context.superTextTheme.caption.copyWith(color: t.fg3)),
                   ],
                 ),
               ),

@@ -54,7 +54,7 @@ class _MinimalReadExampleState extends State<MinimalReadExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('1 · Minimal (read)', style: t.textTheme.heading.copyWith(color: t.fg1)),
+        title: Text('1 · Minimal (read)', style: context.superTextTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Padding(

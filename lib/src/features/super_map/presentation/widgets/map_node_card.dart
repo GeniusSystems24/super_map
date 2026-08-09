@@ -5,7 +5,7 @@
 // for a [MapNode], owns its hover + inline-rename field, and reports pointer
 // intents (select, drag, double-tap-rename, context menu) back to the host.
 // Drag deltas are screen-space; the host divides by the zoom to move in world
-// space. Styled entirely from SuperThemeData + the node's kind accent.
+// space. Styled from SuperThemeData + the active SuperTextTheme + the node's kind accent.
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -262,13 +262,13 @@ class _MapNodeCardState extends State<MapNodeCard> {
         children: [
           if (value != null)
             Text(_compact(value),
-                style: t.textTheme.mono.copyWith(
+                style: context.superTextTheme.mono.copyWith(
                     fontSize: isChip ? 10.5 : 11,
                     fontWeight: FontWeight.w700,
                     color: accent)),
           if (showDegree)
             Text('${s.inCount}→${s.outCount}',
-                style: t.textTheme.mono.copyWith(fontSize: 9.5, color: t.fg4)),
+                style: context.superTextTheme.mono.copyWith(fontSize: 9.5, color: t.fg4)),
         ],
       ),
     );
@@ -283,7 +283,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
             textDirection: TextDirection.rtl,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: t.textTheme.caption.copyWith(
+            style: context.superTextTheme.caption.copyWith(
               fontFamily: SuperThemeData.of(context).tokens.arabicFont,
               fontSize: 11.5,
               color: t.fg4,
@@ -294,7 +294,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
                 node.sub!.toUpperCase(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: t.textTheme.pill.copyWith(fontSize: 10, color: t.fg4),
+                style: context.superTextTheme.pill.copyWith(fontSize: 10, color: t.fg4),
               )
             : null);
 
@@ -303,8 +303,8 @@ class _MapNodeCardState extends State<MapNodeCard> {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: (isChip
-              ? t.textTheme.caption.copyWith(fontSize: 12.5)
-              : t.textTheme.body.copyWith(fontSize: 13.5))
+              ? context.superTextTheme.caption.copyWith(fontSize: 12.5)
+              : context.superTextTheme.body.copyWith(fontSize: 13.5))
           .copyWith(fontWeight: FontWeight.w700, color: t.fg1),
     );
 
@@ -325,7 +325,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
         focusNode: _focus,
         autofocus: true,
         cursorColor: accent,
-        style: t.textTheme.body.copyWith(fontSize: 13, color: t.fg1),
+        style: context.superTextTheme.body.copyWith(fontSize: 13, color: t.fg1),
         decoration: InputDecoration(
           isDense: true,
           contentPadding:

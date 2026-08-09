@@ -52,7 +52,7 @@ class _SearchExampleState extends State<SearchExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('10 · Node Search', style: t.textTheme.heading.copyWith(color: t.fg1)),
+        title: Text('10 · Node Search', style: context.superTextTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -67,11 +67,11 @@ class _SearchExampleState extends State<SearchExample> {
                     Expanded(
                       child: Text('Type in the toolbar search (try "income" or "payroll"). '
                           'Or drive it from chrome with the quick chips below.',
-                          style: t.textTheme.body.copyWith(color: t.fg3)),
+                          style: context.superTextTheme.body.copyWith(color: t.fg3)),
                     ),
                     if (c.hasQuery)
                       Text('${c.matches.length} match(es)',
-                          style: t.textTheme.mono.copyWith(fontSize: 12, color: cs.primary)),
+                          style: context.superTextTheme.mono.copyWith(fontSize: 12, color: cs.primary)),
                   ]),
                   SizedBox(height: context.superTheme.spacing.space3),
                   Wrap(spacing: 8, runSpacing: 8, children: [

@@ -42,7 +42,7 @@ class _CsvExportExampleState extends State<CsvExportExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('9 · CSV Export', style: t.textTheme.heading.copyWith(color: t.fg1)),
+        title: Text('9 · CSV Export', style: context.superTextTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -55,7 +55,7 @@ class _CsvExportExampleState extends State<CsvExportExample> {
                 children: [
                   Text('MapExporter.nodesCsv / edgesCsv turn any MapGraph into an '
                       'audit-ready spreadsheet. ${bytes.length} bytes ready to save.',
-                      style: t.textTheme.body.copyWith(color: t.fg3)),
+                      style: context.superTextTheme.body.copyWith(color: t.fg3)),
                   SizedBox(height: context.superTheme.spacing.space4),
                   Wrap(spacing: 8, runSpacing: 8, children: [
                     SuperButton(
@@ -94,7 +94,7 @@ class _CsvExportExampleState extends State<CsvExportExample> {
                     ),
                     child: SelectableText(
                       _csv,
-                      style: t.textTheme.mono.copyWith(fontSize: 12, color: t.fg2, height: 1.5),
+                      style: context.superTextTheme.mono.copyWith(fontSize: 12, color: t.fg2, height: 1.5),
                     ),
                   ),
                 ],

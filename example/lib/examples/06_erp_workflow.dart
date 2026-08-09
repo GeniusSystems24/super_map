@@ -102,7 +102,7 @@ class _ErpWorkflowExampleState extends State<ErpWorkflowExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('6 · ERP Workflow', style: t.textTheme.heading.copyWith(color: t.fg1)),
+        title: Text('6 · ERP Workflow', style: context.superTextTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -115,7 +115,7 @@ class _ErpWorkflowExampleState extends State<ErpWorkflowExample> {
                 children: [
                   Text('Draft → Pending → Approved → Posted. Tap a node to inspect its '
                       'status, source ref and audit metadata. The Posted record is locked.',
-                      style: t.textTheme.body.copyWith(color: t.fg3)),
+                      style: context.superTextTheme.body.copyWith(color: t.fg3)),
                   SizedBox(height: context.superTheme.spacing.space6),
                   SuperMap(
                     controller: _controller,

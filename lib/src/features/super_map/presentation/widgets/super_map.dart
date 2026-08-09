@@ -275,14 +275,14 @@ class _SuperMapState extends State<SuperMap>
               children: [
                 Text(
                   label,
-                  style: t.textTheme.button.copyWith(
+                  style: context.superTextTheme.button.copyWith(
                     fontSize: 12.5,
                     color: t.fg1,
                   ),
                 ),
                 Text(
                   sub,
-                  style: t.textTheme.caption.copyWith(
+                  style: context.superTextTheme.caption.copyWith(
                     fontSize: 10.5,
                     color: t.fg4,
                   ),
@@ -1121,7 +1121,7 @@ class _ModeToggle extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: t.textTheme.button.copyWith(
+            style: context.superTextTheme.button.copyWith(
               fontSize: 13,
               color: on ? Colors.white : t.fg2,
             ),
@@ -1214,7 +1214,7 @@ class _TitleChip extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             title,
-            style: t.textTheme.caption.copyWith(
+            style: context.superTextTheme.caption.copyWith(
               fontSize: 11.5,
               fontWeight: FontWeight.w700,
               color: t.fg1,
@@ -1223,7 +1223,7 @@ class _TitleChip extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             '$zoom%',
-            style: t.textTheme.mono.copyWith(fontSize: 10.5, color: t.fg3),
+            style: context.superTextTheme.mono.copyWith(fontSize: 10.5, color: t.fg3),
           ),
         ],
       ),
@@ -1270,7 +1270,7 @@ class _EdgeLabel extends StatelessWidget {
                       label!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: t.textTheme.caption.copyWith(
+                      style: context.superTextTheme.caption.copyWith(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w600,
                         color: t.fg2,
@@ -1283,7 +1283,7 @@ class _EdgeLabel extends StatelessWidget {
                 pill(
                   Text(
                     mapCompact(value!),
-                    style: t.textTheme.mono.copyWith(
+                    style: context.superTextTheme.mono.copyWith(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       color: t.fg3,
@@ -1347,11 +1347,11 @@ class _EdgeLabelEditorState extends State<_EdgeLabelEditor> {
         focusNode: _focus,
         textAlign: TextAlign.center,
         cursorColor: cs.primary,
-        style: t.textTheme.body.copyWith(fontSize: 11, color: t.fg1),
+        style: context.superTextTheme.body.copyWith(fontSize: 11, color: t.fg1),
         decoration: InputDecoration(
           isDense: true,
           hintText: 'Label…',
-          hintStyle: t.textTheme.body.copyWith(fontSize: 11, color: t.fg4),
+          hintStyle: context.superTextTheme.body.copyWith(fontSize: 11, color: t.fg4),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 8,
             vertical: 2,
@@ -1419,7 +1419,7 @@ class _CanvasSeg<T> extends StatelessWidget {
                 ),
                 child: Text(
                   entry.value,
-                  style: t.textTheme.button.copyWith(
+                  style: context.superTextTheme.button.copyWith(
                     fontSize: 11.5,
                     color: value == entry.key ? Colors.white : t.fg2,
                   ),
@@ -1475,7 +1475,7 @@ class _DataPanel extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'ALL NODES · ${c.nodes.length}',
-                    style: t.textTheme.label.copyWith(
+                    style: context.superTextTheme.label.copyWith(
                       fontSize: 10.5,
                       color: t.fg2,
                     ),
@@ -1570,7 +1570,7 @@ class _DataRowState extends State<_DataRow> {
                       n.label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: t.textTheme.caption.copyWith(
+                      style: context.superTextTheme.caption.copyWith(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: t.fg1,
@@ -1578,7 +1578,7 @@ class _DataRowState extends State<_DataRow> {
                     ),
                     Text(
                       'in ${s.inCount} · out ${s.outCount}${n.note != null ? ' · note' : ''}',
-                      style: t.textTheme.mono.copyWith(
+                      style: context.superTextTheme.mono.copyWith(
                         fontSize: 9.5,
                         color: t.fg4,
                       ),
@@ -1589,7 +1589,7 @@ class _DataRowState extends State<_DataRow> {
               if (n.value != null)
                 Text(
                   mapCompact(n.value!),
-                  style: t.textTheme.mono.copyWith(
+                  style: context.superTextTheme.mono.copyWith(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
                     color: widget.accent,
@@ -1713,7 +1713,7 @@ class _ToastState extends State<_Toast> {
           const SizedBox(width: 7),
           Text(
             widget.message,
-            style: t.textTheme.button.copyWith(fontSize: 12, color: t.bg),
+            style: context.superTextTheme.button.copyWith(fontSize: 12, color: t.bg),
           ),
         ],
       ),
@@ -1778,13 +1778,13 @@ class _SearchFieldState extends State<_SearchField> {
             child: TextField(
               controller: _ctl,
               cursorColor: cs.primary,
-              style: t.textTheme.body.copyWith(fontSize: 12.5, color: t.fg1),
+              style: context.superTextTheme.body.copyWith(fontSize: 12.5, color: t.fg1),
               decoration: InputDecoration(
                 isDense: true,
                 isCollapsed: true,
                 border: InputBorder.none,
                 hintText: 'Search nodes…',
-                hintStyle: t.textTheme.body.copyWith(
+                hintStyle: context.superTextTheme.body.copyWith(
                   fontSize: 12.5,
                   color: t.fg4,
                 ),
@@ -1795,7 +1795,7 @@ class _SearchFieldState extends State<_SearchField> {
           if (has) ...[
             Text(
               '${widget.count ?? 0}',
-              style: t.textTheme.mono.copyWith(fontSize: 10.5, color: t.fg3),
+              style: context.superTextTheme.mono.copyWith(fontSize: 10.5, color: t.fg3),
             ),
             const SizedBox(width: 4),
             GestureDetector(
@@ -1866,7 +1866,7 @@ class _IssuesPanel extends StatelessWidget {
                     summary.isClean
                         ? 'VALIDATION PASSED'
                         : 'ISSUES · ${summary.errors} ERR · ${summary.warnings} WARN · ${summary.infos} INFO',
-                    style: t.textTheme.label.copyWith(fontSize: 10, color: t.fg2),
+                    style: context.superTextTheme.label.copyWith(fontSize: 10, color: t.fg2),
                   ),
                 ),
                 SuperIconButton(icon: Icons.close_rounded, onPressed: onClose),
@@ -1879,7 +1879,7 @@ class _IssuesPanel extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(13, 14, 13, 16),
               child: Text(
                 'No problems found. The diagram is structurally sound.',
-                style: t.textTheme.caption.copyWith(fontSize: 12, color: t.fg3),
+                style: context.superTextTheme.caption.copyWith(fontSize: 12, color: t.fg3),
               ),
             )
           else
@@ -1943,7 +1943,7 @@ class _IssueRowState extends State<_IssueRow> {
               Expanded(
                 child: Text(
                   widget.issue.message,
-                  style: t.textTheme.caption.copyWith(
+                  style: context.superTextTheme.caption.copyWith(
                     fontSize: 11.5,
                     color: t.fg2,
                     height: 1.3,

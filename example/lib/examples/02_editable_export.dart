@@ -48,7 +48,8 @@ class _EditableExportExampleState extends State<EditableExportExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('2 · Editable + Export', style: t.textTheme.heading.copyWith(color: t.fg1)),
+        title: Text('2 · Editable + Export',
+            style: context.superTextTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -59,8 +60,10 @@ class _EditableExportExampleState extends State<EditableExportExample> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Edit the diagram, then use Export → Image / PDF / Word.',
-                      style: t.textTheme.body.copyWith(color: t.fg3)),
+                  Text(
+                      'Edit the diagram, then use Export → Image / PDF / Word.',
+                      style:
+                          context.superTextTheme.body.copyWith(color: t.fg3)),
                   SizedBox(height: context.superTheme.spacing.space6),
                   SuperMap(
                     controller: _controller,

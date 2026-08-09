@@ -73,7 +73,7 @@ class _ControllerDrivenExampleState extends State<ControllerDrivenExample> {
         elevation: 0,
         shape: Border(bottom: BorderSide(color: t.border)),
         iconTheme: IconThemeData(color: t.fg2),
-        title: Text('4 · Controller-driven', style: t.textTheme.heading.copyWith(color: t.fg1)),
+        title: Text('4 · Controller-driven', style: context.superTextTheme.heading.copyWith(color: t.fg1)),
       ),
       body: SafeArea(
         child: Padding(
@@ -101,7 +101,7 @@ class _ControllerDrivenExampleState extends State<ControllerDrivenExample> {
                   ),
                   Text(
                     sel == null ? 'Nothing selected' : 'Selected: ${sel.label}',
-                    style: t.textTheme.caption.copyWith(color: t.fg3),
+                    style: context.superTextTheme.caption.copyWith(color: t.fg3),
                   ),
                 ],
               ),

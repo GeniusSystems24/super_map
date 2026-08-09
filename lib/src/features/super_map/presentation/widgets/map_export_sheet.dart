@@ -124,7 +124,7 @@ class _MapExportSheetState extends State<_MapExportSheet> {
                     Icon(Icons.ios_share_rounded, size: 16, color: cs.primary),
                     const SizedBox(width: 10),
                     Text('Export diagram',
-                        style: t.textTheme.heading.copyWith(fontSize: 15, color: t.fg1)),
+                        style: context.superTextTheme.heading.copyWith(fontSize: 15, color: t.fg1)),
                     const Spacer(),
                     SuperIconButton(
                         icon: Icons.close_rounded,
@@ -168,10 +168,10 @@ class _MapExportSheetState extends State<_MapExportSheet> {
                           const SizedBox(
                               width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
                           const SizedBox(width: 10),
-                          Text('Rendering…', style: t.textTheme.caption.copyWith(color: t.fg3)),
+                          Text('Rendering…', style: context.superTextTheme.caption.copyWith(color: t.fg3)),
                         ])
                       : Text(_error!,
-                          style: t.textTheme.caption.copyWith(color: Theme.of(context).colorScheme.error)),
+                          style: context.superTextTheme.caption.copyWith(color: Theme.of(context).colorScheme.error)),
                 ),
             ],
           ),
@@ -236,8 +236,8 @@ class _ExportOptionState extends State<_ExportOption> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(widget.label,
-                        style: t.textTheme.body.copyWith(fontWeight: FontWeight.w700, color: t.fg1)),
-                    Text(widget.sub, style: t.textTheme.caption.copyWith(color: t.fg3)),
+                        style: context.superTextTheme.body.copyWith(fontWeight: FontWeight.w700, color: t.fg1)),
+                    Text(widget.sub, style: context.superTextTheme.caption.copyWith(color: t.fg3)),
                   ],
                 ),
               ),

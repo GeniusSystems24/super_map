@@ -104,12 +104,12 @@ class MapDetailsPanel extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(node.label,
-                              style: t.textTheme.body
+                              style: context.superTextTheme.body
                                   .copyWith(fontSize: 13.5, fontWeight: FontWeight.w700, color: t.fg1)),
                           if (node.ar != null)
                             Text(node.ar!,
                                 textDirection: TextDirection.rtl,
-                                style: t.textTheme.caption.copyWith(
+                                style: context.superTextTheme.caption.copyWith(
                                     fontFamily: SuperThemeData.of(context).tokens.arabicFont, color: t.fg3)),
                         ],
                       ),
@@ -156,9 +156,9 @@ class MapDetailsPanel extends StatelessWidget {
                     textBaseline: TextBaseline.alphabetic,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('NET', style: t.textTheme.label.copyWith(color: t.fg3)),
+                      Text('NET', style: context.superTextTheme.label.copyWith(color: t.fg3)),
                       Text(mapCompact(stats.net),
-                          style: t.textTheme.mono.copyWith(fontSize: 14, fontWeight: FontWeight.w700, color: t.fg1)),
+                          style: context.superTextTheme.mono.copyWith(fontSize: 14, fontWeight: FontWeight.w700, color: t.fg1)),
                     ],
                   ),
                 ],
@@ -182,7 +182,7 @@ class MapDetailsPanel extends StatelessWidget {
                             child: Text(node.note!,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: t.textTheme.caption.copyWith(fontSize: 11.5, color: t.fg2)),
+                                style: context.superTextTheme.caption.copyWith(fontSize: 11.5, color: t.fg2)),
                           ),
                         ],
                       ),
@@ -268,7 +268,7 @@ class _RefRow extends StatelessWidget {
           child: Text(reference,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: t.textTheme.mono.copyWith(fontSize: 11.5, color: t.fg2)),
+              style: context.superTextTheme.mono.copyWith(fontSize: 11.5, color: t.fg2)),
         ),
       ],
     );
@@ -293,11 +293,11 @@ class _MetaRow extends StatelessWidget {
             child: Text(label.toUpperCase(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: t.textTheme.pill.copyWith(fontSize: 9.5, color: t.fg3)),
+                style: context.superTextTheme.pill.copyWith(fontSize: 9.5, color: t.fg3)),
           ),
           const SizedBox(width: 8),
           Text(value,
-              style: t.textTheme.mono.copyWith(fontSize: 11, color: t.fg1)),
+              style: context.superTextTheme.mono.copyWith(fontSize: 11, color: t.fg1)),
         ],
       ),
     );
@@ -327,7 +327,7 @@ class _StatusPicker extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('STATUS', style: t.textTheme.label.copyWith(color: t.fg3)),
+        Text('STATUS', style: context.superTextTheme.label.copyWith(color: t.fg3)),
         const SizedBox(height: 6),
         Wrap(
           spacing: 6,
@@ -373,7 +373,7 @@ class _StatusSwatch extends StatelessWidget {
             Container(width: 7, height: 7, decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
             const SizedBox(width: 5),
             Text(label,
-                style: t.textTheme.pill.copyWith(
+                style: context.superTextTheme.pill.copyWith(
                     fontSize: 9.5, color: selected ? t.fg1 : t.fg3)),
           ],
         ),
@@ -402,9 +402,9 @@ class _Stat extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label.toUpperCase(), style: t.textTheme.pill.copyWith(fontSize: 9.5, color: t.fg3)),
-          Text(value, style: t.textTheme.mono.copyWith(fontSize: 16, fontWeight: FontWeight.w700, color: t.fg1)),
-          if (sub != null) Text(sub!, style: t.textTheme.mono.copyWith(fontSize: 10, color: t.fg4)),
+          Text(label.toUpperCase(), style: context.superTextTheme.pill.copyWith(fontSize: 9.5, color: t.fg3)),
+          Text(value, style: context.superTextTheme.mono.copyWith(fontSize: 16, fontWeight: FontWeight.w700, color: t.fg1)),
+          if (sub != null) Text(sub!, style: context.superTextTheme.mono.copyWith(fontSize: 10, color: t.fg4)),
         ],
       ),
     );

@@ -64,11 +64,11 @@ class _MapJsonSheetState extends State<_MapJsonSheet> {
                   children: [
                     Icon(Icons.data_object_rounded, size: 17, color: cs.primary),
                     const SizedBox(width: 10),
-                    Text('Diagram JSON', style: t.textTheme.heading.copyWith(fontSize: 15, color: t.fg1)),
+                    Text('Diagram JSON', style: context.superTextTheme.heading.copyWith(fontSize: 15, color: t.fg1)),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text('· edit & apply, or copy',
-                          style: t.textTheme.caption.copyWith(color: t.fg3)),
+                          style: context.superTextTheme.caption.copyWith(color: t.fg3)),
                     ),
                     SuperIconButton(icon: Icons.close_rounded, onPressed: () => Navigator.of(context).pop()),
                   ],
@@ -83,7 +83,7 @@ class _MapJsonSheetState extends State<_MapJsonSheet> {
                     maxLines: null,
                     expands: true,
                     textAlignVertical: TextAlignVertical.top,
-                    style: t.textTheme.mono.copyWith(fontSize: 12, color: t.fg1, height: 1.6),
+                    style: context.superTextTheme.mono.copyWith(fontSize: 12, color: t.fg1, height: 1.6),
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),

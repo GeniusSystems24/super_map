@@ -46,13 +46,28 @@ dependencies:
 import 'package:super_map/super_map.dart';
 ```
 
-Register the theme extension on your `ThemeData` (most common omission — without
-it colors fall back to defaults):
+Use `SuperMaterialThemeData` from **super_core 3.3.0+**. Typography is mandatory and must be supplied as `SuperTextTheme`:
 
 ```dart
-theme:     ThemeData(brightness: Brightness.light, extensions: [SuperThemeData.light]),
-darkTheme: ThemeData(brightness: Brightness.dark,  extensions: [SuperThemeData.dark]),
+final typography = SuperTextTheme();
+
+theme: SuperMaterialThemeData.light(
+  textTheme: typography,
+  primaryTextTheme: typography,
+),
+darkTheme: SuperMaterialThemeData.dark(
+  textTheme: typography,
+  primaryTextTheme: typography,
+),
 ```
+
+### super_core 3.3.0 migration rules
+
+- Read colors, spacing, sizing, semantic state and tokens from `context.superTheme`.
+- Read typography from `context.superTextTheme` (or `SuperMaterialThemeData.of(context).textTheme`).
+- Never generate `context.superTheme.textTheme`, `SuperThemeData.of(context).textTheme`, or any `.textTheme` access on `SuperThemeData`.
+- `SuperMaterialThemeData.light` and `.dark` require both `textTheme` and `primaryTextTheme`, each of type `SuperTextTheme`.
+- Do not reintroduce `_familyOf`-style inference. A font family embedded in `SuperTextTheme` is not implicitly copied into `SuperTokensData`; use the explicit `fontFamily` argument only when token-level font metadata must be overridden.
 
 A `Material` ancestor must be in scope (a `Scaffold` is fine) — the inline
 rename field and tooltips need it.
