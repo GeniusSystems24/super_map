@@ -15,12 +15,12 @@ import 'package:flutter/material.dart';
 import 'package:super_map/super_map.dart';
 
 /// A settlement graph with intentional integrity problems.
-final MapGraph brokenGraph = MapGraph(
+const MapGraph brokenGraph = MapGraph(
   id: 'broken-settlement',
   title: 'Inter-Account Settlement [TR-9042]',
   currency: 'SAR',
-  legend: const [MapNodeKind.party, MapNodeKind.process, MapNodeKind.account],
-  nodes: const [
+  legend: [MapNodeKind.party, MapNodeKind.process, MapNodeKind.account],
+  nodes: [
     MapNode(id: 'src', x: 0, y: 0, label: 'Source Account', kind: MapNodeKind.account, value: 10000),
     MapNode(id: 'clear', x: 320, y: 0, label: 'Clearing', kind: MapNodeKind.process),
     MapNode(id: 'dst', x: 640, y: -120, label: 'Destination', kind: MapNodeKind.account),
@@ -28,7 +28,7 @@ final MapGraph brokenGraph = MapGraph(
     // Orphan: connected to nothing.
     MapNode(id: 'orphan', x: 320, y: 320, label: 'Unlinked Note', kind: MapNodeKind.leaf),
   ],
-  edges: const [
+  edges: [
     // 10,000 in…
     MapEdge(id: 'e1', from: 'src', to: 'clear', value: 10000),
     // …but only 9,400 out → clearing is unbalanced by 600.

@@ -21,19 +21,19 @@ class AutoLayoutExample extends StatefulWidget {
 class _AutoLayoutExampleState extends State<AutoLayoutExample> {
   // A messy DAG — coordinates are intentionally jumbled.
   late final SuperMapController _controller = SuperMapController(
-    graph: MapGraph(
+    graph: const MapGraph(
       id: 'scrambled-o2c',
       title: 'Order to Cash (scrambled)',
       currency: 'SAR',
-      legend: const [MapNodeKind.process, MapNodeKind.document, MapNodeKind.payment],
-      nodes: const [
+      legend: [MapNodeKind.process, MapNodeKind.document, MapNodeKind.payment],
+      nodes: [
         MapNode(id: 'order', x: 420, y: 280, label: 'Sales Order', kind: MapNodeKind.document),
         MapNode(id: 'pick', x: 80, y: 60, label: 'Pick & Pack', kind: MapNodeKind.process),
         MapNode(id: 'ship', x: 700, y: 120, label: 'Ship', kind: MapNodeKind.process),
         MapNode(id: 'invoice', x: 200, y: 360, label: 'Invoice', kind: MapNodeKind.document, value: 8400),
         MapNode(id: 'receipt', x: 560, y: 420, label: 'Cash Receipt', kind: MapNodeKind.payment, value: 8400),
       ],
-      edges: const [
+      edges: [
         MapEdge(id: 'e1', from: 'order', to: 'pick'),
         MapEdge(id: 'e2', from: 'pick', to: 'ship'),
         MapEdge(id: 'e3', from: 'ship', to: 'invoice'),

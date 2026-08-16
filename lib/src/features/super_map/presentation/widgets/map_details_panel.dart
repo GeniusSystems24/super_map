@@ -126,7 +126,7 @@ class MapDetailsPanel extends StatelessWidget {
                     if (!node.status.isNone)
                       StatusPill(node.status.tag, tone: _statusTone(node.status)),
                     if (node.locked)
-                      StatusPill('Locked', tone: PillTone.neutral),
+                      const StatusPill('Locked', tone: PillTone.neutral),
                   ],
                 ),
                 if (node.ref != null) ...[

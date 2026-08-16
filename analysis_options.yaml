@@ -7,6 +7,8 @@ analyzer:
   errors:
     deprecated_member_use: ignore
     invalid_annotation_target: ignore
+    # منع أي استيراد مباشر لملفات src/ من خارج المكتبة
+    implementation_imports: error
 
 linter:
   rules:

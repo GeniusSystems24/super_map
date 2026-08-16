@@ -142,7 +142,7 @@ class _MapNodeCardState extends State<MapNodeCard> {
       ],
     );
 
-    Widget content = widget.editing ? _editor(t, accent) : _label(t, accent);
+    final Widget content = widget.editing ? _editor(t, accent) : _label(t, accent);
 
     final card = AnimatedOpacity(
       duration: SuperThemeData.of(context).tokens.durBase,

@@ -12,17 +12,17 @@ import 'package:flutter/material.dart';
 import 'package:super_map/super_map.dart';
 
 import 'custom_map_demo.dart';
-import 'examples/01_minimal_read.dart';
-import 'examples/02_editable_export.dart';
-import 'examples/03_styled_features.dart';
-import 'examples/04_controller_driven.dart';
-import 'examples/05_json_driven.dart';
-import 'examples/06_erp_workflow.dart';
-import 'examples/07_validation.dart';
-import 'examples/08_auto_layout.dart';
-import 'examples/09_csv_export.dart';
-import 'examples/10_search.dart';
-import 'examples/11_audit_locks.dart';
+import 'examples/minimal_read.dart';
+import 'examples/editable_export.dart';
+import 'examples/styled_features.dart';
+import 'examples/controller_driven.dart';
+import 'examples/json_driven.dart';
+import 'examples/erp_workflow.dart';
+import 'examples/validation.dart';
+import 'examples/auto_layout.dart';
+import 'examples/csv_export.dart';
+import 'examples/search.dart';
+import 'examples/audit_locks.dart';
 
 void main() => runApp(const ExampleApp());
 
@@ -233,7 +233,7 @@ class _DemoCard extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color:
-                      Color.alphaBlend(cs.primary.withOpacity(0.14), t.surface),
+                      Color.alphaBlend(cs.primary.withValues(alpha:0.14), t.surface),
                   borderRadius:
                       BorderRadius.circular(context.superTheme.spacing.radiusControl),
                 ),

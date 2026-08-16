@@ -168,7 +168,7 @@ abstract final class MapExporter {
   }) {
     // EMU = 914400 per inch; size the picture to ~6.3in wide, preserving ratio.
     const maxW = 5760000; // ~6.3in in EMU
-    final emuW = maxW;
+    const emuW = maxW;
     final emuH = (maxW * height / (width == 0 ? 1 : width)).round();
 
     String esc(String s) => s
@@ -220,7 +220,7 @@ abstract final class MapExporter {
     final archive = Archive();
     void add(String name, List<int> bytes) =>
         archive.addFile(ArchiveFile(name, bytes.length, bytes));
-    final enc = const Utf8Encoder();
+    const enc = Utf8Encoder();
     add('[Content_Types].xml', enc.convert(contentTypes));
     add('_rels/.rels', enc.convert(rootRels));
     add('word/document.xml', enc.convert(document));

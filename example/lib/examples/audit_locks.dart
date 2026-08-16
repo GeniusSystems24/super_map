@@ -21,12 +21,12 @@ class AuditLocksExample extends StatefulWidget {
 
 class _AuditLocksExampleState extends State<AuditLocksExample> {
   late final SuperMapController _controller = SuperMapController(
-    graph: MapGraph(
+    graph: const MapGraph(
       id: 'ledger-locks',
       title: 'General Ledger — March',
       currency: 'SAR',
-      legend: const [MapNodeKind.document, MapNodeKind.account],
-      nodes: const [
+      legend: [MapNodeKind.document, MapNodeKind.account],
+      nodes: [
         MapNode(
           id: 'open',
           x: 0,
@@ -69,7 +69,7 @@ class _AuditLocksExampleState extends State<AuditLocksExample> {
           value: 126220,
         ),
       ],
-      edges: const [
+      edges: [
         MapEdge(id: 'e1', from: 'open', to: 'close', value: 120000),
         MapEdge(id: 'e2', from: 'jv1', to: 'close', value: 5240),
         MapEdge(id: 'e3', from: 'jv2', to: 'close', value: 980),

@@ -15,12 +15,12 @@ import 'package:flutter/material.dart';
 import 'package:super_map/super_map.dart';
 
 /// A small opening-journal-entry approval flow, GeniusLink-style.
-final MapGraph erpWorkflowGraph = MapGraph(
+const MapGraph erpWorkflowGraph = MapGraph(
   id: 'jv-approval',
   title: 'Opening Journal Entry قيد افتتاحي',
   currency: 'SAR',
-  legend: const [MapNodeKind.document, MapNodeKind.approval, MapNodeKind.account],
-  nodes: const [
+  legend: [MapNodeKind.document, MapNodeKind.approval, MapNodeKind.account],
+  nodes: [
     MapNode(
       id: 'draft',
       x: 0,
@@ -67,7 +67,7 @@ final MapGraph erpWorkflowGraph = MapGraph(
       meta: {'Posted': '2024-03-14', 'Period': 'FY24-Q1'},
     ),
   ],
-  edges: const [
+  edges: [
     MapEdge(id: 'e1', from: 'draft', to: 'review', value: 5240),
     MapEdge(id: 'e2', from: 'review', to: 'approved'),
     MapEdge(id: 'e3', from: 'approved', to: 'posted', value: 5240),
